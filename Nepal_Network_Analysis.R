@@ -463,7 +463,7 @@ names<-c("ssid","site_name","survey_round","survey_date","zone","district",
          "idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc",
          "idp2_origin_ward","idp_hh")
 dt_data<-dt_data[,names]
-write.csv(dt_data,file="/Users/georgidgospodinov/Desktop/Dropbox/UN_project/georgi_no_touchy/data/Nepal_DTM_Network_model1.csv")
+write.csv(dt_data,file=paste0(DIR,"Nepal_DTM_Network_model1.csv"))
 
 
 # COLUMN NAMES FOR agency_relief.csv ARE:
