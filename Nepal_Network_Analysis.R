@@ -631,9 +631,10 @@ plot(gd_c,
      edge.width=0.5*sqrt(E(gd_c)$weight),edge.arrow.size=1.0,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF=25% quantile
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 25% quantile
 cut25 <- quantile(as.vector(dtm[dtm>0]),0.25)
-gd_f<-filter(cut25,gd,V(gd)$name)
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+gd_f <- filter(cut25,gd,V(gd)$name)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -644,21 +645,10 @@ plot(gd_f,
      edge.width=0.25*sqrt(E(gd_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
-# DROP LOOPS
-gd_f1<-drop_loops(gd_f)
-
-
-# DISPLAY
-plot(gd_f1,
-     layout=layout.fruchterman.reingold(gd_f1, niter=200, area=2000*vcount(gd_f1)),
-     vertex.color=V(gd_f1)$color,vertex.size=10,vertex.label=V(gd_f1)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.25*sqrt(E(gd_f1)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
-
-
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 50% quantile
 cut50 <- quantile(as.vector(dtm[dtm>0]),0.5)
-gd_f<-filter(cut50,gd,V(gd)$name)
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+gd_f <- filter(cut50,gd,V(gd)$name)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -669,17 +659,18 @@ plot(gd_f,
      edge.width=0.2*sqrt(E(gd_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
-# DROP LOOPS
-gd_f1<-drop_loops(gd_f)
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 75% quantile
+cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+gd_f <- filter(cut75,gd,V(gd)$name)
 
 
-# DISPLAY
-plot(gd_f1,
-     layout=layout.fruchterman.reingold(gd_f1, niter=200, area=2000*vcount(gd_f1)),
-     vertex.color=V(gd_f1)$color,vertex.size=10,vertex.label=V(gd_f1)$name, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=1, 
-     edge.width=0.3*sqrt(E(gd_f1)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
-
+# DISPLAY THE EDGE-FILTERED GRAPH
+plot(gd_f,
+     layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
+     vertex.color=V(gd_f)$color,vertex.size=8,vertex.label=V(gd_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.9, 
+     edge.width=0.2*sqrt(E(gd_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 
