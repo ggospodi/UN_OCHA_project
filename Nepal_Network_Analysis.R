@@ -586,7 +586,7 @@ gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k])) 
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k]<-"green"
@@ -599,7 +599,7 @@ V(gd)$name <- vdc
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
-gd <- drop_isolated(gd,vdc)
+gd <- drop_isolated(gd,V(gd)$name)
 plot(gd,
      layout=layout.fruchterman.reingold(gd, niter=20, area=2000*vcount(gd)),
      vertex.color=V(gd)$color,vertex.size=9, vertex.label=V(gd)$name,
@@ -620,7 +620,7 @@ plot(gd,
 
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-gd_c<-giant_comp(gd,vdc)
+gd_c<-giant_comp(gd,V(gd)$name)
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
@@ -633,15 +633,15 @@ plot(gd_c,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF=25% quantile
 cut25 <- quantile(as.vector(dtm[dtm>0]),0.25)
-gd_f<-filter(cut25,gd,vdc)
+gd_f<-filter(cut25,gd,V(gd)$name)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
-     vertex.color=V(gd_f)$color,vertex.size=7,vertex.label=V(gd_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.9, 
-     edge.width=0.2*sqrt(E(gd_f)$weight),edge.arrow.size=0.5,edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color=V(gd_f)$color,vertex.size=10,vertex.label=V(gd_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+     edge.width=0.25*sqrt(E(gd_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 # DROP LOOPS
@@ -652,13 +652,13 @@ gd_f1<-drop_loops(gd_f)
 plot(gd_f1,
      layout=layout.fruchterman.reingold(gd_f1, niter=200, area=2000*vcount(gd_f1)),
      vertex.color=V(gd_f1)$color,vertex.size=10,vertex.label=V(gd_f1)$name, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=1, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.25*sqrt(E(gd_f1)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 50% quantile
 cut50 <- quantile(as.vector(dtm[dtm>0]),0.5)
-gd_f<-filter(cut50,gd,vdc)
+gd_f<-filter(cut50,gd,V(gd)$name)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
