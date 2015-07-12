@@ -1,6 +1,6 @@
 # Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "June 30, 2015"
+# date: "July 11, 2015"
 # 
 # Data Sources:
 #
@@ -28,7 +28,25 @@
 library(igraph)
 library(RColorBrewer)
 
-REMOTE_DIR <-"/Users/georgidgospodinov/Desktop/Dropbox/UN_project/georgi_no_touchy/data/"
+
+
+
+# TO DO:
+
+# ABSTRACT FUNCITONS SO TAHT GRAPH COLOR IS ASSIGNED TO SOURCES/SINKS
+
+
+
+
+
+DIR <-"/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
+
+
+
+
+
+
+
 
 # SECTION 1: Data Analysis and Nepal Displacement Tracking Network Construction
 #
@@ -294,38 +312,33 @@ drop_loops <- function(graph){
 
 
 # DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
-filter <- function(cutoff,edge_matrix,vertex_names) {
+filter <- function(cutoff,graph,vertex_names) {
+  
+  g <- graph
+  
   # set the cut-off
   cut <- cutoff
-  adj <- edge_matrix
+  adj <- get.adjacency(graph)
   adj[adj<cut] <- 0
   adj_0 <- adj
   adj_0[adj_0>0] <- 1
   
-  # define the filtered graph
-  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
-  
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  V(g_f)$name <- vertex_names[v_g_f]
   
-  # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- rep("green",length(v_g_f))
-  for (k in 1:length(v_g_f)){
-    if(sum(adj_0[,v_g_f[k]])>0){
-      V(g_f)$color[k] <- "SkyBlue2"
-    }
-  }
+  # filter names and color
+  V(g_f)$name <- vertex_names[v_g_f]
+  V(g_f)$color <- V(g)$color[v_g_f]
   return(g_f)
 }
 
 
 # DEFINE DEGREE FILTRATION FUNCTION FOR THE NETWORKS
-filter_deg <- function(cutoff,edge_matrix,vertex_names) {
+filter_deg <- function(cutoff,graph,vertex_names) {
   # set the cut-off
   cut <- cutoff
-  adj <- edge_matrix
+  adj <- get.adjacency(graph)
   adj_0 <- adj
   adj_0[adj_0>0] <- 1
   for (i in 1:dim(adj)[1]){
@@ -339,25 +352,17 @@ filter_deg <- function(cutoff,edge_matrix,vertex_names) {
   
   # define the filtered graph
   g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
-  
+ 
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- rep("green",length(v_g_f))
-  for (k in 1:length(v_g_f)){
-    if(sum(adj_0[,v_g_f[k]])>0){
-      V(g_f)$color[k] <- "SkyBlue2"
-    }
-  }
+  V(g_f)$color <- V(g_f)$color[v_g_f]
+  
   return(g_f)
 }
-
-
-
-
 
 
 
@@ -375,6 +380,14 @@ giant_comp <- function(adj_matrix, vertex_names){
   
   # define the giant component graph
   g <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
+  for (k in 1:length(vertex_names)){
+    o_count <- length(which(dt_data$idp_origin_vdc==vertex_names[k])) 
+    d_count <- length(which(dt_data$vdc==vertex_names[k]))
+    if(o_count>d_count){
+      V(g)$color[k]<-"green"
+    } 
+  }
+  
   
   # filter to only include the giant component
   g_f <- delete.vertices(graph,V(graph)[vertices_complement])
@@ -382,18 +395,14 @@ giant_comp <- function(adj_matrix, vertex_names){
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- rep("green",length(v_g_f))
-  for (k in 1:length(v_g_f)){
-    if(sum(adj_0[,k])>0){
-      V(g_f)$color[k] <- "SkyBlue2"
-    }
-  }
+  V(g_f)$color <- V(g_f)$color[v_g_f]
+  
   return(g_f)
 }
 
 
 # LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
-centroids<-read.csv(paste0(REMOTE_DIR,"centroids.csv"))
+centroids<-read.csv(paste0(DIR,"centroids.csv"))
 
 
 # Attempts to call the file directly from online HDX server:
@@ -404,7 +413,7 @@ centroids<-read.csv(paste0(REMOTE_DIR,"centroids.csv"))
 
 
 # READ IN THE DISPLACEMENT FILE DATA
-dt_data<-read.csv(paste0(REMOTE_DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
+dt_data<-read.csv(paste0(DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
 
 
 # SET VAIRABLE NAMES THAT ARE SHORTER AND DO NOT CONTAIN SPACES AND OTHER SYMBOLS
@@ -475,12 +484,12 @@ write.csv(dt_data,file="/Users/georgidgospodinov/Desktop/Dropbox/UN_project/geor
 
 
 # COLUMN NAMES FOR agency_relief.csv ARE:
-aid_data<-read.csv(paste0(REMOTE_DIR,"agency_relief.csv"), sep=",")
+aid_data<-read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
 colnames(aid_data)<-c("district_code","vdc_code","impl_agency","src_agency","district","vdc")
 
 
 # READ IN DISPLACEMENT DATA
-dt_data<-read.csv(paste0(REMOTE_DIR,"Nepal_DTM_Network_model1.csv"))
+dt_data<-read.csv(paste0(DIR,"Nepal_DTM_Network_model1.csv"))
 dt_data<-dt_data[,2:dim(dt_data)[2]]
 
 
@@ -541,6 +550,34 @@ for (i in 1:length(vdc)){
 
 # BUILD THE DIRECTED WEIGHTED VDC NETWORK
 gv<-graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
+
+
+
+
+
+
+
+
+
+
+
+V(g)$color<-rep("SkyBlue2",length(vertex_names))
+for (k in 1:length(vertex_names)){
+  o_count <- length(which(dt_data$idp_origin_vdc==vertex_names[k])) 
+  d_count <- length(which(dt_data$vdc==vertex_names[k]))
+  if(o_count>d_count){
+    V(g)$color[k]<-"green"
+  } 
+}
+
+
+
+
+
+
+
+
+
 
 
 # COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
