@@ -279,12 +279,10 @@ drop_isolated <- function(graph,vertex_names) {
 
   # get the definitions
   g <- graph
-  adj_0 <- get.adjacency(g)
   
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  adj_0[adj_0>0] <- 1
   
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
@@ -379,7 +377,7 @@ giant_comp <- function(graph, vertex_names){
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- V(g_f)$color[v_g_f]
+  V(g_f)$color <- V(g)$color[v_g_f]
   
   return(g_f)
 }
@@ -533,14 +531,14 @@ for (i in 1:length(vdc)){
 
 
 # BUILD THE DIRECTED WEIGHTED VDC NETWORK
-gv<-graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
+gv <- graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
 
 
 # COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
-V(gv)$color<-rep("SkyBlue2",length(vertex_names))
-for (k in 1:length(vertex_names)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vertex_names[k])) 
-  d_count <- length(which(dt_data$vdc==vertex_names[k]))
+V(gv)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k])) 
+  d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gv)$color[k]<-"green"
   } 
@@ -548,7 +546,7 @@ for (k in 1:length(vertex_names)){
 
 
 # SET THE VERTEX LABELS
-V(gv)$name<-vdc
+V(gv)$name <- vdc
 
 
 # PLOT THE VDC DISPLACEMENT TRACKING GRAPH
@@ -561,7 +559,7 @@ V(gv)$name<-vdc
 
 
 # DROP ISOLATED VERTICES (NO DISPLACEMENT)
-gv<-drop_isolated(gv,vdc)
+gv <- drop_isolated(gv,vdc)
 plot(gv,
      layout=layout.fruchterman.reingold(gv, niter=20, area=2000*vcount(gv)),
      vertex.color=V(gv)$color,vertex.size=9, vertex.label=V(gv)$name,
@@ -582,29 +580,31 @@ plot(gv,
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-gd<-graph.adjacency(dtm,mode="directed",weighted=TRUE)
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 
 
-# SET EDGE COLORS
-V(gd)$color<-rep("green",length(vdc))
+# SET VERTEX COLORS
+V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  if(is.element(vdc[k],vdcs)){
-    V(gd)$color[k]<-"SkyBlue2"
-  }  
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k])) 
+  d_count <- length(which(dt_data$vdc==vdc[k]))
+  if(o_count>d_count){
+    V(gd)$color[k]<-"green"
+  } 
 }
 
 
 # SET THE VERTEX LABELS
-V(gd)$name<-vdc
+V(gd)$name <- vdc
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
-gd<-drop_isolated(vdc_m,vdc)
+gd <- drop_isolated(gd,vdc)
 plot(gd,
      layout=layout.fruchterman.reingold(gd, niter=20, area=2000*vcount(gd)),
      vertex.color=V(gd)$color,vertex.size=9, vertex.label=V(gd)$name,
      vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-     edge.width=0.3*(E(gd)$weight),edge.arrow.size=0.7,edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.2*sqrt(E(gd)$weight),edge.arrow.size=0.7,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 # DROP LOOPS ONLY VERTICES AS WELL 
@@ -616,11 +616,11 @@ plot(gd,
      layout=layout.fruchterman.reingold(gd, niter=20, area=2000*vcount(gd)),
      vertex.color=V(gd)$color,vertex.size=9, vertex.label=V(gd)$name,
      vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-     edge.width=2*(E(gd)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.3*sqrt(E(gd)$weight),edge.arrow.size=0.7,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-gd_c<-giant_comp(dtm,vdc)
+gd_c<-giant_comp(gd,vdc)
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
@@ -628,23 +628,25 @@ plot(gd_c,
      layout=layout.fruchterman.reingold(gd_c, niter=200, area=2000*vcount(gd_c)),
      vertex.color=V(gd_c)$color,vertex.size=12,vertex.label=V(gd_c)$name, 
      vertex.label.color="black", vertex.label.font=2, vertex.label.cex=1, 
-     edge.width=0.2*sqrt(E(gd_c)$weight),edge.arrow.size=0.7,edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.5*sqrt(E(gd_c)$weight),edge.arrow.size=1.0,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF=25% quantile
 cut25 <- quantile(as.vector(dtm[dtm>0]),0.25)
-gd_f<-filter(cut25,dtm,vdc)
+gd_f<-filter(cut25,gd,vdc)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
-     vertex.color=V(gd_f)$color,vertex.size=5,vertex.label=V(gd_f)$name, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
+     vertex.color=V(gd_f)$color,vertex.size=7,vertex.label=V(gd_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.9, 
      edge.width=0.2*sqrt(E(gd_f)$weight),edge.arrow.size=0.5,edge.curved=TRUE,edge.color=gray.colors(1))
+
 
 # DROP LOOPS
 gd_f1<-drop_loops(gd_f)
+
 
 # DISPLAY
 plot(gd_f1,
@@ -656,14 +658,14 @@ plot(gd_f1,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 50% quantile
 cut50 <- quantile(as.vector(dtm[dtm>0]),0.5)
-gd_f<-filter(cut50,dtm,vdc)
+gd_f<-filter(cut50,gd,vdc)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
      vertex.color=V(gd_f)$color,vertex.size=8,vertex.label=V(gd_f)$name, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.9, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.9, 
      edge.width=0.2*sqrt(E(gd_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
@@ -683,6 +685,7 @@ plot(gd_f1,
 
 # AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
 
+
 # CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
 aid_data$vdc <- trim(as.character(aid_data$vdc))
 aid_data$impl_agency<-trim(as.character(aid_data$impl_agency))
@@ -696,6 +699,27 @@ aid_data<-aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
 ag<-unique(aid_data$impl_agency)
 vd<-unique(aid_data$vdc)
 all<-union(ag,vd)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
