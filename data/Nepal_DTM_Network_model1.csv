@@ -1,0 +1,146 @@
+"","ssid","site_name","survey_round","survey_date","zone","district","vdc","lat","lon","idp_origin_zone","idp_origin_district","idp_origin_vdc","idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc","idp2_origin_ward","idp_hh"
+"4","2","Balambu","2","21/05/2015","Bagmati","Kathmandu","","27.4121","85.1436","Bagmati","Kathmandu","Balambu","17","","","","",30
+"5","4","Ratna Park","2","30/04/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7029","85.3152","Bagmati","Kathmandu","Kathmandu Metropolitan","","Bagmati","Kathmandu","Kathmandu Metropolitan","",33
+"6","5","Dasrath stadium","2","21/05/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.695","85.315","Bagmati","Kathmandu","Kathmandu Metropolitan","","Bagmati","Kathmandu","Kathmandu Metropolitan","",130
+"7","7","Narayanchour","2","25/04/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7147","85.3256","Bagmati","Kathmandu","Kathmandu Metropolitan","Nadal , Jamalpokhari , bhatbhateni","Bagmati","Kathmandu","Kathmandu Metropolitan","",188
+"8","10","Halchowk (APF HQ)","2","25/04/2015","Bagmati","Kathmandu","","27.721417","85.286753","Bagmati","Sindhupalchok","Tatopani","","Bagmati","Kathmandu","Kathmandu Metropolitan","Kathmadnu",136
+"9","11","Airport Golf 1","2","21/05/2015","Bagmati","Kathmandu","","27.7028","85.3542","Bagmati","Kathmandu","Kathmandu Metropolitan","8","","","","",156
+"10","13","Hyatt Regency Hotel","2","21/05/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7201","85.3541","Janakpur","Dolakha","","","Sagarmatha","Solukhumbu","","",192
+"11","14","Gokarna Golf Club Site","2","21/05/2015","Bagmati","Kathmandu"," Gokarneshwar ","27.7272","85.3953","Narayani","Makwanpur","Hetauda Municipality","Na","Bagmati","Sindhupalchok","Chautara","Na",38
+"12","15","Balmiki Vidyapith","2","21/05/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7025","85.3207","Bagmati","Kathmandu","Kathmandu Metropolitan","31","Bagmati","Kathmandu","Kathmandu Metropolitan","Ward no.31",20
+"13","16","National Academy","2","21/05/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7089","85.3208","Bagmati","Kathmandu","","","","","","",15
+"14","17","Election Commision Office","2","22/05/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7121","85.3145","Bagmati","Kathmandu","Kathmandu Metropolitan","Kathmandu Metropolitan","Bagmati","Kathmandu","Kathmandu Metropolitan","29",97
+"15","18","Social Welfare Council","2","21/05/2015","Bagmati","Kathmandu"," Kathmandu Metropolitan ","27.7166","85.3153","Bagmati","Kathmandu","Kathmandu Metropolitan","27","Bagmati","Kathmandu","Kathmandu Metropolitan","Na",91
+"16","20","Sallaghari Tinkune","2","21/05/2015","Bagmati","Bhaktapur","Katunje","27.6732","85.4073","Bagmati","Sindhupalchok","Gati","8,9","Bagmati","Sindhupalchok","Mangkha","1",20
+"17","21","Padma High School","2","25/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6721","85.4284","Bagmati","Bhaktapur","Bhaktapur Municipality","","Bagmati","Bhaktapur","Bhaktapur Municipality","",75
+"18","22","Kamal Binayak (Sarswoti English School)","2","23/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6756","85.4367","Bagmati","Bhaktapur","Bhaktapur Municipality","1,2,3,4","","","","",180
+"19","23","Adarsa Azad Higher Secondary School","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6677","85.432","Bagmati","Bhaktapur","Bhaktapur Municipality","","","","","",22
+"20","24","Basu School","2","21/05/2015","Bagmati","Bhaktapur","Jhaukhel","27.6784","85.4293","Bagmati","Bhaktapur","Bhaktapur Municipality","10","","","","",7
+"21","25","Bhaktapur Bahumukhi Campus","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.67","85.4217","Bagmati","Bhaktapur","Bhaktapur Municipality","15,16,17","","","","",30
+"22","26","Bhelukhel","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.669","85.4302","Bagmati","Bhaktapur","Bhaktapur Municipality","11/12/15","Bagmati","Sindhupalchok","","",50
+"23","29","Khwopa College","2","24/05/2015","Bagmati","Bhaktapur","Jhaukhel","27.6775","85.4324","Bagmati","Bhaktapur","Bhaktapur Municipality","5,9,10","Bagmati","Bhaktapur","Bhaktapur Municipality","5",90
+"24","30","Khwopa Engineering College","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6709","85.4398","Bagmati","Bhaktapur","Bhaktapur Municipality","6 ,5","","","","",90
+"25","32","Maheshwori Football Ground","2","24/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6699","85.4361","Bagmati","Bhaktapur","Bhaktapur Municipality","6,2,7,","Bagmati","Bhaktapur","Bhaktapur Municipality","8",300
+"26","33","Nasamana","2","24/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6706","85.4273","Bagmati","Bhaktapur","Bhaktapur Municipality","13","Bagmati","Bhaktapur","Bhaktapur Municipality","12",14
+"27","34","Suryamadi","2","24/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6734","85.4375","Bagmati","Bhaktapur","Bhaktapur Municipality","1,3","","","","",70
+"28","35","Pottery Square","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6699","85.4279","Bagmati","Bhaktapur","Bhaktapur Municipality","12","","","","",25
+"29","37","Vidyarthi Niketan","2","24/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6722","85.4297","Bagmati","Bhaktapur","Bhaktapur Municipality","8.11","","","","",72
+"30","38","Saraswati Vidyagriha","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.6756","85.4368","Bagmati","Bhaktapur","Bhaktapur Municipality","15,17","","","","",90
+"31","40","Lagankhel Football Ground ","2","25/05/2015","Bagmati","Lalitpur"," Lalitpur Sub Metropolitan ","27.6648","85.321","Janakpur","Sindhuli","Amale","","","","","",27
+"32","41","Bagmati Corridor 1","2","25/05/2015","Bagmati","Lalitpur"," Lalitpur Sub Metropolitan ","27.6757","85.2946","Bagmati","Kathmandu","Indrayani","","","","","",60
+"33","42","Jawalakhel Ground","2","21/05/2015","Bagmati","Lalitpur","","27.6725","85.3126","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","","","","","",20
+"34","43","NARC","2","25/05/2015","Bagmati","Lalitpur","","27.6521","85.3252","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","14","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","15",12
+"35","60","Lalitpur Municipality Office","2","21/05/2015","Bagmati","Lalitpur"," Lalitpur ","27.6762","85.3175","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","3","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","22",30
+"36","61","Madan Smarak","2","21/05/2015","Bagmati","Lalitpur"," Lalitpur ","27.6766","85.3184","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","21","","","","",100
+"37","66","Padma Kanya Campus","2","21/05/2015","Bagmati","Kathmandu"," Kathmandu ","27.7064","85.3211","Bagmati","Kathmandu","Kathmandu Metropolitan","","","","","",20
+"38","88","Khatritar 1","2","22/05/2015","Bagmati","Kathmandu","Manmaijn","27.759774","85.309893","Bagmati","Kathmandu","Kathmandu Metropolitan","9","","","","",9
+"39","89","Khatritar 2","2","25/05/2015","Bagmati","Kathmandu","Manmaijn","27.759824","85.308511","Bagmati","Kathmandu","Kathmandu Metropolitan","9","Bagmati","Kathmandu","Kathmandu Metropolitan","",8
+"40","91","Vinayak Chowk","2","22/05/2015","Bagmati","Kathmandu","Tokhasaraswati","27.753967","85.317322","Bagmati","Kathmandu","Kathmandu Metropolitan","2","","","","",10
+"41","93","Bandeshwor School, Jhor","2","22/05/2015","Bagmati","Kathmandu","Tokhasaraswati","27.77354","85.337241","Bagmati","Kathmandu","Tokhachandeshwari","2","","","","",7
+"42","94","Jhor","2","25/04/2015","Bagmati","Kathmandu","Tokhasaraswati","27.770171","85.329807","Bagmati","Kathmandu","Tokhachandeshwari","2","Bagmati","Kathmandu","","2",4
+"43","95","Balkumari School, Tarkeshwor","2","22/05/2015","Bagmati","Kathmandu","Sanga","27.786802","85.31763","Bagmati","Kathmandu","Kathmandu Metropolitan","Tarkeshwar 2","","","","",2
+"44","96","Tarkeshwor","2","22/05/2015","Bagmati","Kathmandu","Sanga","27.7834","85.317609","Bagmati","","","3","Bagmati","","","",30
+"45","97","Buspark, Chowk","2","22/05/2015","Bagmati","Kathmandu","Sangkhu Suntol","27.72758","85.461942","Bagmati","Kathmandu","Kathmandu Metropolitan","Shankarapur, 10","Bagmati","","","",20
+"46","98","Suntole 3","2","25/04/2015","Bagmati","Kathmandu","Sangkhu Suntol","27.728669","85.462851","Bagmati","Kathmandu","Sangkhu Suntol","Ward 8","","","","",15
+"47","99","Suntole 1","2","25/04/2015","Bagmati","Kathmandu","Sangkhu Suntol","27.727414","85.46434","Bagmati","Kathmandu","Sangkhu Suntol","8","","","","",50
+"48","101","Kulaltar","2","22/05/2015","Bagmati","Kathmandu","Indrayani","27.730094","85.443872","Bagmati","Kathmandu","Indrayani","8","","","","",40
+"49","102","Bajrayogini","2","22/05/2015","Bagmati","Kathmandu","Sangkhu Bajrayogini","27.732416","85.464394","Bagmati","Kathmandu","Pukulachhi","11","","","","",20
+"50","103","Salinadi road","2","10/4/15","Bagmati","Kathmandu","Shankarpur","27.729153","85.467572","Bagmati","Kathmandu","Kathmandu Metropolitan","Sankarapur","Bagmati","Kathmandu","Kathmandu Metropolitan","Sankarapur",30
+"51","106","Bhagawati Primary School, Dolchhap","2","13/05/2015","Bagmati","Lalitpur","Chhampi","27.587048","85.321915","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","15","Bagmati","Lalitpur","Lalitpur Sub Metropolitan","",25
+"52","108","Salyantar","2","21/05/2015","Bagmati","Lalitpur","Chhampi","27.625678","85.310236","Bagmati","Lalitpur","Asrang","1","","","","",180
+"53","109","Salkhatole","2","25/05/2015","Bagmati","Kathmandu","Shankarpur","27.73","85.465555","Bagmati","Kathmandu","","3","Bagmati","Kathmandu","Sangkhu Bajrayogini","",30
+"54","116","Pahade Thapagaun","2","13/04/2015","Bagmati","Lalitpur","Lele","27.56639","85.32417","Bagmati","Kathmandu","Kathmandu Metropolitan","6","Bagmati","Kathmandu","Kathmandu Metropolitan","",220
+"55","118","Chapagaon","2","25/04/2015","Bagmati","Lalitpur","Chapagaun","27.60583","85.32528","Bagmati","Lalitpur","Chapagaun","2","Bagmati","Kathmandu","Kathmandu Metropolitan","2",73
+"56","119","Football Ground","2","24/05/2015","Bagmati","Kathmandu","Naikap Naya","27.69367","85.25967","Bagmati","Kathmandu","Naikap Naya","19","","","","",12
+"57","121","Bhagawansthan Chowk","2","23/05/2015","Bagmati","Kathmandu","Kirtipur Municipality","27.67018","85.2636","Bagmati","Kathmandu","Kirtipur Municipality","Ward 7","","","","",22
+"58","122","Lower Gamcha","2","23/05/2015","Bagmati","Kathmandu","Kirtipur Municipality","27.67104","85.26553","Bagmati","Kathmandu","Kirtipur Municipality","7","Bagmati","Kathmandu","Kirtipur Municipality","7",20
+"59","125","Chowki Dada/ Navakiran Hospital 1","2","23/05/2015","Bagmati","Kathmandu","Budhanilkantha","27.78396","85.3729","Bagmati","Kathmandu","Kathmandu Metropolitan","1","","","","",12
+"60","133","Talku, Hundu","2","23/05/2015","Bagmati","Kathmandu","Dakshinkali","27.62587","85.25243","Bagmati","Kathmandu","Talkudunde Chaur","Ward 12","","","","",14
+"61","135","Khokana -1","2","25/04/2015","Bagmati","Lalitpur","Khokana","27.63644","85.30038","Bagmati","Lalitpur","Khokana","","","","","",30
+"62","139","Lubhu Newa School","2","1/5/15","Bagmati","Lalitpur","Lubhu","27.64608","85.37215","Bagmati","Kathmandu","Kathmandu Metropolitan","Townplanning","","","","",45
+"63","152","Lamoshangu","2","6/9/15","Bagmati","Sindhupalchok","Mankha","27.75667","85.85167","Bagmati","Sindhupalchok","Maanka","1","Bagmati","Sindhupalchok","Ramche","5",140
+"64","180","Mandre","2","8/6/15","Gandaki","Gorkha","Barpak","28.204722","84.742778","Gandaki","Gorkha","Warpak","2","","","","",64
+"65","190","Betrawati 1","2","26/05/2015","Bagmati","Nuwakot","Gerkhu","27.96925","85.18352","Bagmati","Rasuwa","Haku","Haku Ward 9","Bagmati","Rasuwa","Haku","Haku Ward 8",151
+"66","191","Betrawati 2","2","26/05/2015","Bagmati","Nuwakot","Gerkhu","27.97393","85.18672","Bagmati","Rasuwa","Haku","Haku Ward 8","Bagmati","Rasuwa","Haku","Haku Ward 9",71
+"67","192","Bode Mulpani","2","30/05/2015","Bagmati","Bhaktapur","Madhyapur Thimi Municipality","27.69903","85.39395","Bagmati","Sindhupalchok","Tatopani","","Bagmati","Sindhupalchok","Baruwa","",233
+"68","193","Madhyapur thimi","2","22/05/2015","Bagmati","Bhaktapur","Madhyapur Thimi Municipality","27.68451","85.38871","Bagmati","Sindhupalchok","Kunchok","7","","","","",108
+"69","194","Pakandol Dadikot","2","22/05/2015","Bagmati","Bhaktapur","Bhaktapur Municipality","27.64552","85.39679","Bagmati","Bhaktapur","Bhaktapur Municipality","9,3","","","","",50
+"70","195","Sangkos","2","4/6/15","Bagmati","Dhading","","27.91839","84.89041","Bagmati","Dhading","Lapa","1,3,6,7","Bagmati","Dhading","Gumdi","7",71
+"71","196","Charighyang","2","6/6/15","Janakpur","Dolakha","Charikot","27.66055","86.0485","Janakpur","Dolakha","Bhimeshwor Municipality","1","Janakpur","Dolakha","Bhimeshwor Municipality","10",100
+"72","198","Singati","2","6/5/15","Janakpur","Dolakha","Singati","27.73497","86.16328","Janakpur","Dolakha","Lamidanda","6","Janakpur","Dolakha","Jhaku","",100
+"73","202","Jogitar","2","28/05/2015","Bagmati","Kavrepalanchok","Chandeni","27.71063","85.65366","Bagmati","Kavrepalanchok","Chandeni Mandan","1","Bagmati","Kavrepalanchok","Chandeni Mandan","1",97
+"74","203","Hope Esparanza","2","4/6/15","Bagmati","Kathmandu","Kathmandu Metropolitan","27.711","85.3559","Bagmati","Sindhupalchok","Tatopani","6,8","","","","",68
+"75","206","Chuchepati","2","30/05/2015","Bagmati","Kathmandu","Kathmandu Metropolitan","27.7199","85.35266","Bagmati","Nuwakot","","","Bagmati","Sindhupalchok","","",600
+"76","215","Hatechaur, Manthali (Site-1)","2","8/6/15","Janakpur","Ramechhap","Manthali","27.38613","86.05799","Janakpur","Ramechhap","Manthali","2","","","","",120
+"77","229","Kailashnagar","2","6/6/15","Narayani","Chitwan","Bharatpur","27.63931","84.37881","Gandaki","Gorkha","Warpak","1,2,3,4","","","","",352
+"78","234","Tundikhel","2","9/6/15","Bagmati","Kathmandu","Kathmandu Metropolitan","27.701944","85.31475","Bagmati","Kathmandu","Kathmandu Metropolitan","28","Bagmati","Kathmandu","Kathmandu Metropolitan","31",677
+"79","235","Santibazaar Coloney","2","3/6/15","Bagmati","Nuwakot","Manakamana","28.01507","85.18318","Bagmati","Rasuwa","Haku","8,9","Bagmati","Rasuwa","Thulo Gaun","8,9",280
+"80","237","Golphu","2","5/6/15","Bagmati","Nuwakot","Betini","27.54025","85.28708","Bagmati","Nuwakot","Beteni","7","Bagmati","Nuwakot","Beteni","8",75
+"81","238","Ghyang","2","5/6/15","Bagmati","Nuwakot","Betini","27.54425","85.28353","Bagmati","Nuwakot","Beteni","9","","","","",50
+"82","240","Dadagaon, Gerkhu 8","2","26/05/2015","Bagmati","Nuwakot","Gerkhu","27.94568","85.19732","Bagmati","Nuwakot","Gerkhu","Gerkhu Ward 8","","","","",181
+"83","241","Gerkhutar Ward 3","2","26/05/2015","Bagmati","Nuwakot","Gerkhu","27.9397","85.16174","Bagmati","Nuwakot","Gerkhu","Gerkhu Ward 3","Bagmati","Nuwakot","Gerkhu","Gerkhu Ward 3",275
+"84","242","Rip Khadkatar","2","27/05/2015","Bagmati","Nuwakot","Kalyanpur","27.94881","85.0639","Bagmati","Nuwakot","Kalyanpur","Rip Khadkatar, Ward No. 6","","","","",110
+"85","243","Samari Vanjyang - 1","2","27/05/2015","Bagmati","Nuwakot","Samari","27.94804","85.04718","Bagmati","Nuwakot","Samari","Samari Vanjyang, Ward 4f","","","","",90
+"86","244","Taskar, Samari Ward 4","2","27/05/2015","Bagmati","Nuwakot","Samari","27.95044","85.00908","Bagmati","Nuwakot","Samari","Samari, Taskar, Ward 4","","","","",158
+"87","245","Arukharka, Thaprek - Ward 3 & 4","2","28/05/2015","Bagmati","Nuwakot","Thaprek","27.91962","85.35281","Bagmati","Nuwakot","Thaprek","Thaprek, Arukharka, Ward No. 3 & 4","","","","",223
+"88","246","Bhamarkot","2","27/05/2015","Bagmati","Kavrepalanchok","Panchkhal","27.2696","85.5974","Bagmati","Kavrepalanchok","Panchkhal","1","","","","",100
+"89","247","Bahunchura","2","21/05/2015","Janakpur","Ramechhap","Puranagaun","27.47037","86.01935","Janakpur","Ramechhap","Puranagaun","9","","","","",16
+"90","248","Dadhikot","2","23/05/2015","Bagmati","Bhaktapur","Dadhikot","27.64552","85.39679","Bagmati","Bhaktapur","Dadhikot","9","Bagmati","Bhaktapur","Dadhikot","8",17
+"91","249","Jimaltol","2","21/05/2015","Janakpur","Ramechhap","Saipu","27.43512","86.23518","Janakpur","Ramechhap","Saipu","Saipu 6","","","","",63
+"92","250","Dandtol","2","23/05/2015","Janakpur","Ramechhap","Bhirpani","27.40617","85.95975","Janakpur","Ramechhap","Bhirpani","9","","","","",13
+"93","251","Ramche","2","23/05/2015","Janakpur","Ramechhap","Dimipokhari","27.50695","85.90192","Janakpur","Ramechhap","Dimipokhari","4","","","","",48
+"94","252","Gunsal tallo tol","2","24/05/2015","Janakpur","Ramechhap","Gunsi","27.54004","85.88631","Janakpur","Ramechhap","Gunsi","9","","","","",75
+"95","253","Kitipa Community Forest","2","24/05/2015","Janakpur","Ramechhap","Lakhanpur","27.55606","85.88078","Janakpur","Ramechhap","Lakhanpur","5","Janakpur","Ramechhap","Lakhanpur","5",11
+"96","254","Khanigaon","2","25/05/2015","Janakpur","Ramechhap","Puranagaun","27.46807","86.02143","Janakpur","Ramechhap","Puranagaun","9","","","","",20
+"97","255","Kubertole","2","25/05/2015","Bagmati","Kavrepalanchok","Jaisithok Mandan","27.68111","85.64802","Bagmati","Kavrepalanchok","Jaisithok Mandan","5","Bagmati","Kavrepalanchok","Jaisithok Mandan","5",19
+"98","256","Bhorle","2","26/05/2015","Narayani","Makwanpur","Agra","27.69995","85.02966","Narayani","Makwanpur","Agra","Agra-7","","","","",43
+"99","257","Chhap, Jyamdi 2","2","26/05/2015","Bagmati","Kavrepalanchok","Jyamdi Mandan","27.6948","85.66585","Bagmati","Kavrepalanchok","Jyamdi Mandan","2","Bagmati","Kavrepalanchok","Jyamdi Mandan","2",109
+"100","258","Mainapur","2","26/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.39997","85.87367","Janakpur","Sindhuli","Jhangajholi Ratmata","5","Janakpur","Sindhuli","Jhangajholi Ratmata","5",37
+"101","259","Orang","2","26/05/2015","Janakpur","Dolakha","Worang","27.79907","86.20057","Janakpur","Dolakha","Worang","4","","","","",72
+"102","260","Patapokhari","2","26/05/2015","Bagmati","Kavrepalanchok","Jaisithok Mandan","27.67764","85.63705","Bagmati","Kavrepalanchok","Jaisithok Mandan","2","Bagmati","Kavrepalanchok","Jaisithok Mandan","2",33
+"103","261","Tamling","2","26/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.39633","85.88203","Janakpur","Sindhuli","Jhangajholi Ratmata","4","Janakpur","Sindhuli","Jhangajholi Ratmata","4",17
+"104","262","Kaflebot","2","27/05/2015","Sagarmatha","Okhaldhunga","Mulkharka","27.26245","86.39298","Sagarmatha","Okhaldhunga","Mulkharka","6","Sagarmatha","Okhaldhunga","Mulkharka","6",23
+"105","263","Kalinchok Higher Sec. School","2","6/6/15","Janakpur","Dolakha","Bhimeswor Municipality","27.3952","86.3216","Janakpur","Dolakha","Bhimeshwor Municipality","1","Janakpur","Dolakha","Bhimeshwor Municipality","10",80
+"106","264","Karkitar","2","27/05/2015","Sagarmatha","Okhaldhunga","Mulkharka","27.26478","86.41938","Sagarmatha","Okhaldhunga","Mulkharka","9","Sagarmatha","Okhaldhunga","Mulkharka","9",50
+"107","265","Khanigau","2","27/05/2015","Sagarmatha","Okhaldhunga","Mulkharka","27.26243","86.40414","Sagarmatha","Okhaldhunga","Mulkharka","7","Sagarmatha","Okhaldhunga","Mulkharka","7",48
+"108","266","kulo vanjhayang","2","27/05/2015","Bagmati","Dhading","Baireni","27.74952","84.96266","","","","2","","","","",90
+"109","267","Laxmidanda","2","27/05/2015","Janakpur","Sindhuli","Kakur Thakur","27.41267","85.86366","Janakpur","Sindhuli","Jhangajholi Ratmata","9","Janakpur","Sindhuli","Jhangajholi Ratmata","9",110
+"110","268","Maruwadanda","2","27/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.40709","85.87862","","","","5","Janakpur","Sindhuli","Jhangajholi Ratmata","5",11
+"111","269","Matakhari","2","27/05/2015","Bagmati","Kavrepalanchok","Panchkhal","27.63761","85.58879","Bagmati","Kavrepalanchok","Panchkhal","1","Bagmati","Kavrepalanchok","Panchkhal","1",30
+"112","270","Naulogau","2","27/05/2015","Sagarmatha","Okhaldhunga","Mulkharka","27.26373","86.41392","Sagarmatha","Okhaldhunga","Mulkharka","9","Sagarmatha","Okhaldhunga","Mulkharka","9",55
+"113","271","Taumat","2","27/05/2015","Narayani","Makwanpur","Markhu","27.59862","85.15426","Narayani","Makwanpur","Markhu","Markhu-6","","","","",49
+"114","272","Adamghat","2","28/05/2015","Bagmati","Dhading","Baireni","27.80607","84.94286","","","","","","","","",20
+"115","273","Bhorleni","2","28/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.38854","85.84476","Janakpur","Sindhuli","Jhangajholi Ratmata","8","Janakpur","Sindhuli","Jhangajholi Ratmata","8",20
+"116","274","Bulung","2","28/05/2015","Janakpur","Dolakha","Bulung","27.78107","86.17974","Janakpur","Dolakha","Bulung","7","","","","",82
+"117","275","Dangi","2","28/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.39681","85.82724","Janakpur","Sindhuli","Jhangajholi Ratmata","8","Janakpur","Sindhuli","Jhangajholi Ratmata","8",38
+"118","276","Dhuney Chaur","2","28/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.40163","85.84002","Janakpur","Sindhuli","Jhangajholi Ratmata","9","Janakpur","Sindhuli","Jhangajholi Ratmata","9",23
+"119","277","Dudhile/Uttise","2","28/05/2015","Janakpur","Ramechhap","Tharpu","27.46664","86.15601","Janakpur","Ramechhap","","9","Janakpur","Ramechhap","","9",25
+"120","279","Lakhanpur","2","28/05/2015","Janakpur","Sindhuli","Jhangajholi Ratmata","27.39915","85.84374","Janakpur","Sindhuli","Jhangajholi Ratmata","9","Janakpur","Sindhuli","Jhangajholi Ratmata","9",41
+"121","280","Majhigau","2","28/05/2015","Bagmati","Kavrepalanchok","Chandeni Mandan","27.7155","85.65513","Bagmati","Kavrepalanchok","Chandeni Mandan","2","Bagmati","Kavrepalanchok","Chandeni Mandan","2",105
+"122","281","Majhtol","2","28/05/2015","Janakpur","Ramechhap","Namadi","27.5097","86.18423","Janakpur","Ramechhap","Namadi","","","","","",38
+"123","282","Siran Tole","2","28/05/2015","Sagarmatha","Okhaldhunga","Barudeshwor","27.35527","86.43701","Sagarmatha","Okhaldhunga","Barudeshwor","2","Sagarmatha","Okhaldhunga","Barudeshwor","2",40
+"124","283","Sisnepakha","2","28/05/2015","Janakpur","Ramechhap","Tharpu","27.48129","86.15091","Janakpur","Ramechhap","Tharpu","","","","","",12
+"125","286","Dorkhani","2","1/6/15","Janakpur","Ramechhap","Lakhanpur","27.56904","85.86942","Janakpur","Ramechhap","Lakhanpur","6","","","","",13
+"126","287","Garudkund Sibir","2","1/6/15","Bagmati","Bhaktapur","Bhaktapur Municipality","","","Bagmati","Bhaktapur","Bhaktapur Municipality","1","Bagmati","Bhaktapur","Bhaktapur Municipality","1",89
+"127","288","Sano Byasi","2","1/6/15","Bagmati","Bhaktapur","Bhaktapur Municipality","","","Bagmati","Bhaktapur","Bhaktapur Municipality","10","Bagmati","Bhaktapur","Bhaktapur Municipality","9",49
+"128","289","Bhuikhel, Swoyambhu","2","2/6/15","Bagmati","Kathmandu","Kathmandu Metropolitan","27.71251","85.2934","Bagmati","Kathmandu","Kathmandu Metropolitan","15","Bagmati","Sindhupalchok","Tatopani","Tatopani",250
+"129","290","Bramhayanipeeth","2","2/6/15","Bagmati","Bhaktapur","Bhaktapur Municipality","27.4026","85.2635","Bagmati","Bhaktapur","Bhaktapur Municipality","Bhaktapur-1","Bagmati","Bhaktapur","Bhaktapur Municipality","Bhaktapur-1",65
+"130","291","Sahid Smarak Khel Maidan","2","2/6/15","Bagmati","Bhaktapur","Bhaktapur Municipality","","","Bagmati","Bhaktapur","Bhaktapur Municipality","Bhaktapur-15","Bagmati","Sindhupalchok","","",130
+"131","292","Yellow Gumba / Namgel","2","2/6/15","Bagmati","Kathmandu","Kathmandu Metropolitan","27.72612","85.28292","Bagmati","Rasuwa","Langtang","1 to 9","Bagmati","Rasuwa","Langtang","1 to 9",126
+"132","293","Tallotar","2","28/06/2015","Sagarmatha","Okhaldhunga","Barudeshwor","27.33367","86.4378","Sagarmatha","Okhaldhunga","Barudeshwor","3","Sagarmatha","Okhaldhunga","Barudeshwor","3",61
+"133","294","Majhgaun","2","28/05/2015","Bagmati","Dhading","Goganpani","27.78453","85.0489","Bagmati","Dhading","Goganpani","Goganpani-3, Majhgaun","","","","",40
+"134","484","Dhansakharka","2","4/6/15","Bagmati","Dhading","","27.91571","84.88926","Bagmati","Dhading","Lapa","2","Bagmati","Dhading","Tipling","3,7",105
+"135","485","Kumaltole","2","4/6/15","Bagmati","Dhading","","27.91839","84.89041","Bagmati","Dhading","Lapa","1,3,6,7","Bagmati","Dhading","Gumdi","7",71
+"136","486","Damgade","2","4/6/15","Bagmati","Dhading","","27.9221","84.89344","Bagmati","Dhading","Rigaun","1,4,5,7,9","Bagmati","Dhading","Lapa","2",95
+"137","491","Boudha","2","8/6/15","Bagmati","Kathmandu","Kathmandu Municipality","27.43057","85.21755","Bagmati","Sindhupalchok","Phulpingkatti","9","Bagmati","Sindhupalchok","Tatopani","9",95
+"138","492","Tarisuhara, Simthali 7","2","5/6/15","Bagmati","Kavrepalanchok","Simthali","27.39806","85.46522","Bagmati","Kavrepalanchok","Simthali","7","","","","",65
+"139","493","Dhuche","2","5/6/15","Bagmati","Kavrepalanchok","Narayansthan","27.30816","85.44433","Bagmati","Kavrepalanchok","Pokhari Narayansthan","3","","","","",50
+"140","494","Gupsepakha","2","9/6/15","Gandaki","Gorkha","Laprak","28.20697","84.78786","Gandaki","Gorkha","Laprak","6","Gandaki","Gorkha","Laprak","8",450
+"141","495","Dhunche Bazaar","2","4/6/15","Bagmati","Rasuwa","Dhunche","28.11096","85.29698","Bagmati","Rasuwa","Haku","2,3,4,5,6,7","","","","",350
+"142","496","Barahbise","2","6/9/15","Bagmati","Sindhupalchok","Barahbise","27.788889","85.897222","Bagmati","Sindhupalchok","barabise","8","Bagmati","Sindhupalchok","barabise","9",310
+"143","497","Vishamkhel","2","29/05/2015","Bagmati","Makwanpur","Chitlang","27.66291","85.14893","Narayani","Makwanpur","Chitlang","Chitlang 9","","","","",70
+"144","498","Syaubari","2","4/6/15","Bagmati","Rasuwa","Laharepauwa","28.00455","85.21009","Bagmati","Rasuwa","Haku","8","Bagmati","Rasuwa","Haku","9",60
+"145","499","Irrigation Office, Charighang 10","2","6/6/15","Janakpur","Dolakha","Bhimeswor Municipality","27.65987","86.04995","Janakpur","Dolakha","Bhimeshwor Municipality","10","","","","",50
+"146","501","Chomder","2","10/6/15","Gandaki","Gorkha","Barpak","28.20211","84.73588","Gandaki","Gorkha","Warpak","1","","","","",46
+"147","502","RCB","2","10/6/15","Gandaki","Gorkha","Barpak","28.20609","84.74741","Gandaki","Gorkha","Warpak","5 Gairigaun","Gandaki","Gorkha","Warpak","5",50
+"148","151","Tudikhel","2","13/06/2015","Bagmati","Sindhupalchok","Chautara","27.777778","85.712222","Bagmati","Sindhupalchok","Chautara Municipality","3","","","","",107
