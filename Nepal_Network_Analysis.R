@@ -275,24 +275,16 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 
 # DEFINE FUNCTION THAT DROPS ISOLATED VERTICES
-drop_isolated <- function(edge_matrix,vertex_names) {
-  # define the filtered graph
-  g <- graph.adjacency(edge_matrix,mode="directed",weighted=TRUE)
-  
-  # define the coloring fo the vertices
-  V(g)$color<-rep("SkyBlue2",length(vertex_names))
-  for (k in 1:length(vertex_names)){
-    o_count <- length(which(dt_data$idp_origin_vdc==vertex_names[k])) 
-    d_count <- length(which(dt_data$vdc==vertex_names[k]))
-    if(o_count>d_count){
-      V(g)$color[k]<-"green"
-    } 
-  }
+drop_isolated <- function(graph,vertex_names) {
+
+  g <- graph
   
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   edge_matrix[edge_matrix>0] <- 1
+  
+  # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- V(g)$color[v_g_f]
   return(g_f)
@@ -367,31 +359,22 @@ filter_deg <- function(cutoff,graph,vertex_names) {
 
 
 # DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
-giant_comp <- function(adj_matrix, vertex_names){
-  # define the graph object
-  graph <- graph.adjacency(adj_matrix,mode="directed",weighted=TRUE)
+giant_comp <- function(graph, vertex_names){
+
+  g <- graph
   
   # identify the largest cluster
-  clusters <- as.data.frame(table(clusters(graph)$membership))
+  clusters <- as.data.frame(table(clusters(g)$membership))
   ind <- as.numeric(clusters[which(clusters$Freq==max(clusters$Freq)),]$Var1)
-  vertices <- which(clusters(graph)$membership==ind)
-  vertices_complement <- which(clusters(graph)$membership!=ind)
-  adj_0 <- adj_matrix[vertices,vertices]
+  vertices <- which(clusters(g)$membership==ind)
+  vertices_complement <- which(clusters(g)$membership!=ind)
   
   # define the giant component graph
-  g <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
-  for (k in 1:length(vertex_names)){
-    o_count <- length(which(dt_data$idp_origin_vdc==vertex_names[k])) 
-    d_count <- length(which(dt_data$vdc==vertex_names[k]))
-    if(o_count>d_count){
-      V(g)$color[k]<-"green"
-    } 
-  }
-  
-  
+  g_0 <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
+
   # filter to only include the giant component
-  g_f <- delete.vertices(graph,V(graph)[vertices_complement])
-  v_g_f <- setdiff(V(graph),V(graph)[vertices_complement])
+  g_f <- delete.vertices(g,V(g)[vertices_complement])
+  v_g_f <- setdiff(V(g),V(g)[vertices_complement])
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
