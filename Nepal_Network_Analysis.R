@@ -277,12 +277,14 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # DEFINE FUNCTION THAT DROPS ISOLATED VERTICES
 drop_isolated <- function(graph,vertex_names) {
 
+  # get the definitions
   g <- graph
+  adj_0 <- get.adjacency(g)
   
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  edge_matrix[edge_matrix>0] <- 1
+  adj_0[adj_0>0] <- 1
   
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
@@ -306,11 +308,12 @@ drop_loops <- function(graph){
 # DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
 filter <- function(cutoff,graph,vertex_names) {
   
+  # get the definitions
   g <- graph
+  adj <- get.adjacency(graph)
   
   # set the cut-off
   cut <- cutoff
-  adj <- get.adjacency(graph)
   adj[adj<cut] <- 0
   adj_0 <- adj
   adj_0[adj_0>0] <- 1
@@ -328,9 +331,13 @@ filter <- function(cutoff,graph,vertex_names) {
 
 # DEFINE DEGREE FILTRATION FUNCTION FOR THE NETWORKS
 filter_deg <- function(cutoff,graph,vertex_names) {
-  # set the cut-off
-  cut <- cutoff
+  
+  # get the definitions
+  g <- get.adjacency(g)
   adj <- get.adjacency(graph)
+  cut <- cutoff
+  
+  # set the cut-off
   adj_0 <- adj
   adj_0[adj_0>0] <- 1
   for (i in 1:dim(adj)[1]){
@@ -341,10 +348,6 @@ filter_deg <- function(cutoff,graph,vertex_names) {
   return(adj)
   }
 
-  
-  # define the filtered graph
-  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
- 
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
@@ -361,6 +364,7 @@ filter_deg <- function(cutoff,graph,vertex_names) {
 # DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
 giant_comp <- function(graph, vertex_names){
 
+  # get the definitions
   g <- graph
   
   # identify the largest cluster
@@ -369,9 +373,6 @@ giant_comp <- function(graph, vertex_names){
   vertices <- which(clusters(g)$membership==ind)
   vertices_complement <- which(clusters(g)$membership!=ind)
   
-  # define the giant component graph
-  g_0 <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
-
   # filter to only include the giant component
   g_f <- delete.vertices(g,V(g)[vertices_complement])
   v_g_f <- setdiff(V(g),V(g)[vertices_complement])
@@ -535,40 +536,14 @@ for (i in 1:length(vdc)){
 gv<-graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
 
 
-
-
-
-
-
-
-
-
-
-V(g)$color<-rep("SkyBlue2",length(vertex_names))
+# COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
+V(gv)$color<-rep("SkyBlue2",length(vertex_names))
 for (k in 1:length(vertex_names)){
   o_count <- length(which(dt_data$idp_origin_vdc==vertex_names[k])) 
   d_count <- length(which(dt_data$vdc==vertex_names[k]))
   if(o_count>d_count){
-    V(g)$color[k]<-"green"
+    V(gv)$color[k]<-"green"
   } 
-}
-
-
-
-
-
-
-
-
-
-
-
-# COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
-V(gv)$color<-rep("green",length(vdc))
-for (k in 1:length(vdc)){
-  if(is.element(vdc[k],vdcs)){
-    V(gv)$color[k]<-"SkyBlue2"
-  }  
 }
 
 
@@ -586,7 +561,7 @@ V(gv)$name<-vdc
 
 
 # DROP ISOLATED VERTICES (NO DISPLACEMENT)
-gv<-drop_isolated(vdc_m,vdc)
+gv<-drop_isolated(gv,vdc)
 plot(gv,
      layout=layout.fruchterman.reingold(gv, niter=20, area=2000*vcount(gv)),
      vertex.color=V(gv)$color,vertex.size=9, vertex.label=V(gv)$name,
