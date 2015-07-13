@@ -861,17 +861,22 @@ plot(agg,
      edge.width=0.5*E(agg)$weight,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
+
+
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
-agg_f<-filter(cut75,ag_m,ag)
+agg_f<-filter(cut75,ag_m,"green",ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+
 
 cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
-agg_f<-filter(cut85,ag_m,ag)
+agg_f<-filter(cut85,ag_m,"green",ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
@@ -879,27 +884,39 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
+
+
+
+
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
-agg_f<-filter(cut90,ag_m,ag)
+agg_f<-filter(cut90,ag_m,"green",ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+
+
 
 cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
-agg_f<-filter(cut95,ag_m,ag)
+agg_f<-filter(cut95,ag_m,"green",ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+
+
 
 
 cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
-agg_f<-filter(cut97,ag_m,ag)
+agg_f<-filter(cut97,ag_m,"green", ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
