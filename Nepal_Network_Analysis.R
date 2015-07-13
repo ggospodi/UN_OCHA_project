@@ -315,9 +315,7 @@ filter <- function(cutoff,graph,vertex_names) {
   adj[adj<cut] <- 0
   adj_0 <- adj
   adj_0[adj_0>0] <- 1
-  g_0<-graph.adjacency(adj_0,mode="directed",weighted=TRUE)
-  
-  
+  g_0 <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
   
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g_0,V(g_0)[degree(g_0)==0])
@@ -328,6 +326,35 @@ filter <- function(cutoff,graph,vertex_names) {
   V(g_f)$color <- V(g)$color[v_g_f]
   return(g_f)
 }
+
+filter <- function(cutoff,edge_matrix,vertex_color,vertex_names) {
+  
+  # set the cut-off
+  cut <- cutoff
+  adj <- edge_matrix
+  adj[adj<cut] <- 0
+  adj_0 <- adj
+  adj_0[adj_0>0] <- 1
+  
+  # define the filtered graph
+  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
+  
+  # filter to degree > 0 eliminate isolated vertices
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
+  V(g_f)$name <- vertex_names[v_g_f]
+  V(g_f)$color <- vertex_color[v_g_f]
+
+  return(g_f)
+}
+
+
+
+
+
+
+
+
 
 
 # DEFINE DEGREE FILTRATION FUNCTION FOR THE NETWORKS
@@ -637,6 +664,7 @@ plot(gd_c,
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 25% quantile
 cut25 <- quantile(as.vector(dtm[dtm>0]),0.25)
 gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+V(gd)$name <- vdc
 gd_f <- filter(cut25,gd,V(gd)$name)
 
 
@@ -651,6 +679,7 @@ plot(gd_f,
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 50% quantile
 cut50 <- quantile(as.vector(dtm[dtm>0]),0.5)
 gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+V(gd)$name <- vdc
 gd_f <- filter(cut50,gd,V(gd)$name)
 
 
@@ -663,8 +692,9 @@ plot(gd_f,
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 75% quantile
-cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
+cut75 <- quantile(as.vector(dtm[dtm>0]),0.99999999995)
 gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+V(gd)$name <- vdc
 gd_f <- filter(cut75,gd,V(gd)$name)
 
 
