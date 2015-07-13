@@ -704,6 +704,10 @@ plot(gd_f,
 
 
 
+
+
+
+
 # AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
 
 
@@ -754,7 +758,7 @@ plot(av,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
 cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
-av_f<-filter(cut25,av,all)
+av_f<-filter(cut25,aid_m,V(av)$color,all)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -767,7 +771,7 @@ plot(av_f,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
 cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
-av_f<-filter(cut50,av,all)
+av_f<-filter(cut50,aid_m,V(av)$color,all)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -780,7 +784,7 @@ plot(av_f,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% percentile
 cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
-av_f<-filter(cut75,av,all)
+av_f<-filter(cut75,aid_m,V(av)$color,all)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -805,8 +809,8 @@ plot(av_f_c,
 
 # FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
 cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
-av_f<-filter(cut90,av,all)
-av_f_c<-giant_comp(get.adjacency(av_f),V(av_f)$name)
+av_f <- filter(cut90,aid_m,V(av)$color,all)
+av_f_c <- giant_comp(graph = av_f,V(av_f)$name)
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
      vertex.color=V(av_f_c)$color,vertex.size=6,vertex.label=NA, 
@@ -815,13 +819,13 @@ plot(av_f_c,
 
 
 cut95 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
-av_f<-filter(cut95,aid_m,all)
-av_f_c<-giant_comp(get.adjacency(av_f),V(av_f)$name)
+av_f<-filter(cut95,aid_m,V(av)$color,all)
+av_f_c<-giant_comp(av_f,V(av_f)$name)
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,vertex.size=6,vertex.label=V(av_f_c)$name, 
+     vertex.color=V(av_f_c)$color,vertex.size=12,vertex.label=V(av_f_c)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1.2, 
-     edge.width=E(av_f_c)$weight,edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.5*(E(av_f_c)$weight),edge.arrow.size=0.8,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 
@@ -833,7 +837,7 @@ plot(av_f_c,
 # NOTE FOR THE AGENCY NETWORK PROJECTION, WE ARE COUNTING THE NUMBER OF
 # INSTANCES WHEN TWO AGENCIES SUPPLIED AID TO THE SAME VDC
 # WE CAN ALSO AUGMENT THIS MEASURE BY ACCOUNTING FOR THE NUMBER OF DIFFERENT 
-# COMMON INSTANCES OF AID WITHIN A VDC, A MROE GRANULAR APPROACH
+# COMMON INSTANCES OF AID WITHIN A VDC, A MORE GRANULAR APPROACH
 ag_m <- matrix(0,nrow=length(ag),ncol=length(ag))
 for (i in 1:length(ag)){
   for (j in 1:length(ag)){
