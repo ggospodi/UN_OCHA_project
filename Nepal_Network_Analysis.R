@@ -315,10 +315,13 @@ filter <- function(cutoff,graph,vertex_names) {
   adj[adj<cut] <- 0
   adj_0 <- adj
   adj_0[adj_0>0] <- 1
+  g_0<-graph.adjacency(adj_0,mode="directed",weighted=TRUE)
+  
+  
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g)==0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
+  g_f <- delete.vertices(g_0,V(g_0)[degree(g_0)==0])
+  v_g_f <- setdiff(V(g_0),V(g_0)[degree(g_0)==0])
   
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
@@ -692,27 +695,6 @@ vd<-unique(aid_data$vdc)
 all<-union(ag,vd)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
 aid_m<-matrix(0,nrow=length(all),ncol=length(all))
 for (i in 1:length(ag)){
@@ -745,7 +727,7 @@ plot(av,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
 cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
-av_f<-filter(cut25,aid_m,all)
+av_f<-filter(cut25,av,all)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -758,7 +740,8 @@ plot(av_f,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
 cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
-av_f<-filter(cut50,aid_m,all)
+av_f<-filter(cut50,av,all)
+
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
@@ -770,7 +753,7 @@ plot(av_f,
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% percentile
 cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
-av_f<-filter(cut75,aid_m,all)
+av_f<-filter(cut75,av,all)
 
 
 # DISPLAY THE EDGE-FILTERED GRAPH
@@ -782,7 +765,7 @@ plot(av_f,
 
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-av_f_c<-giant_comp(get.adjacency(av_f),V(av_f)$name)
+av_f_c<-giant_comp(av_f,V(av_f)$name)
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
@@ -795,7 +778,7 @@ plot(av_f_c,
 
 # FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
 cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
-av_f<-filter(cut90,aid_m,all)
+av_f<-filter(cut90,av,all)
 av_f_c<-giant_comp(get.adjacency(av_f),V(av_f)$name)
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
