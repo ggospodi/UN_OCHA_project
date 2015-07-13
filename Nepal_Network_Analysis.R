@@ -306,7 +306,7 @@ drop_loops <- function(graph){
 # DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
 filter <- function(cutoff,edge_matrix,vertex_color,vertex_names) {
   
-  # set the cut-off
+  # get the definitions
   cut <- cutoff
   adj <- edge_matrix
   adj[adj<cut] <- 0
@@ -327,12 +327,11 @@ filter <- function(cutoff,edge_matrix,vertex_color,vertex_names) {
 
 
 # DEFINE DEGREE FILTRATION FUNCTION FOR THE NETWORKS
-filter_deg <- function(cutoff,graph,vertex_names) {
+filter_deg <- function(cutoff,edge_matrix,vertex_color,vertex_names) {
   
   # get the definitions
-  g <- get.adjacency(g)
-  adj <- get.adjacency(graph)
   cut <- cutoff
+  adj <- edge_matrix
   
   # set the cut-off
   adj_0 <- adj
@@ -342,21 +341,24 @@ filter_deg <- function(cutoff,graph,vertex_names) {
       adj <- adj[,-i]
       adj <- adj[-i,]
     }
-  return(adj)
   }
 
+  # define the filtered graph
+  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
+  V(g)$color <- vertex_color
+  
   # filter to degree > 0 eliminate isolated vertices
   g_f <- delete.vertices(g,V(g)[degree(g)==0])
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- V(g_f)$color[v_g_f]
+  V(g_f)$color <- V(g)$color[v_g_f]
   
   return(g_f)
 }
 
-
+# DEFINE WEIGHTED DEGREE FILTRATION USING graph.strength
 
 # DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
 giant_comp <- function(graph, vertex_names){
@@ -523,10 +525,12 @@ dtm<-matrix(nrow=length(vdc),ncol=length(vdc))
 # COMPUTE THE ENTRIES OF BOTH THE TRACKING DISPLACEMENT MATRIX AND THE WEIGHTED DISPLACEMENT TRACKING MATRIX
 for (i in 1:length(vdc)){
   for (j in 1:length(vdc)){
-    vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],1])
-    dtm[[i,j]]<-sum(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],18])
+    vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],1])+
+      length(dt_data[dt_data$idp2_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],1])
+    dtm[[i,j]]<-sum(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],18])+
+      sum(dt_data[dt_data$idp2_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],18])
+    }
   }
-}
 
 
 # BUILD THE DIRECTED WEIGHTED VDC NETWORK
@@ -536,7 +540,7 @@ gv <- graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
 # COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
 V(gv)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k])) 
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gv)$color[k]<-"green"
@@ -585,7 +589,7 @@ gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k]<-"green"
@@ -636,7 +640,7 @@ gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k]<-"green"
@@ -659,7 +663,7 @@ gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k]<-"green"
@@ -671,7 +675,7 @@ gd_f <- drop_loops(gd_f)
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
-     vertex.color=V(gd_f)$color,vertex.size=8,vertex.label=V(gd_f)$name, 
+     vertex.color=V(gd_f)$color,vertex.size=10,vertex.label=V(gd_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.9, 
      edge.width=0.2*sqrt(E(gd_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
 
@@ -682,7 +686,7 @@ gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k]<-"green"
@@ -694,9 +698,9 @@ gd_f <- drop_loops(gd_f)
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
-     vertex.color=V(gd_f)$color,vertex.size=10,vertex.label=V(gd_f)$name, 
+     vertex.color=V(gd_f)$color,vertex.size=12,vertex.label=V(gd_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*sqrt(E(gd_f)$weight),edge.arrow.size=1,edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.3*sqrt(E(gd_f)$weight),edge.arrow.size=1,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 
