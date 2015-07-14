@@ -832,6 +832,10 @@ plot(av_f_c,
 
 
 
+
+
+
+
 # PROJECT EACH GRAPH COMPONENT WITH APPROPRIATE CONNECTIONS
 
 # NOTE FOR THE AGENCY NETWORK PROJECTION, WE ARE COUNTING THE NUMBER OF
@@ -864,9 +868,6 @@ plot(agg,
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.5, 
      edge.width=0.5*E(agg)$weight,edge.curved=TRUE,edge.color=gray.colors(1))
 
-
-
-
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
 agg_f<-filter(cut75,ag_m,"green",ag)
 
@@ -875,9 +876,6 @@ plot(as.undirected(agg_f),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-
-
 
 cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
 agg_f<-filter(cut85,ag_m,"green",ag)
@@ -888,10 +886,6 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-
-
-
-
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
 agg_f<-filter(cut90,ag_m,"green",ag)
 
@@ -901,10 +895,6 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-
-
-
-
 cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
 agg_f<-filter(cut95,ag_m,"green",ag)
 
@@ -913,11 +903,6 @@ plot(as.undirected(agg_f),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-
-
-
-
 
 cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
 agg_f<-filter(cut97,ag_m,"green", ag)
@@ -945,30 +930,51 @@ plot(agg_c,
 # ANALYSIS OF AGENCY NETWORK: 
 
 
-# RANGE OF NUMBER OF DISTINCT VDC NUMBERS FOR EACH AGENCY
+# RANGE OF NUMBER OF DISTINCT AID INSTANCES FOR EACH AGENCY
 summary(as.data.frame(table(aid_data$impl_agency))[,2])
-summary(degree(av))
+
+# NOTE: THIS IS NOT THE SAME AS
+# summary(graph.strength(av))
+# SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
+
+# RANGE OF NUMBER OF DISTINCT VDCs OF AID FOR EACH AGENCY
+unique_aid <- unique(cbind.data.frame(aid_data$impl_agency,aid_data$vdc))
+colnames(unique_aid) <- c("impl_agency","vdc")
+summary(as.data.frame(table(unique_aid$impl_agency))[,2])
+
+# NOTE: THIS IS NOT THE SAME AS
+# summary(degree(av))
+# SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
 
 
-
-
-summary(as.data.frame(table(aid_data$impl_agency))[,2])
-summary(degree(agg/                                                                                                                                                                                                                                                                                                                                       ))
-summary(graph.strength(av))
-
-
-
-
-
-# PLOT
-
+# PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
 plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]))
 histP1(as.data.frame(table(aid_data$impl_agency))[,2], breaks=100)
 
+# PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
+plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]))
+histP1(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100)
 
 
+# ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
+summary(degree(agg))
+summary(graph.strength(agg))
 
-# AGENCY RELIEF AID NETWORK ANALYSIS BELOW: 
+
+# PLOT THE NUMBER OF DISTINCT VDCs THAT AGENCIES OVERLAP
+plot(sort(degree(agg)))
+histP1(degree(agg), breaks=50,col=adjustcolor(rgb(1,0,1,1)),
+       xlab="Agency Network Degree Values", 
+       main="Agency Network Degree Distribution
+       (VDC Overlap Counts Dsitribution)")
+
+
+plot(sort(graph.strength(agg)))
+histP1(graph.strength(agg), breaks=50,col=adjustcolor(rgb(1,0,1,1)),
+       xlab="Weighted Degree Values [in the range (0,20)]", 
+       main="Agency Network Weighted Degree Distribution"))
+
+
 
 
 # WEIGHTED DEGREE DISTRIBUTION
