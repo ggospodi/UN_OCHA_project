@@ -929,16 +929,25 @@ plot(as.undirected(agg_f),
 
 
 
-agg_c <- as.undirected(giant_comp(get.adjacency(agg_f),V(agg_f)$name))
+agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
 
 plot(agg_c,
      layout=layout.fruchterman.reingold(agg_c, niter=200, area=2000*vcount(agg_c)),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=2*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
 
+# ANALYSIS OF AGENCY NETWORK: 
 
+
+# RANGE OF NUMBER OF DISTINCT 
+summary(as.data.frame(table(aid_data$impl_agency))[,2])
+
+# PLOT
+
+plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]))
+histP1(as.data.frame(table(aid_data$impl_agency))[,2], breaks=100)
 
 # FOR THE AGENCIES: SIMILARITY MEASURE BASED ON AID TYPE AND QUANTITY
 # FOR THE AGENCIES: ASSOCIATION MEASURE BASED ON SHARED VDC DESTINATIONS AND AID AMOUNT
