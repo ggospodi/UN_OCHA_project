@@ -853,6 +853,10 @@ for (k in 1:dim(ag_m)[1]){ag_m[[k,k]] <- 0}
 # DEFINE AGENCY GRAPH
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 
+# SET THE GRAPH COLOR
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
      layout=layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
@@ -925,9 +929,7 @@ plot(as.undirected(agg_f),
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
 
-
-
-
+# CHECKING THE GIANT CONNECTED COMPONENT WE SEE IT IS CONNECTED VERY WELL
 
 agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
 
@@ -938,27 +940,30 @@ plot(agg_c,
      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
 
+
+
 # ANALYSIS OF AGENCY NETWORK: 
 
 
-# RANGE OF NUMBER OF DISTINCT 
+# RANGE OF NUMBER OF DISTINCT VDC NUMBERS FOR EACH AGENCY
 summary(as.data.frame(table(aid_data$impl_agency))[,2])
+summary(degree(av))
+
+
+
+
+summary(as.data.frame(table(aid_data$impl_agency))[,2])
+summary(degree(agg/                                                                                                                                                                                                                                                                                                                                       ))
+summary(graph.strength(av))
+
+
+
+
 
 # PLOT
 
 plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]))
 histP1(as.data.frame(table(aid_data$impl_agency))[,2], breaks=100)
-
-# FOR THE AGENCIES: SIMILARITY MEASURE BASED ON AID TYPE AND QUANTITY
-# FOR THE AGENCIES: ASSOCIATION MEASURE BASED ON SHARED VDC DESTINATIONS AND AID AMOUNT
-# FOR THE VDC NETWORK: DIRECTED DISPLACEMENT TRACKING GRAPH
-# COMPARE VDC PROJECTION DISPLACEMENT TRACKING WITH SEVERITY INDEX
-# COMPARE AID DISTRIBUTION WITH SEVERITY INDEX
-# COMPARE DISPLACEMENT TRACKING WITH 
-
-
-
-
 
 
 
@@ -997,6 +1002,51 @@ max(clusters(gn2)$csize)/vcount(gn2)
 sum(degree(gy2)==0)/vcount(gy2)
 
 # brv1<-graph.bipartite(rep(0:1,length=length(E(rv1))), E(rv1), directed=TRUE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# FOR THE AGENCIES: SIMILARITY MEASURE BASED ON AID TYPE AND QUANTITY
+# FOR THE AGENCIES: ASSOCIATION MEASURE BASED ON SHARED VDC DESTINATIONS AND AID AMOUNT
+# FOR THE VDC NETWORK: DIRECTED DISPLACEMENT TRACKING GRAPH
+# COMPARE VDC PROJECTION DISPLACEMENT TRACKING WITH SEVERITY INDEX
+# COMPARE AID DISTRIBUTION WITH SEVERITY INDEX
+# COMPARE DISPLACEMENT TRACKING WITH 
+
+
+
+
+
+
+
 
 
 plot(rv1,layout=layout.fruchterman.reingold(rv1, niter=200),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
