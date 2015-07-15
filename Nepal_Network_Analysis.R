@@ -953,7 +953,11 @@ histP1(as.data.frame(table(aid_data$impl_agency))[,2], breaks=100)
 
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
 plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]))
-histP1(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100)
+hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
+       col=adjustcolor(rgb(1,0,1,1)),
+       xlab="Agency Network Aid Action Numbers", 
+       main="Agency Network Action Distribution
+  (VDC Overlap Counts Dsitribution)")
 
 
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
@@ -966,13 +970,14 @@ plot(sort(degree(agg)))
 histP1(degree(agg), breaks=50,col=adjustcolor(rgb(1,0,1,1)),
        xlab="Agency Network Degree Values", 
        main="Agency Network Degree Distribution
-       (VDC Overlap Counts Dsitribution)")
+  (VDC Overlap Counts Dsitribution)")
 
 
 plot(sort(graph.strength(agg)))
 histP1(graph.strength(agg), breaks=50,col=adjustcolor(rgb(1,0,1,1)),
        xlab="Weighted Degree Values [in the range (0,20)]", 
-       main="Agency Network Weighted Degree Distribution"))
+       main="Agency Network Weighted Degree Distribution
+  (Weighted VDC Overlap Counts Dsitribution)")
 
 
 
