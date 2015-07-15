@@ -868,6 +868,19 @@ plot(agg,
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.5, 
      edge.width=0.5*E(agg)$weight,edge.curved=TRUE,edge.color=gray.colors(1))
 
+
+
+# BEFORE WE FILTER, COMMUNITY DETECTION:
+
+mc<-multilevel.community(agg)
+plot(mc,agg, vertex.size=5,edge.width=0.15*E(agg)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=V(agg)$name)
+
+
+
+
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
 agg_f<-filter(cut75,ag_m,"green",ag)
 
@@ -876,6 +889,18 @@ plot(as.undirected(agg_f),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+
+
 
 cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
 agg_f<-filter(cut85,ag_m,"green",ag)
@@ -886,6 +911,14 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
 agg_f<-filter(cut90,ag_m,"green",ag)
 
@@ -894,6 +927,14 @@ plot(as.undirected(agg_f),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
 
 cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
 agg_f<-filter(cut95,ag_m,"green",ag)
@@ -904,6 +945,17 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+
+
+
 cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
 agg_f<-filter(cut97,ag_m,"green", ag)
 
@@ -913,16 +965,30 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+
 
 # CHECKING THE GIANT CONNECTED COMPONENT WE SEE IT IS CONNECTED VERY WELL
+# agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
+# 
+# plot(agg_c,
+#      layout=layout.fruchterman.reingold(agg_c, niter=200, area=2000*vcount(agg_c)),
+#      vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
+#      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+#      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
 
-plot(agg_c,
-     layout=layout.fruchterman.reingold(agg_c, niter=200, area=2000*vcount(agg_c)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+
+
 
 
 
@@ -948,8 +1014,20 @@ summary(as.data.frame(table(unique_aid$impl_agency))[,2])
 
 
 # PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
-plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]))
-histP1(as.data.frame(table(aid_data$impl_agency))[,2], breaks=100)
+plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Distinct Aid Activities",
+     main = "Sorted Agencies by Number of Distinct Aid Activities")
+par(new = T)
+lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_agency))[,2]),2), col ="black", lwd=4)
+text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_agency))[,2])),col="black",cex=2.5)
+
+
+histP1(as.data.frame(table(aid_data$impl_agency))[,2],
+       col = adjustcolor(rgb(1,0,1,1)),
+       breaks=100)
 
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
 plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]))
