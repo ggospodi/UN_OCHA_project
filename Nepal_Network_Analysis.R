@@ -623,7 +623,7 @@ plot(gd,
 
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-gd_c<-giant_comp(gd,V(gd)$name)
+gd_c <- giant_comp(gd,V(gd)$name)
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
@@ -993,6 +993,13 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
 
 
 
+
+
+
+
+
+
+
 # ANALYSIS OF AGENCY NETWORK: 
 
 
@@ -1072,7 +1079,6 @@ histP1(degree(agg),
 
 
 
-
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
 # WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF AGENCIES
 plot(sort(graph.strength(agg)),
@@ -1141,6 +1147,341 @@ sum(degree(agg)==0)/vcount(agg)
 
 
 
+# ANALYSIS OF THE VDC AID TARGET NETWORK
+u_vdc <- unique(unique_aid$vdc)
+
+# BUILD THE SHARED AGENCY ASSOCIATION NETWORK FOR THE VDCs
+aid_vdc <- matrix(0, nrow = length(u_vdc), ncol = length(u_vdc))
+for (i in 1:length(u_vdc)){
+  for (j in 1:length(u_vdc)){
+    common <- aid_m[1:length(ag),c(i,j)]
+    common[common>0] <-1
+    aid_vdc[i,j]<-sum((common[,1])*(common[,2]))
+  }
+}
+
+
+# REMOVE SELF LOOPS
+for (k in 1:dim(aid_vdc)[1]){aid_vdc[[k,k]] <- 0}
+
+# DEFINE AGENCY GRAPH
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+
+# SET THE GRAPH COLOR
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = "SkyBlue2",
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.5*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,V(vgg)$name)
+
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = "SkyBlue2",
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.5*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+# GET THE GIANT CONENCTED COMPONENT
+vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
+
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = "SkyBlue2",
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.25*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+#
+
+
+
+
+
+
+
+# BEFORE WE FILTER, COMMUNITY DETECTION:
+
+mc<-multilevel.community(vgg)
+plot(mc,vgg, vertex.size=2,edge.width=0.15*E(vgg)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=NA)
+
+
+# FILTER
+
+cut1 <- 1
+vgg_f<-filter(cut1,aid_vdc,"SkyBlue2",u_vdc)
+vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
+plot(as.undirected(vgg_f),
+     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color="SkyBlue2",vertex.size=2,vertex.label=NA, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+     edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+mc_f <- multilevel.community(as.undirected(vgg_f))
+plot(mc_f,as.undirected(vgg_f), vertex.size=2,edge.width=0.5*E(vgg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=NA)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+
+
+
+cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
+agg_f<-filter(cut85,ag_m,"green",ag)
+
+plot(as.undirected(agg_f),
+     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+     edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
+agg_f<-filter(cut90,ag_m,"green",ag)
+
+plot(as.undirected(agg_f),
+     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
+agg_f<-filter(cut95,ag_m,"green",ag)
+
+plot(as.undirected(agg_f),
+     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+
+
+
+cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
+agg_f<-filter(cut97,ag_m,"green", ag)
+
+plot(as.undirected(agg_f),
+     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+mc_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=1,
+     vertex.label=V(agg_f)$name)
+
+
+
+
+
+# CHECKING THE GIANT CONNECTED COMPONENT WE SEE IT IS CONNECTED VERY WELL
+# agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
+# 
+# plot(agg_c,
+#      layout=layout.fruchterman.reingold(agg_c, niter=200, area=2000*vcount(agg_c)),
+#      vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
+#      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
+#      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# RANGE OF NUMBER OF DISTINCT AID INSTANCES FOR EACH AGENCY
+summary(as.data.frame(table(aid_data$impl_agency))[,2])
+
+# NOTE: THIS IS NOT THE SAME AS
+# summary(graph.strength(av))
+# SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
+
+# RANGE OF NUMBER OF DISTINCT VDCs OF AID FOR EACH AGENCY
+unique_aid <- unique(cbind.data.frame(aid_data$impl_agency,aid_data$vdc))
+colnames(unique_aid) <- c("impl_agency","vdc")
+summary(as.data.frame(table(unique_aid$impl_agency))[,2])
+
+# NOTE: THIS IS NOT THE SAME AS
+# summary(degree(av))
+# SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
+
+
+# PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
+plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Distinct Aid Activities",
+     main = "Sorted Agencies by Number of Distinct Aid Activities")
+par(new = T)
+lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_agency))[,2]),2), col ="black", lwd=4)
+text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_agency))[,2])),col="black",cex=2.5)
+
+histP1(as.data.frame(table(aid_data$impl_agency))[,2],
+       breaks=100,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab="Agency Network Aid Action Numbers", 
+       main="Agency Network Number of Aid Actions Distribution
+  (VDC Overlap Counts Dsitribution)")
+
+
+
+# PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
+plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Distinct Aid Activities",
+     main = "Sorted Agencies by Number of Distinct VDC")
+
+hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
+     col=adjustcolor(rgb(1,0,1,1)),
+     xlab="Agency Network Aid Action Numbers", 
+     main="Agency Network Number of Targeted VDCs Distribution
+  (VDC Overlap Counts Distribution)")
+
+
+
+# ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
+summary(degree(agg))
+summary(graph.strength(agg))
+
 
 
 
@@ -1155,7 +1496,7 @@ sum(degree(agg)==0)/vcount(agg)
 
 
 # FOR THE AGENCIES: SIMILARITY MEASURE BASED ON AID TYPE AND QUANTITY
-# FOR THE AGENCIES: ASSOCIATION MEASURE BASED ON SHARED VDC DESTINATIONS AND AID AMOUNT
+
 # FOR THE VDC NETWORK: DIRECTED DISPLACEMENT TRACKING GRAPH
 # COMPARE VDC PROJECTION DISPLACEMENT TRACKING WITH SEVERITY INDEX
 # COMPARE AID DISTRIBUTION WITH SEVERITY INDEX
