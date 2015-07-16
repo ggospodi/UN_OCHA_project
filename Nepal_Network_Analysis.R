@@ -1024,18 +1024,29 @@ par(new = T)
 lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_agency))[,2]),2), col ="black", lwd=4)
 text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_agency))[,2])),col="black",cex=2.5)
 
-
 histP1(as.data.frame(table(aid_data$impl_agency))[,2],
+       breaks=100,
        col = adjustcolor(rgb(1,0,1,1)),
-       breaks=100)
+       xlab="Agency Network Aid Action Numbers", 
+       main="Agency Network Number of Aid Actions Distribution
+  (VDC Overlap Counts Dsitribution)")
+
+
 
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
-plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]))
+plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Distinct Aid Activities",
+     main = "Sorted Agencies by Number of Distinct VDC")
+
 hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
        col=adjustcolor(rgb(1,0,1,1)),
        xlab="Agency Network Aid Action Numbers", 
-       main="Agency Network Action Distribution
-  (VDC Overlap Counts Dsitribution)")
+       main="Agency Network Number of Targeted VDCs Distribution
+  (VDC Overlap Counts Distribution)")
+
 
 
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
@@ -1043,54 +1054,74 @@ summary(degree(agg))
 summary(graph.strength(agg))
 
 
-# PLOT THE NUMBER OF DISTINCT VDCs THAT AGENCIES OVERLAP
-plot(sort(degree(agg)))
-histP1(degree(agg), breaks=50,col=adjustcolor(rgb(1,0,1,1)),
-       xlab="Agency Network Degree Values", 
-       main="Agency Network Degree Distribution
-  (VDC Overlap Counts Dsitribution)")
+
+# PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
+plot(sort(degree(agg)),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Agencies",
+     main = "Number of Agencies with Shared Target with an Agency (Sorted)")
+
+histP1(degree(agg),
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Agency Network Degree Values", 
+       main = "Agency Network Degree Distribution
+  (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
 
 
-plot(sort(graph.strength(agg)))
-histP1(graph.strength(agg), breaks=50,col=adjustcolor(rgb(1,0,1,1)),
-       xlab="Weighted Degree Values [in the range (0,20)]", 
-       main="Agency Network Weighted Degree Distribution
+
+
+# PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
+# WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF AGENCIES
+plot(sort(graph.strength(agg)),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Agencies",
+     main = "Number of Agencies with Shared Target with an Agency (Sorted)
+     (Weighted By The Number of Shared VDCs)")
+
+
+histP1(graph.strength(agg), 
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Weighted Degree Values", 
+       main = "Agency Network Weighted Degree Distribution
   (Weighted VDC Overlap Counts Dsitribution)")
 
 
+# GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
+# TYPICALLY ON THE ORDER OF 1-10%
+100*graph.density(agg)
 
 
-# WEIGHTED DEGREE DISTRIBUTION
-histP1(graph.strength(av)[graph.strength(av)<20], 
-       breaks=100,
-       col=adjustcolor(rgb(1,0,1,1)),
-       xlab="Weighted Degree Values [in the range (0,20)]", 
-       main="Agency-VDC Weighted Degree Distribution in the range (0,20)]")
+# CLUSTERS ARE CONNECTED COMPONENTS, WE HAVE 4 in the UNFILTERED AGENCY-VDC NETWORK 
+clusters(agg)$no
 
+# SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
+sort(clusters(agg)$csize,decreasing=TRUE)
 
-# GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES ADN THE NUMBER OF POSSIBLE EDGES
-# TYPICALLY ON THE ORDER OF 1-5%, HERE WE HAVE 0.2%
-100*graph.density(av)
-
-
-# CLUSTERS ARE CONENCTED COMPONENTS, WE HAVE 4 in the UNFILTERED AGENCY-VDC NETWORK 
-clusters(av)$no
-
-# SORTED CLUSTERS BY SIZE, NOTE TAHT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS ADN A DROP IN CLUSTER SIZE
-sort(clusters(av)$csize,decreasing=TRUE)
-sort(clusters(av_f)$csize,decreasing=TRUE)
+# We MAY FIND IT USEFUL TO DO CLUSTER ANALYSIS ON FLITRATIONS LATER:
+# cut25 <- quantile(as.vector(ag_m[ag_m>0]),0.25)
+# agg_f <- filter(cut25,ag_m,"green",ag)
+# agg_f <- as.undirected(agg_f)
+# sort(clusters(agg_f)$csize,decreasing=TRUE)
 
 # GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
-transitivity(av_f)
+transitivity(agg)
+cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+agg_f <- filter(cut75,ag_m,"green",ag)
+agg_f <- as.undirected(agg_f)
+transitivity(agg_f)
 
 
 # We will use the relative maximal cluster size (as percent of all the nodes in the graph). For the original networks, the values are almost identical at the department level")
-max(clusters(gy2)$csize)/vcount(gy2)
-max(clusters(gn2)$csize)/vcount(gn2)
-# We will use the relative number of isolated nodes (as percent of all the nodes in the graph). For the original networks, the values are almost identical at the department level. 
-sum(degree(gy2)==0)/vcount(gy2)
+max(clusters(agg)$csize)/vcount(agg)
 
-# brv1<-graph.bipartite(rep(0:1,length=length(E(rv1))), E(rv1), directed=TRUE)
+# We will use the relative number of isolated nodes (as percent of all the nodes in the graph). For the original networks, the values are almost identical at the department level. 
+sum(degree(agg)==0)/vcount(agg)
 
 
 
@@ -1133,32 +1164,6 @@ sum(degree(gy2)==0)/vcount(gy2)
 
 
 
-
-
-
-
-
-plot(rv1,layout=layout.fruchterman.reingold(rv1, niter=200),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.auto(rv1, niter=200, area=20000*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.random(rv1),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.circle(rv1),vertex.color=V(rv1)$color,vertex.size=1,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.1*(E(rv1)$weight),edge.arrow.size=0.1,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.sphere(rv1),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.1*(E(rv1)$weight),edge.arrow.size=0.1,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.kamada.kawai(rv1, dim=3, area=200*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.spring(rv1, niter=1000, area=200*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.fruchterman.reingold.grid(rv1, niter=2000, area=500*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=FALSE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.lgl(rv1, niter=2000, area=500*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=FALSE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.graphopt(rv1, niter=2000, area=500*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=FALSE,edge.color=gray.colors(1))
-# 
-# plot(rv1,layout=layout.svd(rv1, niter=2000, area=500*vcount(rv1)),vertex.color=V(rv1)$color,vertex.size=2,vertex.label=NA, vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, edge.width=0.3*(E(rv1)$weight),edge.arrow.size=0.2,edge.curved=TRUE,edge.color=gray.colors(1))
 
 
 
