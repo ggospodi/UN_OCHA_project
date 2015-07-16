@@ -1031,7 +1031,6 @@ summary(degree(agg))
 # TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF AGENCIES
 summary(graph.strength(agg))
 
-
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
 plot(sort(degree(agg)),
      col = adjustcolor(rgb(1,0,1,1)),
@@ -1268,27 +1267,6 @@ summary(as.data.frame(table(unique_aid$impl_agency))[,2])
 
 
 
-
-# PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
-plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]),
-     col = adjustcolor(rgb(1,0,1,1)),
-     pch = 19,
-     xlab = "Agency index",
-     ylab = "Numer of Distinct Aid Activities",
-     main = "Sorted Agencies by Number of Distinct Aid Activities")
-par(new = T)
-lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_agency))[,2]),2), col ="black", lwd=4)
-text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_agency))[,2])),col="black",cex=2.5)
-
-histP1(as.data.frame(table(aid_data$impl_agency))[,2],
-       breaks=100,
-       col = adjustcolor(rgb(1,0,1,1)),
-       xlab="Agency Network Aid Action Numbers", 
-       main="Agency Network Number of Aid Actions Distribution
-  (VDC Overlap Counts Dsitribution)")
-
-
-
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
 plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
      col = adjustcolor(rgb(1,0,1,1)),
@@ -1306,8 +1284,163 @@ hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
 
 
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
+summary(degree(vgg))
+
+summary(graph.strength(vgg))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
+
+# THIS IS THE NUMBER OF AGENCIES WITH COMMON VDC TARGETS AS A GIVEN AGENCY
 summary(degree(agg))
+
+# THIS IS THE WEIGHTED NUMBER OF THE ABOVE AGENCIES, SO THE NUMBER OF SHARED VDC
+# TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF AGENCIES
 summary(graph.strength(agg))
+
+# PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
+plot(sort(degree(agg)),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Agencies",
+     main = "Number of Agencies with Shared Target with an Agency (Sorted)")
+
+histP1(degree(agg),
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Agency Network Degree Values", 
+       main = "Agency Network Degree Distribution
+       (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
+
+
+# PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
+# WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF AGENCIES
+plot(sort(graph.strength(agg)),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xlab = "Agency index",
+     ylab = "Numer of Agencies",
+     main = "Number of Agencies with Shared Target with an Agency (Sorted)
+     (Weighted By The Number of Shared VDCs)")
+
+
+histP1(graph.strength(agg), 
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Weighted Degree Values", 
+       main = "Agency Network Weighted Degree Distribution
+  (Weighted VDC Overlap Counts Dsitribution)")
+
+
+# GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
+# TYPICALLY ON THE ORDER OF 1-10%
+100*graph.density(agg)
+
+# CLUSTERS ARE CONNECTED COMPONENTS, WE HAVE 4 in the UNFILTERED AGENCY-VDC NETWORK 
+clusters(agg)$no
+
+# SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
+sort(clusters(agg)$csize,decreasing=TRUE)
+
+# We MAY FIND IT USEFUL TO DO CLUSTER ANALYSIS ON FLITRATIONS LATER:
+# cut25 <- quantile(as.vector(ag_m[ag_m>0]),0.25)
+# agg_f <- filter(cut25,ag_m,"green",ag)
+# agg_f <- as.undirected(agg_f)
+# sort(clusters(agg_f)$csize,decreasing=TRUE)
+
+# GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
+transitivity(agg)
+cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+agg_f <- filter(cut75,ag_m,"green",ag)
+agg_f <- as.undirected(agg_f)
+transitivity(agg_f)
+
+# RELATIVE MAXIMAL CLUSTER SIZE (AS % OF NUMBER OF NODES) 
+max(clusters(agg)$csize)/vcount(agg)
+
+# RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
+sum(degree(agg)==0)/vcount(agg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
