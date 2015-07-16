@@ -1023,7 +1023,12 @@ hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
 
 
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
+
+# THIS IS THE NUMBER OF AGENCIES WITH COMMON VDC TARGETS AS A GIVEN AGENCY
 summary(degree(agg))
+
+# THIS IS THE WEIGHTED NUMBER OF THE ABOVE AGENCIES, SO THE NUMBER OF SHARED VDC
+# TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF AGENCIES
 summary(graph.strength(agg))
 
 
@@ -1162,10 +1167,11 @@ plot(mc,vgg, vertex.size=2,edge.width=0.1*E(vgg)$weight,
      vertex.label=NA)
 
 
-# FILTER
+# FILTER BY EDGE WEIGHT LEVELS
 
-cut1 <- 1
-vgg_f<-filter(cut1,aid_vdc,"SkyBlue2",u_vdc)
+# THIS INITIAL FILTRATION IS REDUNDNAT SINCE MINIMAL DEGREE IS 1
+cut <- 1
+vgg_f <- filter(cut,aid_vdc,"SkyBlue2",u_vdc)
 vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
 plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
@@ -1173,189 +1179,52 @@ plot(as.undirected(vgg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-
 mc_f <- multilevel.community(as.undirected(vgg_f))
 plot(mc_f,as.undirected(vgg_f), vertex.size=2,edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=NA)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
-
-
-
-
-
-
-cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
-agg_f<-filter(cut85,ag_m,"green",ag)
-
-plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
+# THE NEXT CUT IS TOO BIG OF A JUMP, WHICH WILL BE EVIDENT IN THE DEGREE DISTRIBUTION
+cut <- 2
+vgg_f <- filter(cut,aid_vdc,"SkyBlue2",u_vdc)
+vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
+plot(as.undirected(vgg_f),
+     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color="SkyBlue2",vertex.size=3,vertex.label=NA, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+
+mc_f <- multilevel.community(as.undirected(vgg_f))
+plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.label=NA)
 
 
-
-cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
-agg_f<-filter(cut90,ag_m,"green",ag)
-
-plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
+cut <- 3
+vgg_f <- filter(cut,aid_vdc,"SkyBlue2",u_vdc)
+vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
+plot(as.undirected(vgg_f),
+     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color="SkyBlue2",vertex.size=3,vertex.label=NA, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+
+mc_f <- multilevel.community(as.undirected(vgg_f))
+plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.label=NA)
 
 
 
-cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
-agg_f<-filter(cut95,ag_m,"green",ag)
+# RANGE OF NUMBER OF SHARED AGENCIES FOR EACH PAIR OF VDCs
+summary(as.vector(aid_vdc))
 
-plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
-
-
-
-
-
-
-cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
-agg_f<-filter(cut97,ag_m,"green", ag)
-
-plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
-
-
-
-
-
-# CHECKING THE GIANT CONNECTED COMPONENT WE SEE IT IS CONNECTED VERY WELL
-# agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
-# 
-# plot(agg_c,
-#      layout=layout.fruchterman.reingold(agg_c, niter=200, area=2000*vcount(agg_c)),
-#      vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
-#      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-#      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# RANGE OF NUMBER OF DISTINCT AID INSTANCES FOR EACH AGENCY
-summary(as.data.frame(table(aid_data$impl_agency))[,2])
+# RANGE OF 
 
 # NOTE: THIS IS NOT THE SAME AS
 # summary(graph.strength(av))
@@ -1369,6 +1238,35 @@ summary(as.data.frame(table(unique_aid$impl_agency))[,2])
 # NOTE: THIS IS NOT THE SAME AS
 # summary(degree(av))
 # SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
