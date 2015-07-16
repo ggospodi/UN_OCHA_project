@@ -871,14 +871,11 @@ plot(agg,
 
 
 # BEFORE WE FILTER, COMMUNITY DETECTION:
-
 mc<-multilevel.community(agg)
 plot(mc,agg, vertex.size=5,edge.width=0.15*E(agg)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
      vertex.label=V(agg)$name)
-
-
 
 
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
@@ -890,15 +887,11 @@ plot(as.undirected(agg_f),
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
-
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
-
-
-
 
 
 
@@ -918,7 +911,6 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      vertex.label=V(agg_f)$name)
 
 
-
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
 agg_f<-filter(cut90,ag_m,"green",ag)
 
@@ -933,7 +925,6 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
-
 
 
 cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
@@ -952,10 +943,6 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      vertex.label=V(agg_f)$name)
 
 
-
-
-
-
 cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
 agg_f<-filter(cut97,ag_m,"green", ag)
 
@@ -971,10 +958,6 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
 
-
-
-
-
 # CHECKING THE GIANT CONNECTED COMPONENT WE SEE IT IS CONNECTED VERY WELL
 # agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
 # 
@@ -983,21 +966,6 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
 #      vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
 #      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
 #      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # ANALYSIS OF AGENCY NETWORK: 
@@ -1039,7 +1007,6 @@ histP1(as.data.frame(table(aid_data$impl_agency))[,2],
   (VDC Overlap Counts Dsitribution)")
 
 
-
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
 plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
      col = adjustcolor(rgb(1,0,1,1)),
@@ -1055,11 +1022,9 @@ hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
   (VDC Overlap Counts Distribution)")
 
 
-
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
 summary(degree(agg))
 summary(graph.strength(agg))
-
 
 
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
@@ -1076,7 +1041,6 @@ histP1(degree(agg),
        xlab = "Agency Network Degree Values", 
        main = "Agency Network Degree Distribution
   (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
-
 
 
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
@@ -1102,7 +1066,6 @@ histP1(graph.strength(agg),
 # TYPICALLY ON THE ORDER OF 1-10%
 100*graph.density(agg)
 
-
 # CLUSTERS ARE CONNECTED COMPONENTS, WE HAVE 4 in the UNFILTERED AGENCY-VDC NETWORK 
 clusters(agg)$no
 
@@ -1122,29 +1085,17 @@ agg_f <- filter(cut75,ag_m,"green",ag)
 agg_f <- as.undirected(agg_f)
 transitivity(agg_f)
 
-
-# We will use the relative maximal cluster size (as percent of all the nodes in the graph). For the original networks, the values are almost identical at the department level")
+# RELATIVE MAXIMAL CLUSTER SIZE (AS % OF NUMBER OF NODES) 
 max(clusters(agg)$csize)/vcount(agg)
 
-# We will use the relative number of isolated nodes (as percent of all the nodes in the graph). For the original networks, the values are almost identical at the department level. 
+# RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
 sum(degree(agg)==0)/vcount(agg)
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+# VDC AID TARGET NETWORK:
 
 
 # ANALYSIS OF THE VDC AID TARGET NETWORK
@@ -1187,20 +1138,7 @@ plot(vgg,
 # REMOVE ISOLATED
 vgg <- drop_isolated(graph = vgg,V(vgg)$name)
 
-plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
-     vertex.color = "SkyBlue2",
-     vertex.size = 2,
-     vertex.label = NA, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.5, 
-     edge.width = 0.5*E(vgg)$weight,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1))
-
-
-# GET THE GIANT CONENCTED COMPONENT
+# GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
 vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
 
 plot(vgg,
@@ -1211,23 +1149,14 @@ plot(vgg,
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.5, 
-     edge.width = 0.25*E(vgg)$weight,
+     edge.width = 0.1*E(vgg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
-
-
-#
-
-
-
-
-
-
 
 # BEFORE WE FILTER, COMMUNITY DETECTION:
 
 mc<-multilevel.community(vgg)
-plot(mc,vgg, vertex.size=2,edge.width=0.15*E(vgg)$weight,
+plot(mc,vgg, vertex.size=2,edge.width=0.1*E(vgg)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
      vertex.label=NA)
@@ -1512,7 +1441,172 @@ summary(graph.strength(agg))
 
 # INCORPORATE EVERYTHING FROM HERE ON
 
-
+PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. Since our network is disconnected, there are paths only between nodes that belong to the same connected component. The following square matrix describes all possible paths, giving value "Inf" to the ones across separate components (they are considered infinite or nonexistant). Observe the path length distribution, we have a highly connected, highly traversible network. In subsequent refinements of this network, we study the path dependence on the edge weight threshold. For this discussion, we will consider the unweighted network.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+sh<-shortest.paths(g1)
+is.na(sh)<-sapply(sh,is.infinite)
+sh[1:5,1:5]
+paths<-na.omit(as.vector(sh))
+length(paths)
+summary(paths)
+par(mfrow=c(1,2))
+plot(sort(paths[1:10000]),xlab="Path Index", ylab="Path Length", main="Sample of 10,000 Paths (sorted by length)", pch=20,col=adjustcolor(rgb(1,0,1/2,1)))
+hist(paths,breaks=100,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",main="Path Length Distribution for g")
+```
+BETWEENNESS CENTRALITY: The betweenness centrality of a node (or an edge) is defined as the number of shortest paths (geodesics) going through it. This measures the way a node is positioned within the network and how information and processes such as markdowns and customer distributions propagate thtorugh the network. We will use the unweighted graph for this part of the analysis.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+bc<-betweenness(g1,v=V(g1), directed=FALSE)
+par(mfrow=c(1,2))
+plot(sort(bc, decreasing=TRUE),col=adjustcolor(rgb(1/2,0,0,1/2)), xlab="Node Index", ylab="Betweenness Centrality", main="Betweenness Centrality Values of g (sorted)", pch=20)
+hist(bc[bc<quantile(bc,0.7)& bc>5],breaks=400,col=adjustcolor(rgb(1/2,0,0,1/2)),xlab="Betweenness Centrality Values",main="70% of Betweenness Centrality Values for g")
+```
+EDGE BETWEENNESS CENTRALITY: This is a measure of the centrality of an edge, given by the sum of the fraction of all pairs of shortest paths that pass through the given edge.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+ec<-edge.betweenness(g1,e=E(g1), directed=FALSE)
+par(mfrow=c(1,2))
+plot(sort(ec[ec<50000 & ec>2000], decreasing=TRUE),col=adjustcolor(rgb(1,0,1,1)), xlab="Node Index", ylab="Edge Betweenness Centrality", main="Edge Betweenness Centrality Values of g (sorted)", pch=20)
+hist(ec[ec<50000 & ec>2000],breaks=200,col=adjustcolor(rgb(1,0,1,1)),xlab="Edge Betweenness Centrality Values",main="Edge Betweenness Distribution for g")
+```
+BETWEENNESS ESTIMATE: This measure calculates betweenness by considering only paths of a certain length that is smaller than or equal to the cutoff value. Similarly for edge betweenness estimates. In our analysis, we will use cutoff lengths 10-30 (refer to the path length distribution analysis above). Here, we use a cutoff=3 just to illustrate the application.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+par(mfrow=c(1,2))
+be<-betweenness.estimate(g1,v=V(g1), directed=FALSE,3)
+plot(sort(be, decreasing=TRUE), xlab="Node Index", ylab="Betweenness Centrality Estimate for g", main="Betweenness Centrality Estimate for g",col=adjustcolor(rgb(0,1/2,0,1)))
+hist(be[be>0 & be<quantile(be,0.95)],breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality Estimate Values (c=3) for g",main="Positive Betweenness Centrality Estimate for g")
+```
+EDGE BETWEENNESS ESTIMATE: This betweenness estimate is defined in a similar way as betweenness estimate, we show it here with cutoff=3.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+ee<-edge.betweenness.estimate(g1,e=E(g1), directed=FALSE,3)
+par(mfrow=c(1,2))
+plot(sort(ee[ee>1 & ee<quantile(be,0.8)], decreasing=TRUE), col=adjustcolor(rgb(0,1/2,0.1,1)), xlab="Node Id", ylab="Edge Betweenness Centrality Estimate (c=3) for g", main="Edge Betweenness Centrality Estimate for g", pch=20)
+hist(ee[ee>1 & ee<quantile(be,0.8)],breaks=200,col=adjustcolor(rgb(0,1/2,0.1,1)),xlab="Edge Betweenness Centrality Estimate for g",main="(>1) Edge Betweenness Centrality Estimate for g")
+```
+CLOSENESS CENTRALITY: This measure takes into account the distribution of distances to other nodes from a given node. It is defined as the reciprocal of the farness of a node, where farness is defined as the sum of its distances to all other nodes. Closeness can be regarded as a measure of how long it will take to spread information (or an efect of an event) from a node to all other nodes. To demonstrate this concept, we compute the closeness centrality for the unweighted network.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+cl<-clusters(g1)
+gg1<-induced.subgraph(g1, which(cl$membership == which.max(cl$csize)))
+cc<-closeness(gg1)
+par(mfrow=c(1,2))
+plot(sort(cc/max(cc), decreasing=TRUE), col=adjustcolor(rgb(1/2,0,1,1)), xlab="Node Id in the Giant Conencted Component (gg1)", ylab="Normalized Closeness Centrality", main="Closeness Centrality for the Giant Component (gg1)", pch="?")
+hist(cc/max(cc),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Closeness Centrality Values for gg1",main="Normalized Closeness Centrality Distribution for gg1")
+```
+EIGENVECTOR CENTRALITY: This is a measure of the influence of a node in the network. It assigns relative scores to all nodes in the network based on the concept that connections to high-scoring nodes contribute more to the score of the given node than equal conenctions to low-scoring nodes. A variant of egenvector centrality is Google's PageRank algorithm.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+clu<-clusters(g1)
+gg1<-induced.subgraph(g1, which(clu$membership == which.max(clu$csize)))
+ec<-evcent(g1)$vector
+par(mfrow=c(1,2))
+plot(sort(ec, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Closeness Centrality Values", main="Essential (first 200 nodes) Closeness Centrality for g", pch=20)
+hist(ec[ec>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Values",main="Essential Closeness Centrality Distribution")
+```
+AUTHORITY SCORE: This is a measure for DIRECTED NETWORKS, and it measures the number of nodes that are hubs and point to a given node. It is defined as the principle eigenvector values for t(A)*A, where A stands for the adjacency matrix of the network. For undirected networks like ours, the adjacency matrix is symmetric, so the authority score is equivalent to the hub score. In subsequent analyses, we will be looking at directed extensions of this network model, so we are including these two scores in the analysis for completeness.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+au<-authority.score(g1)$vector
+par(mfrow=c(1,2))
+plot(sort(au, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
+hist(au[au>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
+```
+HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+hb<-hub.score(g1)$vector
+par(mfrow=c(1,2))
+plot(sort(hb, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
+hist(hb[hb>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
+```
+CLUSTERING COEFFICIENTS: This is a measure of the clustering of the network,defined by the ratio of the number of closed triplets and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+cat("The local clustering coefficient of a node quantifies how close its neighbors are to being a clique (a complete graph). This will be used to detect small-world properties of the network.")
+tr<-transitivity(g1, type="local")
+par(mfrow=c(1,2))
+plot(sort(tr)[1:3200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
+hist(tr[tr<1],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+# The weighted analogue of the clustering coefficient
+trw<-transitivity(g, type="weighted")
+par(mfrow=c(1,2))
+plot(sort(trw)[1:3200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
+hist(trw[trw<0.999],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+```
+COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. We have already looked at the connected components, this is an elementary community detection based on connectivity.
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
+cat("The first example of clustering is the clustering based on connectivity, see the clustering coefficient analysis above. We carried some of this out in the initial report, adn include a reference to it for completeness here.")
+strongclusters<-clusters(g200)$membership
+plot(g200,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=4, edge.color="black", edge.width=E(g200)$weight,vertex.label=NA,main="Clustering for Store Network g200")
+```
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+cat("As an example of more sensitive community detection, we show the multilevel community algorithm.")
+mc<-multilevel.community(g)
+par(mfrow=c(1,2))
+plot(sort(mc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Multilevel Community Values", main="Multilevel Community Values for g", pch=20)
+hist(mc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Multilevel Community Values",main="Multilevel Community Distribution")
+```
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
+mc<-multilevel.community(g200)
+plot(mc,g200, vertex.size=4, vertex.label=NA,edge.width=E(g200)$weight,main="Multilevel Community Detection for g200")
+plot(g200, vertex.color=membership(mc), vertex.size=6, edge.color="black", edge.width=E(g200)$weight,vertex.label.cex=0.5,main="Multilevel Community Detection for g200",vertex.label=ids[1:200])
+```
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+# Next, we show the walktrap community algorithm.
+wc<-walktrap.community(g)
+par(mfrow=c(1,2))
+plot(sort(wc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Walktrap Community Values", main="Walktrap Community Values for g", pch=20)
+hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Community Values",main="Walktrap Community Distribution")
+```
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
+wc<-walktrap.community(g200)
+plot(wc,g200,vertex.size=4, vertex.label=NA,edge.width=E(g200)$weight,main="Walktrap Community Detection for g200")
+plot(g200, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(g200)$weight,vertex.label.cex=0.5,main="Walktrap Community Detection for g200",vertex.label=ids[1:200])
+```
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+cat("Next, we show the edge-betweenness community algorithm.")
+ebt<-edge.betweenness.community(g501)
+par(mfrow=c(1,2))
+plot(sort(ebt$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id", ylab="Edge-Betweenness Centrality", main="Edge-Betweenness Centrality for g500", pch=20)
+hist(ebt$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Edge-Betweenness Centrality",main="Edge-Betweenness Centrality for g500")
+```
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
+ebt<-edge.betweenness.community(g201)
+plot(ebt,g201,vertex.size=4, vertex.label=NA,edge.width=E(g201)$weight,main="Edge-Betweenness Centrality for g200")
+plot(g201, vertex.color=membership(ebt), vertex.size=6, edge.color="black", edge.width=E(g201)$weight,vertex.label.cex=0.5,main="Edge-Betweenness Centrality for g200",vertex.label=ids[1:200])
+```
+CLIQUE ANALYSIS:
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+# Largest clique
+largest.cliques(g1)[1]
+# Maximal clique
+mc<-maximal.cliques(g1)
+mc[length(mc)] 
+maximal.cliques.count(g1)
+clique.number(g1)
+````
+SMALL-WORLD ANALYSIS:
+```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE}
+cat("We compute the giant component.")
+cl<-clusters(g1)
+gg1<-induced.subgraph(g1, which(cl$membership == which.max(cl$csize)))
+cat("We measure average path length for the giant coponent.")
+disthist<-path.length.hist(gg1, directed=TRUE)$res
+diameter<-length(disthist)
+avdistg<-weighted.mean(1:diameter, disthist)
+cat("We compute the tail component.")
+tg1<-induced.subgraph(g1, which(cl$membership != which.max(cl$csize)))
+cat("We measure avearge path length for the tail component.")
+disthist<-path.length.hist(tg1, directed=TRUE)$res
+diameter<-length(disthist)
+avdist<-weighted.mean(1:diameter, disthist)
+cat("We measure the clustering coefficient.")
+clustering_coef<-transitivity(gg1, type="global")
+cat("We create erdos&renyi random network.")	
+er<-erdos.renyi.game(vcount(gg1),ecount(gg1), type="gnm",directed=TRUE)
+# We measure avearge path length for the erdos-renyi network.")
+disthist_er<-path.length.hist(er, directed=TRUE)$res
+diameter_er<-length(disthist_er)
+avdist_er<-weighted.mean(1:diameter_er, disthist_er)     
+cat("We measure the clustering coefficient for the erdos-renyi network for comparison.")
+clustering_coef_er<-transitivity(er, type="global")
+sindex<-(clustering_coef/clustering_coef_er) / (avdistg/avdist_er)
+cat("We compute the small-world index of the store network. We will take a closer look at this and other properties in subsequent sections.")
+sindex
+```
 library(plyr)
 #We next compare the dept-level multi-basket (more than one dept) size distribution for renewal versus nonrenewal members after the first year. Since the distributions are exponential and hard to compare, we use the slope of the linear fit to the semi-log distribution to better see the difference. 
 dy2<-as.data.frame(unique(cbind(dy1$visit_nbr,dy1$dept_nbr)))
