@@ -1259,7 +1259,7 @@ histP2(degree(vgg),
 
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
 # WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF AGENCIES
-plot(sort(graph.strength(agg)),
+plot(sort(graph.strength(vgg)),
      col = adjustcolor(rgb(1,0,1,1)),
      pch = 19,
      xlab = "Agency index",
@@ -1268,8 +1268,8 @@ plot(sort(graph.strength(agg)),
      (Weighted By The Number of Shared VDCs)")
 
 
-histP1(graph.strength(agg), 
-       breaks = 50,
+histP1(graph.strength(vgg), 
+       breaks = 150,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Weighted Degree Values", 
        main = "Agency Network Weighted Degree Distribution
@@ -1278,13 +1278,13 @@ histP1(graph.strength(agg),
 
 # GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
 # TYPICALLY ON THE ORDER OF 1-10%
-100*graph.density(agg)
+100*graph.density(vgg)
 
 # CLUSTERS ARE CONNECTED COMPONENTS, WE HAVE 4 in the UNFILTERED AGENCY-VDC NETWORK 
-clusters(agg)$no
+clusters(vgg)$no
 
 # SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
-sort(clusters(agg)$csize,decreasing=TRUE)
+sort(clusters(vgg)$csize,decreasing=TRUE)
 
 # We MAY FIND IT USEFUL TO DO CLUSTER ANALYSIS ON FLITRATIONS LATER:
 # cut25 <- quantile(as.vector(ag_m[ag_m>0]),0.25)
@@ -1293,11 +1293,17 @@ sort(clusters(agg)$csize,decreasing=TRUE)
 # sort(clusters(agg_f)$csize,decreasing=TRUE)
 
 # GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
-transitivity(agg)
-cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
-agg_f <- filter(cut75,ag_m,"green",ag)
-agg_f <- as.undirected(agg_f)
-transitivity(agg_f)
+transitivity(vgg)
+cut75 <- quantile(as.vector(aid_vdc),0.75)
+vgg_f <- filter(cut75,aid_vdc,"green",u_vdc)
+vgg_f <- as.undirected(vgg_f)
+transitivity(vgg_f)
+
+
+
+
+
+
 
 # RELATIVE MAXIMAL CLUSTER SIZE (AS % OF NUMBER OF NODES) 
 max(clusters(agg)$csize)/vcount(agg)
@@ -1385,6 +1391,12 @@ sum(degree(agg)==0)/vcount(agg)
 # COMPARE VDC PROJECTION DISPLACEMENT TRACKING WITH SEVERITY INDEX
 # COMPARE AID DISTRIBUTION WITH SEVERITY INDEX
 # COMPARE DISPLACEMENT TRACKING WITH 
+
+
+
+
+
+
 
 
 
