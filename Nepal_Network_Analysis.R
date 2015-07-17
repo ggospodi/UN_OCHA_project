@@ -1220,117 +1220,41 @@ plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
 
 
 
-# RANGE OF NUMBER OF SHARED AGENCIES FOR EACH PAIR OF VDCs
-summary(as.vector(aid_vdc))
+# ANALYSIS OF THE TARGET VDC NETWORK ITSELF:
 
-# RANGE OF 
-
-# NOTE: THIS IS NOT THE SAME AS
-# summary(graph.strength(av))
-# SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
-
-# RANGE OF NUMBER OF DISTINCT VDCs OF AID FOR EACH AGENCY
-unique_aid <- unique(cbind.data.frame(aid_data$impl_agency,aid_data$vdc))
-colnames(unique_aid) <- c("impl_agency","vdc")
-summary(as.data.frame(table(unique_aid$impl_agency))[,2])
-
-# NOTE: THIS IS NOT THE SAME AS
-# summary(degree(av))
-# SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
-plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
-     col = adjustcolor(rgb(1,0,1,1)),
-     pch = 19,
-     xlab = "Agency index",
-     ylab = "Numer of Distinct Aid Activities",
-     main = "Sorted Agencies by Number of Distinct VDC")
-
-hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
-     col=adjustcolor(rgb(1,0,1,1)),
-     xlab="Agency Network Aid Action Numbers", 
-     main="Agency Network Number of Targeted VDCs Distribution
-  (VDC Overlap Counts Distribution)")
-
-
-
-# ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
+# THIS IS THE NUMBER OF VDCS A GIVEN VDC HAS AN AGENCY IN COMMON
 summary(degree(vgg))
 
+# THIS IS THE WEIGHTED NUMBER OF THE ABOVE INSTANCES, SO THE NUMBER OF SHARED
+# AGENCIES IS ACCOUNTED FOR BETWEEN EACH PAIR OF VDCs
 summary(graph.strength(vgg))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
-
-# THIS IS THE NUMBER OF AGENCIES WITH COMMON VDC TARGETS AS A GIVEN AGENCY
-summary(degree(agg))
-
-# THIS IS THE WEIGHTED NUMBER OF THE ABOVE AGENCIES, SO THE NUMBER OF SHARED VDC
-# TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF AGENCIES
-summary(graph.strength(agg))
-
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
-plot(sort(degree(agg)),
+plot(sort(degree(vgg)),
      col = adjustcolor(rgb(1,0,1,1)),
      pch = 19,
-     xlab = "Agency index",
-     ylab = "Numer of Agencies",
-     main = "Number of Agencies with Shared Target with an Agency (Sorted)")
+     xlab = "VDC index",
+     ylab = "Numer of VDCs",
+     main = "Number of VDCs with Shared Agency with a Given VDC (Sorted)")
 
-histP1(degree(agg),
-       breaks = 50,
+histP2(degree(vgg),
+       breaks = 130,
        col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Agency Network Degree Values", 
-       main = "Agency Network Degree Distribution
-       (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
+       xlab = "Target VDC Network Degree Values", 
+       main = "Target VDC Network Degree Distribution")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
