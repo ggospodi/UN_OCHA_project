@@ -1384,34 +1384,69 @@ plot(sort(au, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="No
 hist(au[au>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
 
 
-
+# RUN IT FOR THE TOTAL AGENCY-VDC NETWORK
 au<-authority.score(av)$vector
 plot(sort(au, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
 hist(au[au>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
 
 
+# HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
+hb<-hub.score(vgg)$vector
+plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
+hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
+
+# RUN IT FOR THE TOTAL AGENCY-VDC NETWORK
+hb<-hub.score(av)$vector
+plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
+hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
+
+# CLUSTERING COEFFICIENTS: This is a measure of the clustering of the network,defined by the ratio of the number of closed triplets 
+# and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version 
+# of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized 
+# by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
+
+tr<-transitivity(vgg, type="local")
+plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
+hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+# The weighted analogue of the clustering coefficient
+trw<-transitivity(vgg, type="weighted")
+plot(sort(trw), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
+hist(trw,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+
+
+# COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. We have already looked at the connected components, 
+# this is an elementary community detection based on connectivity.
+strongclusters<-clusters(vgg)$membership
+plot(vgg,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=4, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Clustering for Store Network g200")
+
+# ADD SOME FILTERING AND TRY AGAIN
+
+mc<-multilevel.community(vgg)
+plot(sort(mc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Multilevel Community Values", main="Multilevel Community Values for g", pch=20)
+hist(mc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Multilevel Community Values",main="Multilevel Community Distribution")
+
+
+# Next, we show the walktrap community algorithm.
+wc<-walktrap.community(vgg)
+plot(sort(wc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Walktrap Community Values", main="Walktrap Community Values for g", pch=20)
+hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Community Values",main="Walktrap Community Distribution")
+
+
+plot(wc,vgg,vertex.size=4, vertex.label=NA,edge.width=E(vgg)$weight,main="Walktrap Community Detection for g200")
+plot(vgg, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Walktrap Community Detection for g200")
 
 
 
 
+# Next, we show the edge-betweenness algorithm
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ebt<-edge.betweenness.community(vgg)
+plot(sort(ebt$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id", ylab="Edge-Betweenness Centrality", main="Edge-Betweenness Centrality for g500", pch=20)
+hist(ebt$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Edge-Betweenness Centrality",main="Edge-Betweenness Centrality for g500")
+ebt<-edge.betweenness.community(g201)
+plot(ebt,g201,vertex.size=4, vertex.label=NA,edge.width=E(g201)$weight,main="Edge-Betweenness Centrality for g200")
+plot(g201, vertex.color=membership(ebt), vertex.size=6, edge.color="black", edge.width=E(g201)$weight,vertex.label.cex=0.5,main="Edge-Betweenness Centrality for g200",vertex.label=ids[1:200])
 
 
 
@@ -1444,83 +1479,6 @@ hist(au[au>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Sco
 
 
 
-
-
-
-par(mfrow=c(1,1))
-
-
-
-
-
-
-# INCORPORATE EVERYTHING FROM HERE ON
-
-
-
-
-HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
-hb<-hub.score(g1)$vector
-par(mfrow=c(1,2))
-plot(sort(hb, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
-hist(hb[hb>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
-```
-CLUSTERING COEFFICIENTS: This is a measure of the clustering of the network,defined by the ratio of the number of closed triplets and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
-cat("The local clustering coefficient of a node quantifies how close its neighbors are to being a clique (a complete graph). This will be used to detect small-world properties of the network.")
-tr<-transitivity(g1, type="local")
-par(mfrow=c(1,2))
-plot(sort(tr)[1:3200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
-hist(tr[tr<1],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
-# The weighted analogue of the clustering coefficient
-trw<-transitivity(g, type="weighted")
-par(mfrow=c(1,2))
-plot(sort(trw)[1:3200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
-hist(trw[trw<0.999],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
-```
-COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. We have already looked at the connected components, this is an elementary community detection based on connectivity.
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
-cat("The first example of clustering is the clustering based on connectivity, see the clustering coefficient analysis above. We carried some of this out in the initial report, adn include a reference to it for completeness here.")
-strongclusters<-clusters(g200)$membership
-plot(g200,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=4, edge.color="black", edge.width=E(g200)$weight,vertex.label=NA,main="Clustering for Store Network g200")
-```
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
-cat("As an example of more sensitive community detection, we show the multilevel community algorithm.")
-mc<-multilevel.community(g)
-par(mfrow=c(1,2))
-plot(sort(mc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Multilevel Community Values", main="Multilevel Community Values for g", pch=20)
-hist(mc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Multilevel Community Values",main="Multilevel Community Distribution")
-```
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
-mc<-multilevel.community(g200)
-plot(mc,g200, vertex.size=4, vertex.label=NA,edge.width=E(g200)$weight,main="Multilevel Community Detection for g200")
-plot(g200, vertex.color=membership(mc), vertex.size=6, edge.color="black", edge.width=E(g200)$weight,vertex.label.cex=0.5,main="Multilevel Community Detection for g200",vertex.label=ids[1:200])
-```
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
-# Next, we show the walktrap community algorithm.
-wc<-walktrap.community(g)
-par(mfrow=c(1,2))
-plot(sort(wc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Walktrap Community Values", main="Walktrap Community Values for g", pch=20)
-hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Community Values",main="Walktrap Community Distribution")
-```
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
-wc<-walktrap.community(g200)
-plot(wc,g200,vertex.size=4, vertex.label=NA,edge.width=E(g200)$weight,main="Walktrap Community Detection for g200")
-plot(g200, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(g200)$weight,vertex.label.cex=0.5,main="Walktrap Community Detection for g200",vertex.label=ids[1:200])
-```
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
-cat("Next, we show the edge-betweenness community algorithm.")
-ebt<-edge.betweenness.community(g501)
-par(mfrow=c(1,2))
-plot(sort(ebt$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id", ylab="Edge-Betweenness Centrality", main="Edge-Betweenness Centrality for g500", pch=20)
-hist(ebt$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Edge-Betweenness Centrality",main="Edge-Betweenness Centrality for g500")
-```
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=10,fig.height=10, dpi=300,out.width='1000px',out.height='1000px'}
-ebt<-edge.betweenness.community(g201)
-plot(ebt,g201,vertex.size=4, vertex.label=NA,edge.width=E(g201)$weight,main="Edge-Betweenness Centrality for g200")
-plot(g201, vertex.color=membership(ebt), vertex.size=6, edge.color="black", edge.width=E(g201)$weight,vertex.label.cex=0.5,main="Edge-Betweenness Centrality for g200",vertex.label=ids[1:200])
-```
 CLIQUE ANALYSIS:
 ```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
 # Largest clique
