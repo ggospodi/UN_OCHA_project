@@ -1094,6 +1094,295 @@ sum(degree(agg)==0)/vcount(agg)
 
 
 
+# FIX
+# FIX ANALYSIS BELOW
+
+
+# PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
+# Since our network is disconnected, there are paths only between nodes that belong to the same connected component. 
+# The following square matrix describes all possible paths, giving value "Inf" to the ones across separate components (they are considered infinite or nonexistant).
+# Observe the path length distribution, we have a highly connected, highly traversible network. 
+# In subsequent refinements of this network, we study the path dependence on the edge weight threshold. 
+# For this discussion, we will consider the unweighted network.
+sh<-shortest.paths(vgg)
+is.na(sh)<-sapply(sh,is.infinite)
+sh[1:5,1:5]
+paths<-na.omit(as.vector(sh))
+length(paths)
+summary(paths)
+plot(sort(paths[1:10000]),xlab="Path Index", ylab="Path Length", main="Sample of 10,000 Paths (sorted by length)", pch=20,col=adjustcolor(rgb(1,0,1/2,1)))
+hist(paths,breaks=100,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",main="Path Length Distribution for g")
+
+
+
+# BETWEENNESS CENTRALITY: The betweenness centrality of a node (or an edge) is defined as the number of shortest paths 
+# (geodesics) going through it. This measures the way a node is positioned within the network and how information 
+# and processes such as markdowns and customer distributions propagate thtorugh the network. 
+# We will use the unweighted graph for this part of the analysis.
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
+plot(sort(bc, decreasing=TRUE),col=adjustcolor(rgb(1/2,0,0,1/2)), xlab="Node Index", ylab="Betweenness Centrality", main="Betweenness Centrality Values of g (sorted)", pch=20)
+hist(bc,breaks=400,col=adjustcolor(rgb(1/2,0,0,1/2)),xlab="Betweenness Centrality Values",main="70% of Betweenness Centrality Values for g")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
+V(vgg)$name <- u_vdc
+V(vgg)$color <- vector()
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg)$color[k] <- heat.colors(1+as.integer(max(bc_int)))[as.integer(bc_int[k])+1]
+}
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.5*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,V(vgg)$name)
+
+# GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
+
+# SET THE GRAPH COLOR ACCORDING TO BC
+bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
+V(vgg)$color <- vector()
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg)$color[k] <- heat.colors((1+as.integer(max(bc_int)))/(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# EDGE BETWEENNESS CENTRALITY: This is a measure of the centrality of an edge, given by the sum of the fraction 
+# of all pairs of shortest paths that pass through the given edge.
+ec<-edge.betweenness(vgg,e=E(vgg), directed=FALSE)
+plot(sort(ec, decreasing=TRUE),col=adjustcolor(rgb(1,0,1,1)), xlab="Node Index", ylab="Edge Betweenness Centrality", main="Edge Betweenness Centrality Values of g (sorted)", pch=20)
+hist(ec,breaks=200,col=adjustcolor(rgb(1,0,1,1)),xlab="Edge Betweenness Centrality Values",main="Edge Betweenness Distribution for g")
+
+
+
+# BETWEENNESS ESTIMATE: This measure calculates betweenness by considering only paths of a certain length 
+# that is smaller than or equal to the cutoff value. Similarly for edge betweenness estimates. 
+# In our analysis, we will use cutoff lengths 10-30 (refer to the path length distribution analysis above). 
+# Here, we use a cutoff=3 just to illustrate the application.
+
+be<-betweenness.estimate(vgg,v=V(vgg), directed=FALSE,3)
+plot(sort(be, decreasing=TRUE), xlab="Node Index", ylab="Betweenness Centrality Estimate for g", main="Betweenness Centrality Estimate for g",col=adjustcolor(rgb(0,1/2,0,1)))
+hist(be,breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality Estimate Values (c=3) for g",main="Positive Betweenness Centrality Estimate for g")
+
+
+
+
+
+# EDGE BETWEENNESS ESTIMATE: This betweenness estimate is defined in a similar way as betweenness estimate, 
+# we show it here with cutoff=3.
+ee <- edge.betweenness.estimate(vgg,e=E(vgg), directed=FALSE,3)
+
+plot(sort(ee, decreasing=TRUE), col=adjustcolor(rgb(0,1/2,0.1,1)), xlab="Node Id", ylab="Edge Betweenness Centrality Estimate (c=3) for g", main="Edge Betweenness Centrality Estimate for g", pch=20)
+hist(ee,breaks=200,col=adjustcolor(rgb(0,1/2,0.1,1)),xlab="Edge Betweenness Centrality Estimate for g",main="(>1) Edge Betweenness Centrality Estimate for g")
+
+
+
+# CLOSENESS CENTRALITY: This measure takes into account the distribution of distances to other nodes from a given node. 
+# It is defined as the reciprocal of the farness of a node, where farness is defined as the sum of its distances to all 
+# other nodes. Closeness can be regarded as a measure of how long it will take to spread information 
+# (or an efect of an event) from a node to all other nodes. To demonstrate this concept, we compute the closeness 
+# centrality for the unweighted network.
+cl<-clusters(vgg)
+vgg1<-induced.subgraph(vgg, which(cl$membership == which.max(cl$csize)))
+cc<-closeness(vgg1)
+plot(sort(cc/max(cc), decreasing=TRUE), col=adjustcolor(rgb(1/2,0,1,1)), xlab="Node Id in the Giant Conencted Component (gg1)", ylab="Normalized Closeness Centrality", main="Closeness Centrality for the Giant Component (gg1)")
+hist(cc/max(cc),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Closeness Centrality Values for gg1",main="Normalized Closeness Centrality Distribution for gg1")
+
+# EIGENVECTOR CENTRALITY: This is a measure of the influence of a node in the network. 
+# It assigns relative scores to all nodes in the network based on the concept that connections to high-scoring nodes 
+# contribute more to the score of the given node than equal conenctions to low-scoring nodes. 
+# A variant of egenvector centrality is Google's PageRank algorithm.
+clu<-clusters(vgg)
+vgg1<-induced.subgraph(vgg, which(clu$membership == which.max(clu$csize)))
+ec<-evcent(vgg1)$vector
+plot(sort(ec, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Closeness Centrality Values", main="Essential (first 200 nodes) Closeness Centrality for g", pch=20)
+hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Values",main="Essential Closeness Centrality Distribution")
+
+
+# AUTHORITY SCORE: This is a measure for DIRECTED NETWORKS, and it measures the number of nodes that are hubs and point 
+# to a given node. It is defined as the principle eigenvector values for t(A)*A, where A stands for the adjacency 
+# matrix of the network. For undirected networks like ours, the adjacency matrix is symmetric, so the authority score 
+# is equivalent to the hub score. In subsequent analyses, we will be looking at directed extensions of this network 
+# model, so we are including these two scores in the analysis for completeness.
+au<-authority.score(vgg)$vector
+plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
+hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
+
+
+# RUN IT FOR THE TOTAL AGENCY-VDC NETWORK
+au<-authority.score(av)$vector
+plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
+hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
+
+
+# HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
+hb<-hub.score(vgg)$vector
+plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
+hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
+
+# RUN IT FOR THE TOTAL AGENCY-VDC NETWORK
+hb<-hub.score(av)$vector
+plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
+hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
+
+# CLUSTERING COEFFICIENTS: This is a measure of the clustering of the network,defined by the ratio of the number of closed triplets 
+# and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version 
+# of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized 
+# by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
+tr<-transitivity(vgg, type="local")
+plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
+hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+
+
+# The weighted analogue of the clustering coefficient
+trw<-transitivity(vgg, type="weighted")
+plot(sort(trw), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
+hist(trw,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+
+
+# COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. We have already looked at the connected components, 
+# this is an elementary community detection based on connectivity.
+strongclusters<-clusters(vgg)$membership
+plot(vgg,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=4, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Clustering for Store Network g200")
+
+# ADD SOME FILTERING AND TRY AGAIN
+
+mc<-multilevel.community(vgg)
+plot(sort(mc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Multilevel Community Values", main="Multilevel Community Values for g", pch=20)
+hist(mc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Multilevel Community Values",main="Multilevel Community Distribution")
+
+
+# Next, we show the walktrap community algorithm.
+wc<-walktrap.community(vgg)
+plot(sort(wc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Walktrap Community Values", main="Walktrap Community Values for g", pch=20)
+hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Community Values",main="Walktrap Community Distribution")
+
+
+plot(wc,vgg,vertex.size=4, vertex.label=NA,edge.width=E(vgg)$weight,main="Walktrap Community Detection for g200")
+plot(vgg, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Walktrap Community Detection for g200")
+
+
+
+
+# Next, we show the edge-betweenness algorithm
+
+
+ebt<-edge.betweenness.community(vgg)
+plot(sort(ebt$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id", ylab="Edge-Betweenness Centrality", main="Edge-Betweenness Centrality for g500", pch=20)
+hist(ebt$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Edge-Betweenness Centrality",main="Edge-Betweenness Centrality for g500")
+ebt<-edge.betweenness.community(g201)
+plot(ebt,g201,vertex.size=4, vertex.label=NA,edge.width=E(g201)$weight,main="Edge-Betweenness Centrality for g200")
+plot(g201, vertex.color=membership(ebt), vertex.size=6, edge.color="black", edge.width=E(g201)$weight,vertex.label.cex=0.5,main="Edge-Betweenness Centrality for g200",vertex.label=ids[1:200])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # VDC AID TARGET NETWORK:
@@ -1180,6 +1469,7 @@ plot(mc_f,as.undirected(vgg_f), vertex.size=2,edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=NA)
+
 
 # THE NEXT CUT IS TOO BIG OF A JUMP, WHICH WILL BE EVIDENT IN THE DEGREE DISTRIBUTION
 cut <- 2
@@ -1316,9 +1606,75 @@ hist(paths,breaks=100,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",
 # (geodesics) going through it. This measures the way a node is positioned within the network and how information 
 # and processes such as markdowns and customer distributions propagate thtorugh the network. 
 # We will use the unweighted graph for this part of the analysis.
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
 plot(sort(bc, decreasing=TRUE),col=adjustcolor(rgb(1/2,0,0,1/2)), xlab="Node Index", ylab="Betweenness Centrality", main="Betweenness Centrality Values of g (sorted)", pch=20)
-hist(bc[bc<quantile(bc,0.7)& bc>5],breaks=400,col=adjustcolor(rgb(1/2,0,0,1/2)),xlab="Betweenness Centrality Values",main="70% of Betweenness Centrality Values for g")
+hist(bc,breaks=400,col=adjustcolor(rgb(1/2,0,0,1/2)),xlab="Betweenness Centrality Values",main="70% of Betweenness Centrality Values for g")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
+V(vgg)$name <- u_vdc
+V(vgg)$color <- vector()
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg)$color[k] <- heat.colors(1+as.integer(max(bc_int)))[as.integer(bc_int[k])+1]
+  }
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.5*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,V(vgg)$name)
+
+# GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
+
+# SET THE GRAPH COLOR ACCORDING TO BC
+bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
+V(vgg)$color <- vector()
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg)$color[k] <- heat.colors((1+as.integer(max(bc_int)))/(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1326,7 +1682,7 @@ hist(bc[bc<quantile(bc,0.7)& bc>5],breaks=400,col=adjustcolor(rgb(1/2,0,0,1/2)),
 # of all pairs of shortest paths that pass through the given edge.
 ec<-edge.betweenness(vgg,e=E(vgg), directed=FALSE)
 plot(sort(ec, decreasing=TRUE),col=adjustcolor(rgb(1,0,1,1)), xlab="Node Index", ylab="Edge Betweenness Centrality", main="Edge Betweenness Centrality Values of g (sorted)", pch=20)
-hist(ec[ec<quantile(ec,0.9)],breaks=200,col=adjustcolor(rgb(1,0,1,1)),xlab="Edge Betweenness Centrality Values",main="Edge Betweenness Distribution for g")
+hist(ec,breaks=200,col=adjustcolor(rgb(1,0,1,1)),xlab="Edge Betweenness Centrality Values",main="Edge Betweenness Distribution for g")
 
 
 
@@ -1337,7 +1693,7 @@ hist(ec[ec<quantile(ec,0.9)],breaks=200,col=adjustcolor(rgb(1,0,1,1)),xlab="Edge
 
 be<-betweenness.estimate(vgg,v=V(vgg), directed=FALSE,3)
 plot(sort(be, decreasing=TRUE), xlab="Node Index", ylab="Betweenness Centrality Estimate for g", main="Betweenness Centrality Estimate for g",col=adjustcolor(rgb(0,1/2,0,1)))
-hist(be[be>0 & be<quantile(be,0.95)],breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality Estimate Values (c=3) for g",main="Positive Betweenness Centrality Estimate for g")
+hist(be,breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality Estimate Values (c=3) for g",main="Positive Betweenness Centrality Estimate for g")
 
 
 
@@ -1368,10 +1724,10 @@ hist(cc/max(cc),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Clos
 # contribute more to the score of the given node than equal conenctions to low-scoring nodes. 
 # A variant of egenvector centrality is Google's PageRank algorithm.
 clu<-clusters(vgg)
-gg1<-induced.subgraph(vgg, which(clu$membership == which.max(clu$csize)))
-ec<-evcent(gg1)$vector
-plot(sort(ec, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Closeness Centrality Values", main="Essential (first 200 nodes) Closeness Centrality for g", pch=20)
-hist(ec[ec>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Values",main="Essential Closeness Centrality Distribution")
+vgg1<-induced.subgraph(vgg, which(clu$membership == which.max(clu$csize)))
+ec<-evcent(vgg1)$vector
+plot(sort(ec, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Closeness Centrality Values", main="Essential (first 200 nodes) Closeness Centrality for g", pch=20)
+hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Values",main="Essential Closeness Centrality Distribution")
 
 
 # AUTHORITY SCORE: This is a measure for DIRECTED NETWORKS, and it measures the number of nodes that are hubs and point 
@@ -1380,14 +1736,14 @@ hist(ec[ec>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Cen
 # is equivalent to the hub score. In subsequent analyses, we will be looking at directed extensions of this network 
 # model, so we are including these two scores in the analysis for completeness.
 au<-authority.score(vgg)$vector
-plot(sort(au, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
-hist(au[au>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
+plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
+hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
 
 
 # RUN IT FOR THE TOTAL AGENCY-VDC NETWORK
 au<-authority.score(av)$vector
-plot(sort(au, decreasing=TRUE)[1:200], col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
-hist(au[au>10e-7],breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
+plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
+hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
 
 
 # HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
@@ -1404,10 +1760,11 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 # and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version 
 # of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized 
 # by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
-
 tr<-transitivity(vgg, type="local")
 plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+
+
 # The weighted analogue of the clustering coefficient
 trw<-transitivity(vgg, type="weighted")
 plot(sort(trw), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
