@@ -10,7 +10,7 @@
 # 
 # This report contains the initial displacement tracking network model construction and some analytics.
 # 
-# 1. Nepal Displacement Tracking Network Construction and Analysis
+# 1. NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
 # 2. Nepal Disaster Relief Distribution Network Construction and Analysis
 # 3. Nepal Disaster Agency Network Construction and Analysis
 # 4. Severity Index Correlation With Disaster Agency NEtwork. 
@@ -24,33 +24,169 @@
 #
 #
 # LOAD PACKAGES
-# 
 library(igraph)
 library(RColorBrewer)
 
+# SET FILE SOURCE PATH
+DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
+
+# DEFINE FUNCTIONS
+
+
+# FUNCTION TO DISPLAY RELATIVE PERCENTAGES FOR HSITOGRAM COLUMNS
+histP <- function(x,breaks, ...) {
+  H <- hist(x, plot = FALSE, breaks=breaks)
+  H$density <- with(H, 100 * density* diff(breaks)[1])
+  labs <- paste(round(H$density), "%", sep="")
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
+}
+
+
+# FUNCTION TO DISPLAY RELATIVE PERCENTAGE VALUES GREATER THAN 0
+histP1 <- function(x,breaks, ...) {
+  H <- hist(x, plot = FALSE, breaks=breaks)
+  H$density <- with(H, 100 * density* diff(breaks)[1])
+  labs <- ifelse(round(H$density)>0,paste(round(H$density), "%", sep=""),NA)
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
+}
+
+
+# FUNCITON TO DISPLAY RELATIVE PERCENTAGE VALUES GREATER THAN 5, CAN BE HARDCODED
+histP2 <- function(x,breaks, ...) {
+  H <- hist(x, plot = FALSE, breaks=breaks)
+  H$density <- with(H, 100 * density* diff(breaks)[1])
+  labs <- ifelse(round(H$density)>5,paste(round(H$density), "%", sep=""),NA)
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
+}
+
+
+# FUNCTION THAT TRIMS LEADING WHITESPACE
+trim.leading <- function (x)  sub("^\\s+", "", x)
+
+
+# FUNCTION THAT TRIMS TRAILING WHITESPACE
+trim.trailing <- function (x) sub("\\s+$", "", x)
+
+
+# FUNCTION THAT TRIMS LEADING OR TRAILING WHITESPACE
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+
+
+# FUNCTION THAT DROPS ISOLATED VERTICES
+drop_isolated <- function(graph, vertex_colors, vertex_names) {
+  
+  # get the definitions
+  g <- graph
+  
+  # filter to degree > 0 eliminate isolated vertices
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
+  
+  # filter names and color
+  V(g_f)$name <- vertex_names[v_g_f]
+  V(g_f)$color <- vertex_colors[v_g_f]
+  return(g_f)
+}
+
+
+# FUNCITON THAT DROPS LOOPS
+drop_loops <- function(graph, vertex_colors, vertex_names){
+  g <- simplify(graph,remove.loops=TRUE)
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
+  # filter names and color
+  V(g_f)$name <- vertex_names[v_g_f]
+  V(g_f)$color <- vertex_colors[v_g_f]
+  return(g_f)
+}
+
+
+# DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
+filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
+  
+  # get the definitions
+  cut <- cutoff
+  adj <- edge_matrix
+  adj[adj<cut] <- 0
+  adj_0 <- adj
+  
+  # define the filtered graph
+  g <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
+  V(g)$color <- vertex_colors
+  
+  # filter to degree > 0 eliminate isolated vertices
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
+  V(g_f)$name <- vertex_names[v_g_f]
+  V(g_f)$color <- vertex_colors[v_g_f]
+  
+  return(g_f)
+}
+
+
+# DEFINE DEGREE FILTRATION FUNCTION FOR THE NETWORKS
+filter_deg <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
+  
+  # get the definitions
+  cut <- cutoff
+  adj <- edge_matrix
+  
+  # set the cut-off
+  adj_0 <- adj
+  adj_0[adj_0>0] <- 1
+  for (i in 1:dim(adj)[1]){
+    if (sum(adj_0[,i])<cutoff){
+      adj <- adj[,-i]
+      adj <- adj[-i,]
+    }
+  }
+  
+  # define the filtered graph
+  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
+  V(g)$color <- vertex_color
+  
+  # filter to degree > 0 eliminate isolated vertices
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
+  V(g_f)$name <- vertex_names[v_g_f]
+  
+  # color the filtered graph with sources and endpoints for the directed edges
+  V(g_f)$color <- V(g)$colors[v_g_f]
+  
+  return(g_f)
+}
+
+# DEFINE WEIGHTED DEGREE FILTRATION USING graph.strength
+
+# DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
+giant_comp <- function(graph, vertex_colors, vertex_names){
+  
+  # get the definitions
+  g <- graph
+  
+  # identify the largest cluster
+  clusters <- as.data.frame(table(clusters(g)$membership))
+  ind <- as.numeric(clusters[which(clusters$Freq==max(clusters$Freq)),]$Var1)
+  vertices <- which(clusters(g)$membership==ind)
+  vertices_complement <- which(clusters(g)$membership!=ind)
+  
+  # filter to only include the giant component
+  g_f <- delete.vertices(g,V(g)[which(V(g) %in% vertices_complement)])
+  v_g_f <- setdiff(V(g),V(g)[which(V(g) %in% vertices_complement)])
+  V(g_f)$name <- vertex_names[v_g_f]
+  
+  # color the filtered graph with sources and endpoints for the directed edges
+  V(g_f)$color <- vertex_colors[v_g_f]
+  
+  return(g_f)
+}
 
 
 
-# TO DO:
 
-# ABSTRACT FUNCITONS SO TAHT GRAPH COLOR IS ASSIGNED TO SOURCES/SINKS
-
-
-
-
-
-DIR <-"/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
-
-
-
-
-
-
-
-
-# SECTION 1: Data Analysis and Nepal Displacement Tracking Network Construction
+# SECTION 1: NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
 #
-
+#
 # COLUMN NAMES FOR CCCM_Nepal_DTM_R2.csv ARE:
 #
 # 1.1.c.1 Site ID (SSID)
@@ -233,155 +369,6 @@ DIR <-"/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
 # If other, please specify  
 # 11.1.h.1 Is everyone aware that donations do not need to be exchanged for anything?  
 # Site classification
-
-
-# DEFINE HISTOGRAM FORMATS
-histP <- function(x,breaks, ...) {
-  H <- hist(x, plot = FALSE, breaks=breaks)
-  H$density <- with(H, 100 * density* diff(breaks)[1])
-  labs <- paste(round(H$density), "%", sep="")
-  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
-}
-
-
-# DISPLAYS RELATIVE PERCENTAGE VALUES GREATER THAN 0
-histP1 <- function(x,breaks, ...) {
-  H <- hist(x, plot = FALSE, breaks=breaks)
-  H$density <- with(H, 100 * density* diff(breaks)[1])
-  labs <- ifelse(round(H$density)>0,paste(round(H$density), "%", sep=""),NA)
-  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
-}
-
-
-# DISPLAYS RELATIVE PERCENTAGE VALUES GREATER THAN 5, CAN BE HARDCODED
-histP2 <- function(x,breaks, ...) {
-  H <- hist(x, plot = FALSE, breaks=breaks)
-  H$density <- with(H, 100 * density* diff(breaks)[1])
-  labs <- ifelse(round(H$density)>5,paste(round(H$density), "%", sep=""),NA)
-  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
-}
-
-
-# DEFINE FUNCTION THAT TRIMS LEADING WHITESPACE
-trim.leading <- function (x)  sub("^\\s+", "", x)
-
-
-# DEFINE FUNCTION THAT TRIMS TRAILING WHITESPACE
-trim.trailing <- function (x) sub("\\s+$", "", x)
-
-
-# DEFINE FUNCTION THAT TRIMS LEADING OR TRAILING WHITESPACE
-trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-
-
-# DEFINE FUNCTION THAT DROPS ISOLATED VERTICES
-drop_isolated <- function(graph,vertex_names) {
-
-  # get the definitions
-  g <- graph
-  
-  # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g)==0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  
-  # filter names and color
-  V(g_f)$name <- vertex_names[v_g_f]
-  V(g_f)$color <- V(g)$color[v_g_f]
-  return(g_f)
-}
-
-
-
-
-# DEFINE FUNCITON THAT DROPS LOOPS
-drop_loops <- function(graph){
-  g <- simplify(graph,remove.loops=TRUE)
-  g_f <- delete.vertices(g,V(g)[degree(g)==0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  V(g_f)$name <- V(g)$name[v_g_f]
-  return(g_f)
-}
-
-
-# DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
-filter <- function(cutoff,edge_matrix,vertex_color,vertex_names) {
-  
-  # get the definitions
-  cut <- cutoff
-  adj <- edge_matrix
-  adj[adj<cut] <- 0
-  adj_0 <- adj
-  
-  # define the filtered graph
-  g <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
-  V(g)$color <- vertex_color
-  
-  # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g)==0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  V(g_f)$name <- vertex_names[v_g_f]
-  V(g_f)$color <- V(g)$color[v_g_f]
-
-  return(g_f)
-}
-
-
-# DEFINE DEGREE FILTRATION FUNCTION FOR THE NETWORKS
-filter_deg <- function(cutoff,edge_matrix,vertex_color,vertex_names) {
-  
-  # get the definitions
-  cut <- cutoff
-  adj <- edge_matrix
-  
-  # set the cut-off
-  adj_0 <- adj
-  adj_0[adj_0>0] <- 1
-  for (i in 1:dim(adj)[1]){
-    if (sum(adj_0[,i])<cutoff){
-      adj <- adj[,-i]
-      adj <- adj[-i,]
-    }
-  }
-
-  # define the filtered graph
-  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
-  V(g)$color <- vertex_color
-  
-  # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g)==0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
-  V(g_f)$name <- vertex_names[v_g_f]
-  
-  # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- V(g)$color[v_g_f]
-  
-  return(g_f)
-}
-
-# DEFINE WEIGHTED DEGREE FILTRATION USING graph.strength
-
-# DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
-giant_comp <- function(graph, vertex_names){
-
-  # get the definitions
-  g <- graph
-  
-  # identify the largest cluster
-  clusters <- as.data.frame(table(clusters(g)$membership))
-  ind <- as.numeric(clusters[which(clusters$Freq==max(clusters$Freq)),]$Var1)
-  vertices <- which(clusters(g)$membership==ind)
-  vertices_complement <- which(clusters(g)$membership!=ind)
-  
-  # filter to only include the giant component
-  g_f <- delete.vertices(g,V(g)[vertices_complement])
-  v_g_f <- setdiff(V(g),V(g)[vertices_complement])
-  V(g_f)$name <- vertex_names[v_g_f]
-  
-  # color the filtered graph with sources and endpoints for the directed edges
-  V(g_f)$color <- V(g)$color[v_g_f]
-  
-  return(g_f)
-}
 
 
 # LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
@@ -1095,8 +1082,10 @@ sum(degree(agg)==0)/vcount(agg)
 
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
-V(agg)$name <- ag
-agg <- giant_comp(graph = agg,vertex_names = ag)
+V(agg)$color <- rep("green", length(ag))
+agg <- giant_comp(graph = agg,
+                  vertex_color = V(agg)$color,
+                  vertex_names = ag)
 sh<-shortest.paths(agg)
 is.na(sh)<-sapply(sh,is.infinite)
 sh[1:5,1:5]
@@ -1108,7 +1097,7 @@ hist(paths,breaks=15,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",m
 
 
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
-bc<-betweenness(agg,v=V(agg), directed=FALSE)
+bc <- betweenness(agg,v=V(agg), directed=FALSE)
 plot(sort(bc, decreasing=TRUE),
      col=adjustcolor(rgb(1/2,0,0,1/2)), 
      xlab="Node Index", 
@@ -1123,27 +1112,35 @@ histP2(bc,
 
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
-V(agg)$color <- vector()
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
-  V(agg)$color[k] <- heat.colors(1+as.integer(max(bc_int)))[as.integer(bc_int[k])+1]
+  V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
 
 # PLOT AGENCY GRAPH AND FILTER
-plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
-     vertex.color = V(vgg)$color,
-     vertex.size = 2,
-     vertex.label = NA, 
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = 7,
+     vertex.label = V(agg)$name, 
      vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.5, 
-     edge.width = 0.5*E(vgg)$weight,
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.5*E(agg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
+# FIND THE TOP 10% BETWENNES NODES
+top_bc <- bc[which(bc > quantile(bc,0.9))]
+top_bc
+
+# FIND THE TOP 5% BETWENNES NODES
+top_bc <- bc[which(bc > quantile(bc,0.95))]
+top_bc
+
+
 # REMOVE ISOLATED
-vgg <- drop_isolated(graph = vgg,V(vgg)$name)
+agg <- drop_isolated(graph = agg,V(agg)$name)
 
 # GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
 vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
