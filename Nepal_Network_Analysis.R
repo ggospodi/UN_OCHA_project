@@ -940,6 +940,8 @@ plot(av_f_c,
 
 # PROJECT EACH GRAPH COMPONENT WITH APPROPRIATE CONNECTIONS
 
+
+
 # NOTE FOR THE AGENCY NETWORK PROJECTION, WE ARE COUNTING THE NUMBER OF
 # INSTANCES WHEN TWO AGENCIES SUPPLIED AID TO THE SAME VDC
 # WE CAN ALSO AUGMENT THIS MEASURE BY ACCOUNTING FOR THE NUMBER OF DIFFERENT 
@@ -966,28 +968,43 @@ V(agg)$name <- ag
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
      layout=layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
-     vertex.color="green",vertex.size=6,vertex.label=ag, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=0.5, 
-     edge.width=0.5*E(agg)$weight,edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color="green",
+     vertex.size=6,
+     vertex.label=ag, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.5, 
+     edge.width=0.5*E(agg)$weight,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
-
-# BEFORE WE FILTER, COMMUNITY DETECTION:
+# BEFORE WE FILTER, MULTILEVEL COMMUNITY DETECTION:
 mc<-multilevel.community(agg)
 plot(mc,agg, vertex.size=5,edge.width=0.15*E(agg)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
      vertex.label=V(agg)$name)
 
-
+# FILTRATION, CUTOFF = 75% quantile
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
-agg_f<-filter(cut75,ag_m,"green",ag)
+agg_f<-filter(cutoff = cut75,
+              edge_matrix = ag_m,
+              vertex_colors = V(agg)$color,
+              vertex_names = ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color="green",
+     vertex.size=10,
+     vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=(E(agg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
+# MULTILEVEL COMMUNITY DETECTION:
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
@@ -995,13 +1012,35 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
      vertex.label=V(agg_f)$name)
 
 cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
-agg_f<-filter(cut85,ag_m,"green",ag)
+agg_f<-filter(cutoff = cut85,
+              edge_matrix = ag_m,
+              vertex_colors = V(agg)$color,
+              vertex_names = ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
      vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
      edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
