@@ -980,7 +980,10 @@ plot(agg,
 
 # BEFORE WE FILTER, MULTILEVEL COMMUNITY DETECTION:
 mc<-multilevel.community(agg)
-plot(mc,agg, vertex.size=5,edge.width=0.15*E(agg)$weight,
+plot(mc,
+     agg, 
+     vertex.size=5,
+     edge.width=0.15*E(agg)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
      vertex.label=V(agg)$name)
@@ -1004,9 +1007,12 @@ plot(as.undirected(agg_f),
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
-# MULTILEVEL COMMUNITY DETECTION:
+# MULTILEVEL COMMUNITY DETECTION WITH FILTRATIONS:
 mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+plot(mc_f,
+     as.undirected(agg_f), 
+     vertex.size=10,
+     edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
@@ -1019,79 +1025,102 @@ agg_f<-filter(cutoff = cut85,
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color="green",
+     vertex.size=10,
+     vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=(E(agg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+c_f <- multilevel.community(as.undirected(agg_f))
+plot(mc_f,
+     as.undirected(agg_f), 
+     vertex.size=10,
+     edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
-
 
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
-agg_f<-filter(cut90,ag_m,"green",ag)
+agg_f<-filter(cut90,
+              edge_matrix = ag_m,
+              vertex_colors = V(agg)$color,
+              vertex_names = ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color="green",
+     vertex.size=10,
+     vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=0.5*(E(agg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+plot(mc_f,
+     as.undirected(agg_f), 
+     vertex.size=10,
+     edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
-
 
 cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
-agg_f<-filter(cut95,ag_m,"green",ag)
+agg_f<-filter(cut95,
+              edge_matrix = ag_m,
+              vertex_colors = V(agg)$color,
+              vertex_names = ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color="green",
+     vertex.size=10,
+     vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=0.5*(E(agg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+plot(mc_f,
+     as.undirected(agg_f), 
+     vertex.size=10,
+     edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
 
-
 cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
-agg_f<-filter(cut97,ag_m,"green", ag)
+agg_f<-filter(cut97,
+              edge_matrix = ag_m,
+              vertex_colors = V(agg)$color,
+              vertex_names = ag)
 
 plot(as.undirected(agg_f),
      layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",vertex.size=10,vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color="green",
+     vertex.size=10,
+     vertex.label=V(agg_f)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=0.5*(E(agg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 mc_f <- multilevel.community(as.undirected(agg_f))
-plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
+plot(mc_f,
+     as.undirected(agg_f), 
+     vertex.size=10,
+     edge.width=0.5*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
      vertex.label=V(agg_f)$name)
@@ -1106,7 +1135,12 @@ plot(mc_f,as.undirected(agg_f), vertex.size=10,edge.width=0.5*E(agg_f)$weight,
 #      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
 
 
+
+
+
 # ANALYSIS OF AGENCY NETWORK: 
+
+
 
 
 # RANGE OF NUMBER OF DISTINCT AID INSTANCES FOR EACH AGENCY
@@ -1124,7 +1158,6 @@ summary(as.data.frame(table(unique_aid$impl_agency))[,2])
 # NOTE: THIS IS NOT THE SAME AS
 # summary(degree(av))
 # SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
-
 
 # PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
 plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]),
@@ -1144,7 +1177,6 @@ histP1(as.data.frame(table(aid_data$impl_agency))[,2],
        main="Agency Network Number of Aid Actions Distribution
   (VDC Overlap Counts Dsitribution)")
 
-
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
 plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
      col = adjustcolor(rgb(1,0,1,1)),
@@ -1158,7 +1190,6 @@ hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
        xlab="Agency Network Aid Action Numbers", 
        main="Agency Network Number of Targeted VDCs Distribution
   (VDC Overlap Counts Distribution)")
-
 
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
 
@@ -1184,7 +1215,6 @@ histP1(degree(agg),
        main = "Agency Network Degree Distribution
   (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
 
-
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
 # WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF AGENCIES
 plot(sort(graph.strength(agg)),
@@ -1194,7 +1224,6 @@ plot(sort(graph.strength(agg)),
      ylab = "Numer of Agencies",
      main = "Number of Agencies with Shared Target with an Agency (Sorted)
      (Weighted By The Number of Shared VDCs)")
-
 
 histP1(graph.strength(agg), 
        breaks = 50,
@@ -1233,7 +1262,6 @@ max(clusters(agg)$csize)/vcount(agg)
 # RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
 sum(degree(agg)==0)/vcount(agg)
 
-
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 V(agg)$color <- rep("green", length(ag))
@@ -1246,9 +1274,17 @@ sh[1:5,1:5]
 paths<-na.omit(as.vector(sh))
 length(paths)
 summary(paths)
-plot(sort(paths),xlab="Path Index", ylab="Path Length", main="Paths (sorted by length)", pch=20,col=adjustcolor(rgb(1,0,1/2,1)))
-hist(paths,breaks=15,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",main="Path Length Distribution for g")
-
+plot(sort(paths),
+     xlab="Path Index", 
+     ylab="Path Length", 
+     main="Paths (sorted by length)", 
+     pch=20,
+     col=adjustcolor(rgb(1,0,1/2,1)))
+hist(paths,
+     breaks=15,
+     col=adjustcolor(rgb(1,0,1/2,1)),
+     xlab="Path Length Values",
+     main="Path Length Distribution for g")
 
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
 bc <- betweenness(agg,v=V(agg), directed=FALSE)
@@ -1263,7 +1299,6 @@ histP2(bc,
        col=adjustcolor(rgb(1/2,0,0,1/2)),
        xlab="Betweenness Centrality Values",
        main="Relief Agency Betweenness Centrality Distribution")
-
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
 bc_int <- as.integer(round(bc,0))
@@ -1292,12 +1327,26 @@ top_bc
 top_bc <- bc[which(bc > quantile(bc,0.95))]
 top_bc
 
-
 # REMOVE ISOLATED
-agg <- drop_isolated(graph = agg,V(agg)$name)
+agg <- drop_isolated(graph = agg,
+                     vertex_colors = V(agg)$color,
+                     vertex_names = V(agg)$name)
+
+
+
+
+
+
+
+
+
+
+
 
 # GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
-vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(agg)$color,
+                  vertex_names = V(vgg)$name)
 
 # SET THE GRAPH COLOR ACCORDING TO BC
 bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
