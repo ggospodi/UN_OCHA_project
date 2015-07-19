@@ -1093,44 +1093,40 @@ max(clusters(agg)$csize)/vcount(agg)
 sum(degree(agg)==0)/vcount(agg)
 
 
-
-# FIX
-# FIX ANALYSIS BELOW
-
-
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
-# Since our network is disconnected, there are paths only between nodes that belong to the same connected component. 
-# The following square matrix describes all possible paths, giving value "Inf" to the ones across separate components (they are considered infinite or nonexistant).
-# Observe the path length distribution, we have a highly connected, highly traversible network. 
-# In subsequent refinements of this network, we study the path dependence on the edge weight threshold. 
-# For this discussion, we will consider the unweighted network.
-sh<-shortest.paths(vgg)
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$name <- ag
+agg <- giant_comp(graph = agg,vertex_names = ag)
+sh<-shortest.paths(agg)
 is.na(sh)<-sapply(sh,is.infinite)
 sh[1:5,1:5]
 paths<-na.omit(as.vector(sh))
 length(paths)
 summary(paths)
-plot(sort(paths[1:10000]),xlab="Path Index", ylab="Path Length", main="Sample of 10,000 Paths (sorted by length)", pch=20,col=adjustcolor(rgb(1,0,1/2,1)))
-hist(paths,breaks=100,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",main="Path Length Distribution for g")
+plot(sort(paths),xlab="Path Index", ylab="Path Length", main="Paths (sorted by length)", pch=20,col=adjustcolor(rgb(1,0,1/2,1)))
+hist(paths,breaks=15,col=adjustcolor(rgb(1,0,1/2,1)),xlab="Path Length Values",main="Path Length Distribution for g")
 
 
-
-# BETWEENNESS CENTRALITY: The betweenness centrality of a node (or an edge) is defined as the number of shortest paths 
-# (geodesics) going through it. This measures the way a node is positioned within the network and how information 
-# and processes such as markdowns and customer distributions propagate thtorugh the network. 
-# We will use the unweighted graph for this part of the analysis.
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
-plot(sort(bc, decreasing=TRUE),col=adjustcolor(rgb(1/2,0,0,1/2)), xlab="Node Index", ylab="Betweenness Centrality", main="Betweenness Centrality Values of g (sorted)", pch=20)
-hist(bc,breaks=400,col=adjustcolor(rgb(1/2,0,0,1/2)),xlab="Betweenness Centrality Values",main="70% of Betweenness Centrality Values for g")
+# BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
+bc<-betweenness(agg,v=V(agg), directed=FALSE)
+plot(sort(bc, decreasing=TRUE),
+     col=adjustcolor(rgb(1/2,0,0,1/2)), 
+     xlab="Node Index", 
+     ylab="Betweenness Centrality", 
+     main="Sorted Relief Agency Betweenness Centrality Values", 
+     pch=19)
+histP2(bc,
+       breaks=100,
+       col=adjustcolor(rgb(1/2,0,0,1/2)),
+       xlab="Betweenness Centrality Values",
+       main="Relief Agency Betweenness Centrality Distribution")
 
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
-V(vgg)$name <- u_vdc
-V(vgg)$color <- vector()
+V(agg)$color <- vector()
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
-  V(vgg)$color[k] <- heat.colors(1+as.integer(max(bc_int)))[as.integer(bc_int[k])+1]
+  V(agg)$color[k] <- heat.colors(1+as.integer(max(bc_int)))[as.integer(bc_int[k])+1]
 }
 
 # PLOT AGENCY GRAPH AND FILTER
