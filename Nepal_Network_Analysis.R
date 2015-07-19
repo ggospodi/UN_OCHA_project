@@ -756,26 +756,22 @@ plot(gd_f,
 
 
 
-
-
-
 # AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
+
+
 
 
 # CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
 aid_data$vdc <- trim(as.character(aid_data$vdc))
 aid_data$impl_agency<-trim(as.character(aid_data$impl_agency))
 
-
 # FILTER OUT THE EMPTY ENTRIES
 aid_data<-aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
-
 
 # SELECT UNIQUE AGENCIES AND TARGET VDC
 ag<-unique(aid_data$impl_agency)
 vd<-unique(aid_data$vdc)
 all<-union(ag,vd)
-
 
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
 aid_m<-matrix(0,nrow=length(all),ncol=length(all))
@@ -785,10 +781,8 @@ for (i in 1:length(ag)){
   }
 }
 
-
 # BUILD THE AGENCY-VDC RELIEF EFFORT AID NETWORK
 av<-graph.adjacency(aid_m,mode="directed",weighted=TRUE)
-
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
 V(av)$color<-rep("green",length(all))
@@ -798,13 +792,18 @@ for (k in 1:length(all)){
   }  
 }
 
-
 # PLOT THE AGENCY-VDC AID NETWORK
-plot(av,
-     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
-     vertex.color=V(av)$color,vertex.size=2,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-     edge.width=0.5*sqrt(E(av)$weight),edge.arrow.size=0.3,edge.curved=TRUE,edge.color=gray.colors(1))
+plot(av,layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
+     vertex.color=V(av)$color,
+     vertex.size=2,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.5*sqrt(E(av)$weight),
+     edge.arrow.size=0.3,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
