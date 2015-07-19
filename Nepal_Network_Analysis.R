@@ -372,7 +372,7 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 
 
 # LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
-centroids<-read.csv(paste0(DIR,"centroids.csv"))
+centroids <- read.csv(paste0(DIR,"centroids.csv"))
 
 
 # Attempts to call the file directly from online HDX server:
@@ -383,11 +383,11 @@ centroids<-read.csv(paste0(DIR,"centroids.csv"))
 
 
 # READ IN THE DISPLACEMENT FILE DATA
-dt_data<-read.csv(paste0(DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
+dt_data <- read.csv(paste0(DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
 
 
 # SET VAIRABLE NAMES THAT ARE SHORTER AND DO NOT CONTAIN SPACES AND OTHER SYMBOLS
-nam<-c("ssid","site_name","survey_round","survey_date","zone","district","vdc","lat","lon","is_open","closing_date",
+nam <- c("ssid","site_name","survey_round","survey_date","zone","district","vdc","lat","lon","is_open","closing_date",
        "site_class","site_type","if_other","site_start","expect_close","access","owner","shelter_type",
        "specify","is_smc","women_smc","smc_locals","smc_members","member_phone","is_sma","sma_type",
        "if_other2","sma_name","sma_member","sma_phone","is_idp","is_wash","wash_provider","is_health",
@@ -412,15 +412,15 @@ nam<-c("ssid","site_name","survey_round","survey_date","zone","district","vdc","
        "child_friendly","women_friendly","id","gbv_survivors","w_segregated","where","discrimination","men_safe",
        "children_safe","women_safe","lights","info","if_other20","complaints","to_whom","info_need","if_other21",
        "donations","site_class2")
-colnames(dt_data)<-nam
+colnames(dt_data) <- nam
 
 
 # DROP THE FIRST THREE ROWS DUE TO EXTRA NOTATION
-dt_data<-dt_data[4:dim(dt_data)[1],]
+dt_data <- dt_data[4:dim(dt_data)[1],]
 
 
 # FORMAT THE POPULATION COUNT (IN HH) OF DISPLACEMENT
-dt_data$idp_hh<-as.numeric(levels(dt_data$idp_hh))[dt_data$idp_hh]
+dt_data$idp_hh <- as.numeric(levels(dt_data$idp_hh))[dt_data$idp_hh]
 
 
 # COLUMNS FOR THE INITIAL MODEL:
@@ -445,22 +445,22 @@ dt_data$idp_hh<-as.numeric(levels(dt_data$idp_hh))[dt_data$idp_hh]
 
 
 # SELECT INITIAL COLUMNS, SAVE THE FILE
-names<-c("ssid","site_name","survey_round","survey_date","zone","district",
+names <- c("ssid","site_name","survey_round","survey_date","zone","district",
          "vdc","lat","lon","idp_origin_zone","idp_origin_district","idp_origin_vdc",
          "idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc",
          "idp2_origin_ward","idp_hh")
-dt_data<-dt_data[,names]
+dt_data <- dt_data[,names]
 write.csv(dt_data,file=paste0(DIR,"Nepal_DTM_Network_model1.csv"))
 
 
 # COLUMN NAMES FOR agency_relief.csv ARE:
-aid_data<-read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
-colnames(aid_data)<-c("district_code","vdc_code","impl_agency","src_agency","district","vdc")
+aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
+colnames(aid_data) <- c("district_code","vdc_code","impl_agency","src_agency","district","vdc")
 
 
 # READ IN DISPLACEMENT DATA
-dt_data<-read.csv(paste0(DIR,"Nepal_DTM_Network_model1.csv"))
-dt_data<-dt_data[,2:dim(dt_data)[2]]
+dt_data <- read.csv(paste0(DIR,"Nepal_DTM_Network_model1.csv"))
+dt_data <- dt_data[,2:dim(dt_data)[2]]
 
 
 # FORMAT THE VDC RELATED COLUMNS AS CHARACTER
@@ -502,11 +502,11 @@ vdc <- unique(trim(union(vdc1_o,vdcs)))
 
 
 # VDC-LEVEL ADJACENCY MATRIX FOR THE DISPLACEMENT GRAPH, AT THE LEVEL OF DISPLACEMENT TRACK
-vdc_m<-matrix(0,nrow=length(vdc),ncol=length(vdc))
+vdc_m <- matrix(0,nrow=length(vdc),ncol=length(vdc))
 
 
 # CREATE A MATRIX THAT TRACKS THE NUMBERS OF DISPALCED POPULATIONS AS WELL (THIS COULD BE USED TO DERIVE EDGE WEIGHTS)
-dtm<-matrix(nrow=length(vdc),ncol=length(vdc))
+dtm <- matrix(nrow=length(vdc),ncol=length(vdc))
 
 
 # COMPUTE THE ENTRIES OF BOTH THE TRACKING DISPLACEMENT MATRIX AND THE WEIGHTED DISPLACEMENT TRACKING MATRIX
@@ -530,7 +530,7 @@ for (k in 1:length(vdc)){
   o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
-    V(gv)$color[k]<-"green"
+    V(gv)$color[k] <- "green"
   } 
 }
 
@@ -591,7 +591,7 @@ for (k in 1:length(vdc)){
   o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
-    V(gd)$color[k]<-"green"
+    V(gd)$color[k] <- "green"
   } 
 }
 
@@ -621,7 +621,8 @@ gd <- drop_loops(graph = gd,
                  vertex_names = V(gd)$name)
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
-plot(gd, layout=layout.fruchterman.reingold(gd, niter=20, area=2000*vcount(gd)),
+plot(gd, 
+     layout=layout.fruchterman.reingold(gd, niter=20, area=2000*vcount(gd)),
      vertex.color=V(gd)$color,
      vertex.size=9, 
      vertex.label=V(gd)$name,
@@ -660,7 +661,7 @@ for (k in 1:length(vdc)){
   o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
-    V(gd)$color[k]<-"green"
+    V(gd)$color[k] <- "green"
   } 
 }
 gd_f <- filter(cutoff = cut25,
@@ -695,7 +696,7 @@ for (k in 1:length(vdc)){
   o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
-    V(gd)$color[k]<-"green"
+    V(gd)$color[k] <- "green"
   } 
 }
 gd_f <- filter(cutoff = cut50,
@@ -729,7 +730,7 @@ for (k in 1:length(vdc)){
   o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
-    V(gd)$color[k]<-"green"
+    V(gd)$color[k] <- "green"
   } 
 }
 gd_f <- filter(cutoff = cut75,
@@ -763,26 +764,27 @@ plot(gd_f,
 
 # CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
 aid_data$vdc <- trim(as.character(aid_data$vdc))
-aid_data$impl_agency<-trim(as.character(aid_data$impl_agency))
+aid_data$impl_agency <- trim(as.character(aid_data$impl_agency))
 
 # FILTER OUT THE EMPTY ENTRIES
-aid_data<-aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
+aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
 
 # SELECT UNIQUE AGENCIES AND TARGET VDC
-ag<-unique(aid_data$impl_agency)
-vd<-unique(aid_data$vdc)
-all<-union(ag,vd)
+ag <- unique(aid_data$impl_agency)
+vd <- unique(aid_data$vdc)
+all <- union(ag,vd)
 
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
-aid_m<-matrix(0,nrow=length(all),ncol=length(all))
+aid_m <- matrix(0,nrow=length(all),ncol=length(all))
 for (i in 1:length(ag)){
   for (j in 1:length(vd)){
-    aid_m[[i,length(ag)+j]]<-dim(aid_data[aid_data$impl_agency==ag[i] & aid_data$vdc==vd[j],c(3,6)])[1]
+    aid_m[[i,length(ag)+j]] <- 
+      dim(aid_data[aid_data$impl_agency==ag[i] & aid_data$vdc==vd[j],c(3,6)])[1]
   }
 }
 
 # BUILD THE AGENCY-VDC RELIEF EFFORT AID NETWORK
-av<-graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
 V(av)$color<-rep("green",length(all))
@@ -793,7 +795,8 @@ for (k in 1:length(all)){
 }
 
 # PLOT THE AGENCY-VDC AID NETWORK
-plot(av,layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
+plot(av,
+     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
      vertex.color=V(av)$color,
      vertex.size=2,
      vertex.label=NA, 
@@ -808,80 +811,129 @@ plot(av,layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
 cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
-av_f<-filter(cut25,aid_m,V(av)$color,all)
-
+av_f <- filter(cutoff = cut25,
+             edge_matrix = aid_m,
+             vertex_colors = V(av)$color,
+             vertex_names = all)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,vertex.size=2,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-     edge.width=0.5*sqrt(E(av_f)$weight),edge.arrow.size=0.5,edge.curved=TRUE,edge.color=gray.colors(1))
-
+     vertex.color=V(av_f)$color,
+     vertex.size=4,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.7*sqrt(E(av_f)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
 cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
-av_f<-filter(cut50,aid_m,V(av)$color,all)
-
+av_f <- filter(cutoff = cut50,
+             edge_matrix = aid_m,
+             vertex_colors = V(av)$color,
+             vertex_names = all)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,vertex.size=3,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-     edge.width=0.3*(E(av_f)$weight),edge.arrow.size=0.5,edge.curved=TRUE,edge.color=gray.colors(1))
-
+     vertex.color=V(av_f)$color,
+     vertex.size=3,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.3*(E(av_f)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% percentile
 cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
-av_f<-filter(cut75,aid_m,V(av)$color,all)
-
+av_f <- filter(cutoff = cut75,
+             edge_matrix = aid_m,
+             vertex_colors = V(av)$color,
+             vertex_names = all)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,vertex.size=3,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-     edge.width=0.3*(E(av_f)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
-
+     vertex.color=V(av_f)$color,
+     vertex.size=3,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.3*(E(av_f)$weight),
+     edge.arrow.size=0.6,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-av_f_c<-giant_comp(av_f,V(av_f)$name)
-
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,vertex.size=4,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=1, 
-     edge.width=sqrt(E(av_f_c)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
-
+     vertex.color=V(av_f_c)$color,
+     vertex.size=4,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=1, 
+     edge.width=sqrt(E(av_f_c)$weight),
+     edge.arrow.size=0.6,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 # FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
 cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
-av_f <- filter(cut90,aid_m,V(av)$color,all)
-av_f_c <- giant_comp(graph = av_f,V(av_f)$name)
+av_f <- filter(cutoff = cut90,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,vertex.size=6,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=2, vertex.label.cex=1, 
-     edge.width=sqrt(E(av_f_c)$weight),edge.arrow.size=0.6,edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color=V(av_f_c)$color,
+     vertex.size=6,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=1, 
+     edge.width=sqrt(E(av_f_c)$weight),
+     edge.arrow.size=0.6,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
-
+# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 95% quantile
 cut95 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
-av_f<-filter(cut95,aid_m,V(av)$color,all)
-av_f_c<-giant_comp(av_f,V(av_f)$name)
+av_f<-filter(cutoff = cut95,
+             edge_matrix = aid_m,
+             vertex_colors = V(av)$color,
+             vertex_names = all)
+av_f_c<-giant_comp(graph = av_f,
+                   vertex_colors = V(av_f)$color,
+                   vertex_names = V(av_f)$name)
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,vertex.size=12,vertex.label=V(av_f_c)$name, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1.2, 
-     edge.width=0.5*(E(av_f_c)$weight),edge.arrow.size=0.8,edge.curved=TRUE,edge.color=gray.colors(1))
-
-
-
-
-
-
+     vertex.color=V(av_f_c)$color,
+     vertex.size=12,
+     vertex.label=V(av_f_c)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1.2, 
+     edge.width=0.5*(E(av_f_c)$weight),
+     edge.arrow.size=0.8,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 
 
