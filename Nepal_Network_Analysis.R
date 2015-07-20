@@ -3479,7 +3479,7 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 
 
 # CLUSTERING COEFFICIENTS: This is a measure of the clustering of the network,defined by the ratio of the number of closed triplets 
-# and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version 
+# and the number of connected triplets of vertices. Here we include the local and weighted version 
 # of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized 
 # by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
@@ -3642,43 +3642,22 @@ hist(trw,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-trw <- closeness(graph = vgg,
-                 vids = V(vgg), 
-                 weights = E(vgg)$weight,
-                 normalized = TRUE)
-trw_int <- as.integer(round(10000*trw,0))
-trw_int <- trw_int-min(trw_int)
-
-# FIND THE TOP 10% BETWEENNES NODES
-top_trw <- trw[which(trw > quantile(trw,0.9))]
-top_trw
-
-# FIND THE TOP 10% BETWEENNES NODES
-top_trw <- trw[which(trw > quantile(trw,0.95))]
-top_trw
-
-# FIND THE TOP 10% BETWEENNES NODES
-top_trw <- trw[which(trw > quantile(trw,0.99))]
-top_trw
-
 # REMOVE ISOLATED
 vgg <- drop_isolated(graph = vgg,
                      vertex_colors = V(vgg)$color,
                      vertex_names = V(vgg)$name)
-
 # GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
 vgg <- giant_comp(graph = vgg,
                   vertex_colors = V(vgg)$color,
                   vertex_names = V(vgg)$name)
-
-# NOTE: MUST RECALCULATE trw AFER GRAPH TRANSFORMATIONS
-trw <- closeness(graph = vgg,
-                 vids = V(vgg), 
-                 weights = E(vgg)$weight,
-                 normalized = TRUE)
-trw_int <- as.integer(round(10000*trw,0))
+trw <- transitivity(graph = vgg,
+                    type = "weighted",
+                    vids = V(vgg))
+trw_int <- as.integer(round(1000*trw,0))
 trw_int <- trw_int-min(trw_int)
 
+
+trw_int <- trw
 for (k in 1:length(trw_int)){
   V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(trw_int))))[as.integer(trw_int[k])+1]
 }
