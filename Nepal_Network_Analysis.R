@@ -2049,7 +2049,7 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 
 
 # ANALYSIS OF THE VDC AID TARGET NETWORK
-u_vdc <- unique(unique_aid$vdc)
+u_vdc <- as.character(unique(unique_aid$vdc))
 
 # BUILD THE SHARED AGENCY ASSOCIATION NETWORK FOR THE VDCs
 aid_vdc <- matrix(0, nrow = length(u_vdc), ncol = length(u_vdc))
@@ -2119,14 +2119,28 @@ plot(mc,vgg, vertex.size=2,edge.width=0.1*E(vgg)$weight,
 # FILTER BY EDGE WEIGHT LEVELS
 
 # THIS INITIAL FILTRATION IS REDUNDNAT SINCE MINIMAL DEGREE IS 1
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
 cut <- 1
-vgg_f <- filter(cut,aid_vdc,"SkyBlue2",u_vdc)
-vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
+vgg_f <- filter(cutoff = cut,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = u_vdc)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
 plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color="SkyBlue2",vertex.size=2,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.color = V(vgg_f)$color,
+     vertex.size=2,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=0.25*(E(vgg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 mc_f <- multilevel.community(as.undirected(vgg_f))
 plot(mc_f,as.undirected(vgg_f), vertex.size=2,edge.width=0.5*E(vgg_f)$weight,
@@ -2136,15 +2150,28 @@ plot(mc_f,as.undirected(vgg_f), vertex.size=2,edge.width=0.5*E(vgg_f)$weight,
 
 
 # THE NEXT CUT IS TOO BIG OF A JUMP, WHICH WILL BE EVIDENT IN THE DEGREE DISTRIBUTION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
 cut <- 2
-vgg_f <- filter(cut,aid_vdc,"SkyBlue2",u_vdc)
-vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
+vgg_f <- filter(cutoff = cut,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = u_vdc)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
 plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color="SkyBlue2",vertex.size=3,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
+     vertex.color = V(vgg_f)$color,
+     vertex.size=2,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=0.25*(E(vgg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 mc_f <- multilevel.community(as.undirected(vgg_f))
 plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
@@ -2153,21 +2180,37 @@ plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
      vertex.label=NA)
 
 
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
 cut <- 3
-vgg_f <- filter(cut,aid_vdc,"SkyBlue2",u_vdc)
-vgg_f <- giant_comp(vgg_f,vertex_names = V(vgg_f)$name)
+vgg_f <- filter(cutoff = cut,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
 plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color="SkyBlue2",vertex.size=3,vertex.label=NA, 
-     vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
+     vertex.color = V(vgg_f)$color,
+     vertex.size=5,
+     vertex.label=V(vgg_f)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=(E(vgg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 mc_f <- multilevel.community(as.undirected(vgg_f))
-plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
+plot(mc_f,
+     as.undirected(vgg_f), 
+     vertex.size=3,
+     edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=1,
-     vertex.label=NA)
+     vertex.label=V(vgg_f)$name)
 
 
 # ANALYSIS OF THE TARGET VDC NETWORK ITSELF:
@@ -2239,12 +2282,15 @@ sort(clusters(vgg)$csize,decreasing=TRUE)
 
 
 # GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
 transitivity(vgg)
 cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
 vgg_f <- filter(cutoff = cut75,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
-                vertex_names = ag)
+                vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
 transitivity(vgg_f)
 
@@ -2256,10 +2302,11 @@ sum(degree(vgg)==0)/vcount(vgg)
 
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green", length(ag))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
 vgg <- giant_comp(graph = vgg,
                   vertex_color = V(vgg)$color,
-                  vertex_names = ag)
+                  vertex_names = V(vgg)$name)
 sh<-shortest.paths(vgg)
 is.na(sh)<-sapply(sh,is.infinite)
 sh[1:5,1:5]
