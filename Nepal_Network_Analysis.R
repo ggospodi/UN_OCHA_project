@@ -1283,6 +1283,8 @@ hist(paths,
      xlab="Path Length Values",
      main="Path Length Distribution for g")
 
+
+
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
 bc <- betweenness(agg,v=V(agg), directed=FALSE)
 plot(sort(bc, decreasing=TRUE),
@@ -1499,7 +1501,6 @@ plot(agg,
      edge.curved = TRUE,
      edge.color = E(agg)$color)
 
-
 # FILTER AND REPEAT:
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 V(agg)$color <- rep("green",length(ag))
@@ -1533,10 +1534,6 @@ plot(agg_f,
      edge.curved = TRUE,
      edge.color = E(agg_f)$color)
 
-
-
-
-
 # FILTER AND REPEAT:
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 V(agg)$color <- rep("green",length(ag))
@@ -1569,7 +1566,6 @@ plot(agg_f,
      edge.width = 0.5*E(agg_f)$weight,
      edge.curved = TRUE,
      edge.color = E(agg_f)$color)
-
 
 # FILTER AND REPEAT:
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
@@ -1606,17 +1602,104 @@ plot(agg_f,
 
 
 
+# EDGE-BETWEENNESS COMMUNITY
+# The edge betweenness score of an edge measures the number of shortest paths through it, see edge.betweenness for details. 
+# The idea of the edge betweenness based community structure detection is that it is likely that edges connecting separate modules 
+# have high edge betweenness as all the shortest paths from one module to another must traverse through them. 
+# So if we gradually remove the edge with the highest edge betweenness score we will get a hierarchical map, a rooted tree, 
+# called a dendrogram of the graph. The leafs of the tree are the individual vertices and the root of the tree represents the whole graph.
+#
+# edge.betweenness.community performs this algorithm by calculating the edge betweenness of the graph, 
+# removing the edge with the highest edge betweenness score, then recalculating edge betweenness of the edges 
+# and again removing the one with the highest score, etc.
 
+# FILTER AND CLUSTER WITH CUTOFF = 0.75
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+agg_f <- filter(cutoff = cut75,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name)
+agg_f <- as.undirected(agg_f)
+agg_f <- giant_comp(graph = agg_f,
+                    vertex_color = V(agg_f)$color,
+                    vertex_names = V(agg_f)$name)
+ebc <- edge.betweenness.community(graph = agg_f)
+plot(ebc,
+     agg_f, 
+     vertex.size=5,
+     edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=V(agg_f)$name)
 
+# FILTER AND CLUSTER WITH CUTOFF = 0.85
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
+agg_f <- filter(cutoff = cut85,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name)
+agg_f <- as.undirected(agg_f)
+agg_f <- giant_comp(graph = agg_f,
+                    vertex_color = V(agg_f)$color,
+                    vertex_names = V(agg_f)$name)
+ebc <- edge.betweenness.community(graph = agg_f)
+plot(ebc,
+     agg_f, 
+     vertex.size=5,
+     edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=V(agg_f)$name)
 
+# FILTER AND CLUSTER WITH CUTOFF = 0.90
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
+agg_f <- filter(cutoff = cut90,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name)
+agg_f <- as.undirected(agg_f)
+agg_f <- giant_comp(graph = agg_f,
+                    vertex_color = V(agg_f)$color,
+                    vertex_names = V(agg_f)$name)
+ebc <- edge.betweenness.community(graph = agg_f)
+plot(ebc,
+     agg_f, 
+     vertex.size=5,
+     edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=V(agg_f)$name)
 
-
-
-
-
-
-
-
+# FILTER AND CLUSTER WITH CUTOFF = 0.95
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
+agg_f <- filter(cutoff = cut95,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name)
+agg_f <- as.undirected(agg_f)
+agg_f <- giant_comp(graph = agg_f,
+                    vertex_color = V(agg_f)$color,
+                    vertex_names = V(agg_f)$name)
+ebc <- edge.betweenness.community(graph = agg_f)
+plot(ebc,
+     agg_f, 
+     vertex.size=5,
+     edge.width=0.5*E(agg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=V(agg_f)$name)
 
 
 
@@ -1628,6 +1711,120 @@ plot(agg_f,
 be<-betweenness.estimate(vgg,v=V(vgg), directed=FALSE,3)
 plot(sort(be, decreasing=TRUE), xlab="Node Index", ylab="Betweenness Centrality Estimate for g", main="Betweenness Centrality Estimate for g",col=adjustcolor(rgb(0,1/2,0,1)))
 hist(be,breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality Estimate Values (c=3) for g",main="Positive Betweenness Centrality Estimate for g")
+
+
+
+
+
+# BETWEENNESS ESTIMATE CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+bce <- betweenness.estimate(agg,v=V(agg), directed=FALSE,4)
+plot(sort(bce, decreasing=TRUE),
+     col=adjustcolor(rgb(1/2,0,0,1/2)), 
+     xlab="Node Index", 
+     ylab="Betweenness Centrality Estimate", 
+     main="Sorted Relief Agency Betweenness Centrality Values", 
+     pch=19)
+histP2(bce,
+       breaks=100,
+       col=adjustcolor(rgb(1/2,0,0,1/2)),
+       xlab="Betweenness Estimate Centrality Values",
+       main="Relief Agency Betweenness Estimate Centrality Distribution")
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
+bce_int <- as.integer(round(bce,0))
+for (k in 1:length(bce_int)){
+  V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bce_int))))[as.integer(bce_int[k])+1]
+}
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = 7,
+     vertex.label = V(agg)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.5*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_bce <- bce[which(bce > quantile(bce,0.9))]
+top_bce
+
+# FIND THE TOP 5% BETWENNES NODES
+top_bce <- bce[which(bce > quantile(bce,0.95))]
+top_bce
+
+# REMOVE ISOLATED
+agg <- drop_isolated(graph = agg,
+                     vertex_colors = V(agg)$color,
+                     vertex_names = V(agg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+agg <- giant_comp(graph = agg,
+                  vertex_colors = V(agg)$color,
+                  vertex_names = V(agg)$name)
+
+# SET THE GRAPH COLOR ACCORDING TO BC
+
+bce<-betweenness(agg,v=V(agg), directed=FALSE)
+bce_int <- as.integer(round(bce,0))
+for (k in 1:length(bce_int)){
+  V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bce_int))))[as.integer(bce_int[k])+1]
+}
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = 5,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
