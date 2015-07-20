@@ -1243,16 +1243,13 @@ clusters(agg)$no
 # SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
 sort(clusters(agg)$csize,decreasing=TRUE)
 
-# We MAY FIND IT USEFUL TO DO CLUSTER ANALYSIS ON FLITRATIONS LATER:
-# cut25 <- quantile(as.vector(ag_m[ag_m>0]),0.25)
-# agg_f <- filter(cut25,ag_m,"green",ag)
-# agg_f <- as.undirected(agg_f)
-# sort(clusters(agg_f)$csize,decreasing=TRUE)
-
 # GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
 transitivity(agg)
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
-agg_f <- filter(cut75,ag_m,"green",ag)
+agg_f <- filter(cutoff = cut75,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = ag)
 agg_f <- as.undirected(agg_f)
 transitivity(agg_f)
 
@@ -1319,7 +1316,7 @@ plot(agg,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
-# FIND THE TOP 10% BETWENNES NODES
+# FIND THE TOP 10% BETWEENNES NODES
 top_bc <- bc[which(bc > quantile(bc,0.9))]
 top_bc
 
@@ -1332,58 +1329,90 @@ agg <- drop_isolated(graph = agg,
                      vertex_colors = V(agg)$color,
                      vertex_names = V(agg)$name)
 
-
-
-
-
-
-
-
-
-
-
-
-# GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
-vgg <- giant_comp(graph = vgg,
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+agg <- giant_comp(graph = agg,
                   vertex_colors = V(agg)$color,
-                  vertex_names = V(vgg)$name)
+                  vertex_names = V(agg)$name)
 
 # SET THE GRAPH COLOR ACCORDING TO BC
-bc<-betweenness(vgg,v=V(vgg), directed=FALSE)
-V(vgg)$color <- vector()
+
+bc<-betweenness(agg,v=V(agg), directed=FALSE)
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
-  V(vgg)$color[k] <- heat.colors((1+as.integer(max(bc_int)))/(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+  V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
-plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
-     vertex.color = V(vgg)$color,
-     vertex.size = 2,
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = 5,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.5, 
-     edge.width = 0.1*E(vgg)$weight,
+     edge.width = 0.1*E(agg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
 
+# FILTER AND REPEAT:
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+agg_f <- filter(cutoff = cut75,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name)
+agg_f <- as.undirected(agg_f)
+agg_f <- giant_comp(graph = agg_f,
+                  vertex_color = V(agg_f)$color,
+                  vertex_names = V(agg_f)$name)
+bc<-betweenness(agg_f,v=V(agg_f), directed=FALSE)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(agg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(agg_f,
+     layout = layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = 5,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(agg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# FILTER AND REPEAT:
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
+agg_f <- filter(cutoff = cut90,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name)
+agg_f <- as.undirected(agg_f)
+agg_f <- giant_comp(graph = agg_f,
+                    vertex_color = V(agg_f)$color,
+                    vertex_names = V(agg_f)$name)
+bc<-betweenness(agg_f,v=V(agg_f), directed=FALSE)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(agg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(agg_f,
+     layout = layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = 5,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(agg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
 
 
 
