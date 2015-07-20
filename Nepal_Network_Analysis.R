@@ -2853,7 +2853,7 @@ plot(ebc,
 
 # BETWEENNESS ESTIMATE CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 bce <- betweenness.estimate(graph = vgg,
                             vids = V(vgg),
@@ -2882,8 +2882,8 @@ for (k in 1:length(bce_int)){
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = V(vgg)$color,
-     vertex.size = 7,
-     vertex.label = V(vgg)$name, 
+     vertex.size = 2,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2934,9 +2934,8 @@ plot(vgg,
 
 # EDGE BETWEENNESS ESTIMATE: This betweenness estimate is defined in a similar way as betweenness estimate, 
 # we show it here with cutoff=4.
-
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 ebe <- edge.betweenness.estimate(graph = vgg,
                                  weights =E(vgg)$weight,
@@ -2964,8 +2963,8 @@ for (k in 1:length(ebe_int)){
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg)$name, 
+     vertex.size = 3,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2978,7 +2977,7 @@ top_ebe <- ebe[which(ebe > quantile(ebe,0.9))]
 E(vgg)[which(ebe %in% top_ebe)]
 
 # FIND THE TOP 5% EDGE-BETWEENNES EDGES
-top_ebe <- ebe[which(ebe > quantile(ebe,0.99))]
+top_ebe <- ebe[which(ebe > quantile(ebe,0.999))]
 E(vgg)[which(ebe %in% top_ebe)]
 
 # REMOVE ISOLATED
@@ -2997,20 +2996,23 @@ ebe <- edge.betweenness.estimate(graph = vgg,
                                  directed=FALSE,
                                  cutoff = 4)
 ebe_int <- as.integer(round(ebe,0))
-for (k in 1:length(ec_int)){
+for (k in 1:length(ebe_int)){
   E(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(ebe_int))))[as.integer(ebe_int[k])+1]
 }
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg)$name, 
+     vertex.size = 2,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
-     edge.width = 0.5*E(vgg)$weight,
+     edge.width = 3*E(vgg)$weight,
      edge.curved = TRUE,
      edge.color = E(vgg)$color)
+
+
+
 
 
 # WE CAN FURTHER FILTER AND APPLY THIS DEPENDING ON MODELING GOALS
@@ -3024,7 +3026,7 @@ plot(vgg,
 # (or an efect of an event) from a node to all other nodes. To demonstrate this concept, we compute the closeness 
 # centrality for the unweighted network.
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 cl<-clusters(vgg)
 vgg1<-induced.subgraph(vgg, which(cl$membership == which.max(cl$csize)))
@@ -3032,11 +3034,143 @@ cc<-closeness(graph = vgg1,vids = V(vgg1),weights = E(vgg1)$weight)
 plot(sort(cc/max(cc), decreasing=TRUE), col=adjustcolor(rgb(1/2,0,1,1)), xlab="Node Id in the Giant Conencted Component (gg1)", ylab="Normalized Closeness Centrality", main="Closeness Centrality for the Giant Component (gg1)")
 hist(cc/max(cc),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Closeness Centrality Values for gg1",main="Normalized Closeness Centrality Distribution for gg1")
 
+# DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cc <- closeness(graph = vgg,
+              vids = V(vgg), 
+              weights = E(vgg)$weight,
+              normalized = TRUE)
+cc_int <- as.integer(round(10000*cc,0))
+cc_int <- cc_int-min(cc_int)
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_cc <- cc[which(cc > quantile(cc,0.9))]
+top_cc
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_cc <- cc[which(cc > quantile(cc,0.95))]
+top_cc
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_cc <- cc[which(cc > quantile(cc,0.99))]
+top_cc
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,
+                     vertex_colors = V(vgg)$color,
+                     vertex_names = V(vgg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(vgg)$color,
+                  vertex_names = V(vgg)$name)
+
+# NOTE: MUST RECALCULATE CC AFER GRAPH TRANSFORMATIONS
+cc <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+cc_int <- as.integer(round(10000*cc,0))
+cc_int <- cc_int-min(cc_int)
+
+for (k in 1:length(cc_int)){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(cc_int))))[as.integer(cc_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+cc <- closeness(graph = vgg_f,
+              vids = V(vgg_f), 
+              weights = E(vgg_f)$weight,
+              normalized = TRUE)
+cc_int <- as.integer(round(10000*cc,0))
+cc_int <- cc_int-min(cc_int)
+for (k in 1:length(cc_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+cc <- closeness(graph = vgg_f,
+              vids = V(vgg_f), 
+              weights = E(vgg_f)$weight,
+              normalized = TRUE)
+cc_int <- as.integer(round(10000*cc,0))
+cc_int <- cc_int-min(cc_int)
+for (k in 1:length(cc_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
 cce<-closeness.estimate(graph = vgg1,vids = V(vgg1),weights = E(vgg1)$weight,cutoff = 7)
 plot(sort(cce/max(cce), decreasing=TRUE), col=adjustcolor(rgb(1/2,0,1,1)), xlab="Node Id in the Giant Conencted Component (gg1)", ylab="Normalized Closeness Centrality", main="Closeness Centrality for the Giant Component (gg1)")
 hist(cce/max(cce),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Closeness Centrality Values for gg1",main="Normalized Closeness Centrality Distribution for gg1")
 
 
+# WE CAN FILTER FURTHER AT A LATER STAGE
 
 
 
@@ -3045,7 +3179,7 @@ hist(cce/max(cce),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Cl
 # contribute more to the score of the given node than equal conenctions to low-scoring nodes. 
 # A variant of egenvector centrality is Google's PageRank algorithm.
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 clu<-clusters(vgg)
 vgg1<-induced.subgraph(vgg, which(clu$membership == which.max(clu$csize)))
@@ -3054,17 +3188,284 @@ plot(sort(ec, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id i
 hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Values",main="Essential Closeness Centrality Distribution")
 
 
+# DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+ec <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+ec_int <- as.integer(round(10000*ec,0))
+ec_int <- ec_int-min(ec_int)
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_ec <- ec[which(ec > quantile(ec,0.9))]
+top_ec
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_ec <- ec[which(ec > quantile(ec,0.95))]
+top_ec
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_ec <- ec[which(ec > quantile(ec,0.99))]
+top_ec
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,
+                     vertex_colors = V(vgg)$color,
+                     vertex_names = V(vgg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(vgg)$color,
+                  vertex_names = V(vgg)$name)
+
+# NOTE: MUST RECALCULATE EC AFTER GRAPH TRANSFORMATIONS
+ec <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+ec_int <- as.integer(round(10000*ec,0))
+ec_int <- ec_int-min(ec_int)
+
+for (k in 1:length(ec_int)){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(ec_int))))[as.integer(ec_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+ec <- closeness(graph = vgg_f,
+                vids = V(vgg_f), 
+                weights = E(vgg_f)$weight,
+                normalized = TRUE)
+ec_int <- as.integer(round(10000*ec,0))
+ec_int <- ec_int-min(ec_int)
+for (k in 1:length(ec_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+ec <- closeness(graph = vgg_f,
+                vids = V(vgg_f), 
+                weights = E(vgg_f)$weight,
+                normalized = TRUE)
+ec_int <- as.integer(round(10000*ec,0))
+ec_int <- ec_int-min(ec_int)
+for (k in 1:length(ec_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
 # AUTHORITY SCORE: This is a measure for DIRECTED NETWORKS, and it measures the number of nodes that are hubs and point 
 # to a given node. It is defined as the principle eigenvector values for t(A)*A, where A stands for the adjacency 
 # matrix of the network. For undirected networks like ours, the adjacency matrix is symmetric, so the authority score 
 # is equivalent to the hub score. In subsequent analyses, we will be looking at directed extensions of this network 
 # model, so we are including these two scores in the analysis for completeness.
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 au<-authority.score(vgg)$vector
 plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
 hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
+
+
+# DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+au <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+au_int <- as.integer(round(10000*au,0))
+au_int <- au_int-min(au_int)
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_au <- au[which(au > quantile(au,0.9))]
+top_au
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_au <- au[which(au > quantile(au,0.95))]
+top_au
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_au <- au[which(au > quantile(au,0.99))]
+top_au
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,
+                     vertex_colors = V(vgg)$color,
+                     vertex_names = V(vgg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(vgg)$color,
+                  vertex_names = V(vgg)$name)
+
+# NOTE: MUST RECALCULATE au AFER GRAPH TRANSFORMATIONS
+au <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+au_int <- as.integer(round(10000*au,0))
+au_int <- au_int-min(au_int)
+
+for (k in 1:length(au_int)){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(au_int))))[as.integer(au_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+au <- closeness(graph = vgg_f,
+                vids = V(vgg_f), 
+                weights = E(vgg_f)$weight,
+                normalized = TRUE)
+au_int <- as.integer(round(10000*au,0))
+au_int <- au_int-min(au_int)
+for (k in 1:length(au_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+au <- closeness(graph = vgg_f,
+                vids = V(vgg_f), 
+                weights = E(vgg_f)$weight,
+                normalized = TRUE)
+au_int <- as.integer(round(10000*au,0))
+au_int <- au_int-min(au_int)
+for (k in 1:length(au_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3082,17 +3483,294 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 # of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized 
 # by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 tr<-transitivity(vgg, type="local")
 plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
 
 
+
+# DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+tr <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+tr_int <- as.integer(round(10000*tr,0))
+tr_int <- tr_int-min(tr_int)
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_tr <- tr[which(tr > quantile(tr,0.9))]
+top_tr
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_tr <- tr[which(tr > quantile(tr,0.95))]
+top_tr
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_tr <- tr[which(tr > quantile(tr,0.99))]
+top_tr
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,
+                     vertex_colors = V(vgg)$color,
+                     vertex_names = V(vgg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(vgg)$color,
+                  vertex_names = V(vgg)$name)
+
+# NOTE: MUST RECALCULATE tr AFER GRAPH TRANSFORMATIONS
+tr <- closeness(graph = vgg,
+                vids = V(vgg), 
+                weights = E(vgg)$weight,
+                normalized = TRUE)
+tr_int <- as.integer(round(10000*tr,0))
+tr_int <- tr_int-min(tr_int)
+
+for (k in 1:length(tr_int)){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(tr_int))))[as.integer(tr_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+tr <- closeness(graph = vgg_f,
+                vids = V(vgg_f), 
+                weights = E(vgg_f)$weight,
+                normalized = TRUE)
+tr_int <- as.integer(round(10000*tr,0))
+tr_int <- tr_int-min(tr_int)
+for (k in 1:length(tr_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+tr <- closeness(graph = vgg_f,
+                vids = V(vgg_f), 
+                weights = E(vgg_f)$weight,
+                normalized = TRUE)
+tr_int <- as.integer(round(10000*tr,0))
+tr_int <- tr_int-min(tr_int)
+for (k in 1:length(tr_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+
 # The weighted analogue of the clustering coefficient
 trw<-transitivity(vgg, type="weighted")
 plot(sort(trw), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(trw,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
+
+
+
+# DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+trw <- closeness(graph = vgg,
+                 vids = V(vgg), 
+                 weights = E(vgg)$weight,
+                 normalized = TRUE)
+trw_int <- as.integer(round(10000*trw,0))
+trw_int <- trw_int-min(trw_int)
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_trw <- trw[which(trw > quantile(trw,0.9))]
+top_trw
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_trw <- trw[which(trw > quantile(trw,0.95))]
+top_trw
+
+# FIND THE TOP 10% BETWEENNES NODES
+top_trw <- trw[which(trw > quantile(trw,0.99))]
+top_trw
+
+# REMOVE ISOLATED
+vgg <- drop_isolated(graph = vgg,
+                     vertex_colors = V(vgg)$color,
+                     vertex_names = V(vgg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(vgg)$color,
+                  vertex_names = V(vgg)$name)
+
+# NOTE: MUST RECALCULATE trw AFER GRAPH TRANSFORMATIONS
+trw <- closeness(graph = vgg,
+                 vids = V(vgg), 
+                 weights = E(vgg)$weight,
+                 normalized = TRUE)
+trw_int <- as.integer(round(10000*trw,0))
+trw_int <- trw_int-min(trw_int)
+
+for (k in 1:length(trw_int)){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(trw_int))))[as.integer(trw_int[k])+1]
+}
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+trw <- closeness(graph = vgg_f,
+                 vids = V(vgg_f), 
+                 weights = E(vgg_f)$weight,
+                 normalized = TRUE)
+trw_int <- as.integer(round(10000*trw,0))
+trw_int <- trw_int-min(trw_int)
+for (k in 1:length(trw_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+trw <- closeness(graph = vgg_f,
+                 vids = V(vgg_f), 
+                 weights = E(vgg_f)$weight,
+                 normalized = TRUE)
+trw_int <- as.integer(round(10000*trw,0))
+trw_int <- trw_int-min(trw_int)
+for (k in 1:length(trw_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+
+
+
+
+
 
 
 # COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. We have already looked at the connected components, 
