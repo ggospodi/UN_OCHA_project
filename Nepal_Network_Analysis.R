@@ -1720,7 +1720,11 @@ hist(be,breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality 
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 V(agg)$color <- rep("green",length(ag))
 V(agg)$name <- ag
-bce <- betweenness.estimate(agg,v=V(agg), directed=FALSE,4)
+bce <- betweenness.estimate(graph = agg,
+                            vids = V(agg),
+                            weights = E(agg)$weight,
+                            directed=FALSE,
+                            4)
 plot(sort(bce, decreasing=TRUE),
      col=adjustcolor(rgb(1/2,0,0,1/2)), 
      xlab="Node Index", 
@@ -1771,8 +1775,11 @@ agg <- giant_comp(graph = agg,
                   vertex_names = V(agg)$name)
 
 # SET THE GRAPH COLOR ACCORDING TO BC
-
-bce<-betweenness(agg,v=V(agg), directed=FALSE)
+bce <- betweenness.estimate(graph = agg,
+                            vids = V(agg),
+                            weights = E(agg)$weight,
+                            directed=FALSE,
+                            cutoff = 4)
 bce_int <- as.integer(round(bce,0))
 for (k in 1:length(bce_int)){
   V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bce_int))))[as.integer(bce_int[k])+1]
@@ -1790,52 +1797,89 @@ plot(agg,
      edge.color = gray.colors(1))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # EDGE BETWEENNESS ESTIMATE: This betweenness estimate is defined in a similar way as betweenness estimate, 
-# we show it here with cutoff=3.
-ee <- edge.betweenness.estimate(vgg,e=E(vgg), directed=FALSE,3)
+# we show it here with cutoff=4.
 
-plot(sort(ee, decreasing=TRUE), col=adjustcolor(rgb(0,1/2,0.1,1)), xlab="Node Id", ylab="Edge Betweenness Centrality Estimate (c=3) for g", main="Edge Betweenness Centrality Estimate for g", pch=20)
-hist(ee,breaks=200,col=adjustcolor(rgb(0,1/2,0.1,1)),xlab="Edge Betweenness Centrality Estimate for g",main="(>1) Edge Betweenness Centrality Estimate for g")
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+ebe <- edge.betweenness.estimate(graph = agg,
+                                weights =E(agg)$weight,
+                                directed=FALSE,
+                                cutoff = 4)
+plot(sort(ebe, decreasing=TRUE),
+     col=adjustcolor(rgb(1/2,0,0,1/2)), 
+     xlab="Node Index", 
+     ylab="Edge-Betweenness Centrality", 
+     main="Sorted Relief Agency Edge-Betweenness Centrality Values", 
+     pch=19)
+histP2(ebe,
+       breaks=100,
+       col=adjustcolor(rgb(1/2,0,0,1/2)),
+       xlab="Edge-Betweenness Centrality Values",
+       main="Relief Agency Edge-Betweenness Centrality Distribution")
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO EDGE-BEWEENNESS CENTRALITY
+ebe_int <- as.integer(round(ebe,0))
+for (k in 1:length(ebe_int)){
+  E(agg)$color[k] <- rev(heat.colors(1+as.integer(max(ebe_int))))[as.integer(ebe_int[k])+1]
+}
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     vertex.color = "green",
+     vertex.size = 7,
+     vertex.label = V(agg)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.5*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = E(agg)$color)
+
+# FIND THE TOP 10% EDGE-BETWEENNES EDGES
+top_ebe <- ebe[which(ebe > quantile(ebe,0.9))]
+E(agg)[which(ebe %in% top_ebe)]
+
+# FIND THE TOP 5% EDGE-BETWEENNES EDGES
+top_ebe <- ebe[which(ebe > quantile(ebe,0.99))]
+E(agg)[which(ebe %in% top_ebe)]
+
+# REMOVE ISOLATED
+agg <- drop_isolated(graph = agg,
+                     vertex_colors = V(agg)$color,
+                     vertex_names = V(agg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+agg <- giant_comp(graph = agg,
+                  vertex_colors = V(agg)$color,
+                  vertex_names = V(agg)$name)
+
+# SET THE GRAPH COLOR ACCORDING TO EC
+ebe <- edge.betweenness.estimate(graph = agg,
+                                 weights =E(agg)$weight,
+                                 directed=FALSE,
+                                 cutoff = 4)
+ebe_int <- as.integer(round(ebe,0))
+for (k in 1:length(ec_int)){
+  E(agg)$color[k] <- rev(heat.colors(1+as.integer(max(ebe_int))))[as.integer(ebe_int[k])+1]
+}
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     vertex.color = "green",
+     vertex.size = 7,
+     vertex.label = V(agg)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.5*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = E(agg)$color)
+
+
+# WE CAN FURTHER FILTER AND APPLY THIS DEPENDING ON MODELING GOALS
+
 
 
 
