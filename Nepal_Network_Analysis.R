@@ -2086,10 +2086,14 @@ plot(vgg,
      edge.color = gray.colors(1))
 
 # REMOVE ISOLATED
-vgg <- drop_isolated(graph = vgg,V(vgg)$name)
+vgg <- drop_isolated(graph = vgg,
+                     vertex_colors = V(vgg)$color,
+                     vertex_names = V(vgg)$name)
 
 # GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
-vgg <- giant_comp(graph = vgg,vertex_names = V(vgg)$name)
+vgg <- giant_comp(graph = vgg,
+                  vertex_colors = V(vgg)$color,
+                  vertex_names = V(vgg)$name)
 
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
@@ -2230,11 +2234,15 @@ sort(clusters(vgg)$csize,decreasing=TRUE)
 
 
 
+
+
+
+
 # GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
 transitivity(vgg)
-cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
 vgg_f <- filter(cutoff = cut75,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = ag)
 vgg_f <- as.undirected(vgg_f)
@@ -2247,7 +2255,7 @@ max(clusters(vgg)$csize)/vcount(vgg)
 sum(degree(vgg)==0)/vcount(vgg)
 
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green", length(ag))
 vgg <- giant_comp(graph = vgg,
                   vertex_color = V(vgg)$color,
@@ -2344,12 +2352,12 @@ plot(vgg,
 
 
 # FILTER AND REPEAT:
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+V(vgg)$name <- u_vdc
+cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
 vgg_f <- filter(cutoff = cut75,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2374,12 +2382,12 @@ plot(vgg_f,
      edge.color = gray.colors(1))
 
 # FILTER AND REPEAT:
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
+V(vgg)$name <- u_vdc
+cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
 vgg_f <- filter(cutoff = cut90,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2411,9 +2419,9 @@ plot(vgg_f,
 
 
 # EDGE-BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH AN EDGE
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 ec <- edge.betweenness(graph = vgg,
                        e = E(vgg), 
                        directed = FALSE,
@@ -2489,12 +2497,12 @@ plot(vgg,
      edge.color = E(vgg)$color)
 
 # FILTER AND REPEAT:
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
+V(vgg)$name <- u_vdc
+cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
 vgg_f <- filter(cutoff = cut85,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2522,12 +2530,12 @@ plot(vgg_f,
      edge.color = E(vgg_f)$color)
 
 # FILTER AND REPEAT:
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
+V(vgg)$name <- u_vdc
+cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
 vgg_f <- filter(cutoff = cut90,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2555,12 +2563,12 @@ plot(vgg_f,
      edge.color = E(vgg_f)$color)
 
 # FILTER AND REPEAT:
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
 vgg_f <- filter(cutoff = cut95,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2601,12 +2609,12 @@ plot(vgg_f,
 # and again removing the one with the highest score, etc.
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.75
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
+V(vgg)$name <- u_vdc
+cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
 vgg_f <- filter(cutoff = cut75,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2623,12 +2631,12 @@ plot(ebc,
      vertex.label=V(vgg_f)$name)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.85
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
+V(vgg)$name <- u_vdc
+cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
 vgg_f <- filter(cutoff = cut85,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2645,12 +2653,12 @@ plot(ebc,
      vertex.label=V(vgg_f)$name)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.90
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
+V(vgg)$name <- u_vdc
+cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
 vgg_f <- filter(cutoff = cut90,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2667,12 +2675,12 @@ plot(ebc,
      vertex.label=V(vgg_f)$name)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.95
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
-cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
+V(vgg)$name <- u_vdc
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
 vgg_f <- filter(cutoff = cut95,
-                edge_matrix = ag_m,
+                edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
 vgg_f <- as.undirected(vgg_f)
@@ -2704,9 +2712,9 @@ hist(be,breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality 
 
 
 # BETWEENNESS ESTIMATE CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 bce <- betweenness.estimate(graph = vgg,
                             vids = V(vgg),
                             weights = E(vgg)$weight,
@@ -2787,9 +2795,9 @@ plot(vgg,
 # EDGE BETWEENNESS ESTIMATE: This betweenness estimate is defined in a similar way as betweenness estimate, 
 # we show it here with cutoff=4.
 
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 ebe <- edge.betweenness.estimate(graph = vgg,
                                  weights =E(vgg)$weight,
                                  directed=FALSE,
@@ -2875,9 +2883,9 @@ plot(vgg,
 # other nodes. Closeness can be regarded as a measure of how long it will take to spread information 
 # (or an efect of an event) from a node to all other nodes. To demonstrate this concept, we compute the closeness 
 # centrality for the unweighted network.
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 cl<-clusters(vgg)
 vgg1<-induced.subgraph(vgg, which(cl$membership == which.max(cl$csize)))
 cc<-closeness(graph = vgg1,vids = V(vgg1),weights = E(vgg1)$weight)
@@ -2896,9 +2904,9 @@ hist(cce/max(cce),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Cl
 # It assigns relative scores to all nodes in the network based on the concept that connections to high-scoring nodes 
 # contribute more to the score of the given node than equal conenctions to low-scoring nodes. 
 # A variant of egenvector centrality is Google's PageRank algorithm.
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 clu<-clusters(vgg)
 vgg1<-induced.subgraph(vgg, which(clu$membership == which.max(clu$csize)))
 ec<-evcent(vgg1)$vector
@@ -2911,9 +2919,9 @@ hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Va
 # matrix of the network. For undirected networks like ours, the adjacency matrix is symmetric, so the authority score 
 # is equivalent to the hub score. In subsequent analyses, we will be looking at directed extensions of this network 
 # model, so we are including these two scores in the analysis for completeness.
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 au<-authority.score(vgg)$vector
 plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
 hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
@@ -2921,9 +2929,9 @@ hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values"
 
 
 # HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 hb<-hub.score(vgg)$vector
 plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
 hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
@@ -2933,9 +2941,9 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 # and the number of connected triplets of vertices. We computed it in the previous report, but here we include the local and weighted version 
 # of the clustering coefficients. Clustering is particularly relevant to social netowrks where nodes tend to create tightly knit groups charaterized 
 # by a high density of ties, this likelihood is greater than the average probability of an edge between two randomly selected nodes.
-vgg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- ag
+V(vgg)$name <- u_vdc
 tr<-transitivity(vgg, type="local")
 plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
@@ -2967,10 +2975,6 @@ hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Com
 
 plot(wc,vgg,vertex.size=4, vertex.label=NA,edge.width=E(vgg)$weight,main="Walktrap Community Detection for g200")
 plot(vgg, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Walktrap Community Detection for g200")
-
-
-
-
 
 
 
