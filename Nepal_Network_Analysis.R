@@ -2352,7 +2352,7 @@ plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = V(vgg)$color,
      vertex.size = 7,
-     vertex.label = V(vgg)$name, 
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2400,10 +2400,10 @@ plot(vgg,
 
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
-vgg_f <- filter(cutoff = cut75,
+cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
+vgg_f <- filter(cutoff = cut85,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
@@ -2430,10 +2430,10 @@ plot(vgg_f,
 
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
-vgg_f <- filter(cutoff = cut90,
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
@@ -2441,7 +2441,43 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-bc<-betweenness(vgg_f,v=V(vgg_f), directed=FALSE)
+bc<-betweenness(graph = vgg_f,
+                v=V(vgg_f), 
+                directed=FALSE,
+                weights = E(vgg_f)$weight)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 5,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut97 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.97)
+vgg_f <- filter(cutoff = cut97,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+bc<-betweenness(graph = vgg_f,
+                v=V(vgg_f), 
+                directed=FALSE,
+                weights = E(vgg_f)$weight)
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -2460,6 +2496,38 @@ plot(vgg_f,
 
 
 
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99.8 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.998)
+vgg_f <- filter(cutoff = cut99.8,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+bc<-betweenness(graph = vgg_f,
+                v=V(vgg_f), 
+                directed=FALSE,
+                weights = E(vgg_f)$weight)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size = 12,
+     vertex.label = V(vgg_f)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 1.3, 
+     edge.width = 0.7*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
 
 
 
