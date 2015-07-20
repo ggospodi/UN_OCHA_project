@@ -1888,11 +1888,22 @@ plot(agg,
 # other nodes. Closeness can be regarded as a measure of how long it will take to spread information 
 # (or an efect of an event) from a node to all other nodes. To demonstrate this concept, we compute the closeness 
 # centrality for the unweighted network.
-cl<-clusters(vgg)
-vgg1<-induced.subgraph(vgg, which(cl$membership == which.max(cl$csize)))
-cc<-closeness(vgg1)
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+cl<-clusters(agg)
+agg1<-induced.subgraph(agg, which(cl$membership == which.max(cl$csize)))
+cc<-closeness(graph = agg1,vids = V(agg1),weights = E(agg1)$weight)
 plot(sort(cc/max(cc), decreasing=TRUE), col=adjustcolor(rgb(1/2,0,1,1)), xlab="Node Id in the Giant Conencted Component (gg1)", ylab="Normalized Closeness Centrality", main="Closeness Centrality for the Giant Component (gg1)")
 hist(cc/max(cc),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Closeness Centrality Values for gg1",main="Normalized Closeness Centrality Distribution for gg1")
+
+cce<-closeness.estimate(graph = agg1,vids = V(agg1),weights = E(agg1)$weight,cutoff = 7)
+plot(sort(cce/max(cce), decreasing=TRUE), col=adjustcolor(rgb(1/2,0,1,1)), xlab="Node Id in the Giant Conencted Component (gg1)", ylab="Normalized Closeness Centrality", main="Closeness Centrality for the Giant Component (gg1)")
+hist(cce/max(cce),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Closeness Centrality Values for gg1",main="Normalized Closeness Centrality Distribution for gg1")
+
+
+
+
 
 # EIGENVECTOR CENTRALITY: This is a measure of the influence of a node in the network. 
 # It assigns relative scores to all nodes in the network based on the concept that connections to high-scoring nodes 
