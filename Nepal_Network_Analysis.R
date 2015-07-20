@@ -2535,7 +2535,7 @@ plot(vgg_f,
 
 # EDGE-BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH AN EDGE
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 ec <- edge.betweenness(graph = vgg,
                        e = E(vgg), 
@@ -2563,8 +2563,8 @@ for (k in 1:length(ec_int)){
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg)$name, 
+     vertex.size = 2,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2573,11 +2573,11 @@ plot(vgg,
      edge.color = E(vgg)$color)
 
 # FIND THE TOP 10% EDGE-BETWEENNES EDGES
-top_ec <- ec[which(ec > quantile(ec,0.9))]
+top_ec <- ec[which(ec > quantile(ec,0.999))]
 E(vgg)[which(ec %in% top_ec)]
 
 # FIND THE TOP 5% EDGE-BETWEENNES EDGES
-top_ec <- ec[which(ec > quantile(ec,0.99))]
+top_ec <- ec[which(ec > quantile(ec,0.9995))]
 E(vgg)[which(ec %in% top_ec)]
 
 # REMOVE ISOLATED
@@ -2602,8 +2602,8 @@ for (k in 1:length(ec_int)){
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg)$name, 
+     vertex.size = 2,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2613,7 +2613,7 @@ plot(vgg,
 
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
 vgg_f <- filter(cutoff = cut85,
@@ -2635,8 +2635,8 @@ for (k in 1:length(ec_int)){
 plot(vgg_f,
      layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
      vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg_f)$name, 
+     vertex.size = 2,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2646,40 +2646,7 @@ plot(vgg_f,
 
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- u_vdc
-cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
-vgg_f <- filter(cutoff = cut90,
-                edge_matrix = aid_vdc,
-                vertex_colors = V(vgg)$color,
-                vertex_names = V(vgg)$name)
-vgg_f <- as.undirected(vgg_f)
-vgg_f <- giant_comp(graph = vgg_f,
-                    vertex_color = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
-ec <- edge.betweenness(graph = vgg_f,
-                       e = E(vgg_f), 
-                       directed = FALSE,
-                       weights = E(vgg_f)$weight)
-ec_int <- as.integer(round(ec,0))
-for (k in 1:length(ec_int)){
-  E(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(ec_int))))[as.integer(ec_int[k])+1]
-}
-plot(vgg_f,
-     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg_f)$name, 
-     vertex.label.color = "black",
-     vertex.label.font = 1.5, 
-     vertex.label.cex = 1, 
-     edge.width = 0.5*E(vgg_f)$weight,
-     edge.curved = TRUE,
-     edge.color = E(vgg_f)$color)
-
-# FILTER AND REPEAT:
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
 vgg_f <- filter(cutoff = cut95,
@@ -2701,8 +2668,8 @@ for (k in 1:length(ec_int)){
 plot(vgg_f,
      layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
      vertex.color = "green",
-     vertex.size = 7,
-     vertex.label = V(vgg_f)$name, 
+     vertex.size = 2,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
@@ -2710,6 +2677,72 @@ plot(vgg_f,
      edge.curved = TRUE,
      edge.color = E(vgg_f)$color)
 
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+ec <- edge.betweenness(graph = vgg_f,
+                       e = E(vgg_f), 
+                       directed = FALSE,
+                       weights = E(vgg_f)$weight)
+ec_int <- as.integer(round(ec,0))
+for (k in 1:length(ec_int)){
+  E(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(ec_int))))[as.integer(ec_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = "green",
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.5*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = E(vgg_f)$color)
+
+
+# FILTER AND REPEAT:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99.9 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.999)
+vgg_f <- filter(cutoff = cut99.9,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+ec <- edge.betweenness(graph = vgg_f,
+                       e = E(vgg_f), 
+                       directed = FALSE,
+                       weights = E(vgg_f)$weight)
+ec_int <- as.integer(round(ec,0))
+for (k in 1:length(ec_int)){
+  E(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(ec_int))))[as.integer(ec_int[k])+1]
+}
+plot(vgg_f,
+     layout = layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = "green",
+     vertex.size = 10,
+     vertex.label = V(vgg_f)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1.3, 
+     edge.width = 0.9*E(vgg_f)$weight,
+     edge.curved = TRUE,
+     edge.color = E(vgg_f)$color)
 
 
 # EDGE-BETWEENNESS COMMUNITY
@@ -2725,7 +2758,7 @@ plot(vgg_f,
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.75
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
 vgg_f <- filter(cutoff = cut75,
@@ -2739,15 +2772,15 @@ vgg_f <- giant_comp(graph = vgg_f,
 ebc <- edge.betweenness.community(graph = vgg_f)
 plot(ebc,
      vgg_f, 
-     vertex.size=5,
+     vertex.size=2,
      edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
-     vertex.label=V(vgg_f)$name)
+     vertex.label=NA)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.85
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
 vgg_f <- filter(cutoff = cut85,
@@ -2761,37 +2794,15 @@ vgg_f <- giant_comp(graph = vgg_f,
 ebc <- edge.betweenness.community(graph = vgg_f)
 plot(ebc,
      vgg_f, 
-     vertex.size=5,
+     vertex.size=2,
      edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
-     vertex.label=V(vgg_f)$name)
-
-# FILTER AND CLUSTER WITH CUTOFF = 0.90
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
-V(vgg)$name <- u_vdc
-cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
-vgg_f <- filter(cutoff = cut90,
-                edge_matrix = aid_vdc,
-                vertex_colors = V(vgg)$color,
-                vertex_names = V(vgg)$name)
-vgg_f <- as.undirected(vgg_f)
-vgg_f <- giant_comp(graph = vgg_f,
-                    vertex_color = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
-ebc <- edge.betweenness.community(graph = vgg_f)
-plot(ebc,
-     vgg_f, 
-     vertex.size=5,
-     edge.width=0.5*E(vgg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=0.8,
-     vertex.label=V(vgg_f)$name)
+     vertex.label=NA)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.95
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("green",length(ag))
+V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
 vgg_f <- filter(cutoff = cut95,
@@ -2805,25 +2816,39 @@ vgg_f <- giant_comp(graph = vgg_f,
 ebc <- edge.betweenness.community(graph = vgg_f)
 plot(ebc,
      vgg_f, 
-     vertex.size=5,
+     vertex.size=3,
      edge.width=0.5*E(vgg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
-     vertex.label=V(vgg_f)$name)
+     vertex.label=NA)
 
+# FILTER AND CLUSTER WITH CUTOFF = 0.99
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.99)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_color = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+ebc <- edge.betweenness.community(graph = vgg_f)
+plot(ebc,
+     vgg_f, 
+     vertex.size=4,
+     edge.width=0.25*E(vgg_f)$weight,
+     main="Example: ML Communities",
+     vertex.label.cex=0.8,
+     vertex.label=NA)
 
 
 # BETWEENNESS ESTIMATE: This measure calculates betweenness by considering only paths of a certain length 
 # that is smaller than or equal to the cutoff value. Similarly for edge betweenness estimates. 
 # In our analysis, we will use cutoff lengths 10-30 (refer to the path length distribution analysis above). 
 # Here, we use a cutoff=3 just to illustrate the application.
-
-be<-betweenness.estimate(vgg,v=V(vgg), directed=FALSE,3)
-plot(sort(be, decreasing=TRUE), xlab="Node Index", ylab="Betweenness Centrality Estimate for g", main="Betweenness Centrality Estimate for g",col=adjustcolor(rgb(0,1/2,0,1)))
-hist(be,breaks=200,col=adjustcolor(rgb(0,1/2,0,1)),xlab="Betweenness Centrality Estimate Values (c=3) for g",main="Positive Betweenness Centrality Estimate for g")
-
-
-
 
 
 # BETWEENNESS ESTIMATE CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
