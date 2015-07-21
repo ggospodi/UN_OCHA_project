@@ -494,7 +494,7 @@ vdc_o <- union(vdc1_o,vdc2_o)
 
 
 # OVERALL LIST OF VDC CODES, BOTH ORIGIN AND DESTINATION
-vdc <- unique(trim(union(vdc1_o,vdcs)))
+vdc <- unique(trim(union(vdc_o,vdcs)))
 
 
 # GET COORDINATES OF THE VDC CENTROIDS FROM CHRIS AFTER CONVERTING AND TRIMMING WHITESPACES FROM NAMES
