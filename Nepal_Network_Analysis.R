@@ -3325,7 +3325,8 @@ plot(vgg_f,
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-au<-authority.score(vgg)$vector
+au <- authority.score(graph = vgg,
+                      weights = E(vgg)$weight)$vector
 plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
 hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
 
@@ -3334,10 +3335,8 @@ hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values"
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-au <- closeness(graph = vgg,
-                vids = V(vgg), 
-                weights = E(vgg)$weight,
-                normalized = TRUE)
+au <- authority.score(graph = vgg,
+                      weights = E(vgg)$weight)$vector
 au_int <- as.integer(round(10000*au,0))
 au_int <- au_int-min(au_int)
 
@@ -3364,10 +3363,8 @@ vgg <- giant_comp(graph = vgg,
                   vertex_names = V(vgg)$name)
 
 # NOTE: MUST RECALCULATE au AFER GRAPH TRANSFORMATIONS
-au <- closeness(graph = vgg,
-                vids = V(vgg), 
-                weights = E(vgg)$weight,
-                normalized = TRUE)
+au <- authority.score(graph = vgg,
+                      weights = E(vgg)$weight)$vector
 au_int <- as.integer(round(10000*au,0))
 au_int <- au_int-min(au_int)
 
@@ -3386,9 +3383,6 @@ plot(vgg,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
-
-
-
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
@@ -3402,10 +3396,8 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-au <- closeness(graph = vgg_f,
-                vids = V(vgg_f), 
-                weights = E(vgg_f)$weight,
-                normalized = TRUE)
+au <- authority.score(graph = vgg_f,
+                      weights = E(vgg_f)$weight)$vector
 au_int <- as.integer(round(10000*au,0))
 au_int <- au_int-min(au_int)
 for (k in 1:length(au_int)){
@@ -3422,7 +3414,6 @@ plot(vgg_f,
      edge.width = 0.1*E(vgg_f)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
-
 
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
@@ -3437,10 +3428,8 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-au <- closeness(graph = vgg_f,
-                vids = V(vgg_f), 
-                weights = E(vgg_f)$weight,
-                normalized = TRUE)
+au <- authority.score(graph = vgg,
+                      weights = E(vgg)$weight)$vector
 au_int <- as.integer(round(10000*au,0))
 au_int <- au_int-min(au_int)
 for (k in 1:length(au_int)){
@@ -3460,13 +3449,7 @@ plot(vgg_f,
 
 
 
-
-
-
-
-
-
-
+# APPLY TO AV NETWORK
 
 
 # HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
@@ -3477,6 +3460,7 @@ hb<-hub.score(vgg)$vector
 plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
 hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
 
+# APPLY TO AV NETWORK
 
 # CLUSTERING COEFFICIENTS: This is a measure of the clustering of the network,defined by the ratio of the number of closed triplets 
 # and the number of connected triplets of vertices. Here we include the local and weighted version 
@@ -3490,8 +3474,6 @@ tr <- transitivity(graph = vgg,
                    type="local")
 plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
-
-
 
 # DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
@@ -3528,8 +3510,6 @@ plot(vgg,
      edge.width = 0.1*E(vgg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
-
-
 
 
 # FILTER AND REPEAT:
