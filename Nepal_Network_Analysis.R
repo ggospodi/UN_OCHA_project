@@ -2107,110 +2107,88 @@ plot(vgg,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
-# BEFORE WE FILTER, COMMUNITY DETECTION:
 
-mc<-multilevel.community(vgg)
-plot(mc,vgg, vertex.size=2,edge.width=0.1*E(vgg)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=0.8,
-     vertex.label=NA)
+# FILTER BY EDGE WEIGHT LEVELS, NOTE THAT LOWER CUTOFF VALUES
+# DO NOT RESULT IN SIGNIFICANT FILTRATION
 
-
-# FILTER BY EDGE WEIGHT LEVELS
-
-# THIS INITIAL FILTRATION IS REDUNDNAT SINCE MINIMAL DEGREE IS 1
+# THIS INITIAL FILTRATION IS REDUNDANT SINCE MINIMAL DEGREE IS 1
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
-cut <- 1
-vgg_f <- filter(cutoff = cut,
-                edge_matrix = aid_vdc,
-                vertex_colors = V(vgg)$color,
-                vertex_names = u_vdc)
-vgg_f <- giant_comp(graph = vgg_f,
-                    vertex_colors = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
-plot(as.undirected(vgg_f),
-     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color = V(vgg_f)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-mc_f <- multilevel.community(as.undirected(vgg_f))
-plot(mc_f,as.undirected(vgg_f), vertex.size=2,edge.width=0.5*E(vgg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=NA)
-
-
-# THE NEXT CUT IS TOO BIG OF A JUMP, WHICH WILL BE EVIDENT IN THE DEGREE DISTRIBUTION
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
-V(vgg)$name <- u_vdc
-cut <- 2
-vgg_f <- filter(cutoff = cut,
-                edge_matrix = aid_vdc,
-                vertex_colors = V(vgg)$color,
-                vertex_names = u_vdc)
-vgg_f <- giant_comp(graph = vgg_f,
-                    vertex_colors = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
-plot(as.undirected(vgg_f),
-     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color = V(vgg_f)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-mc_f <- multilevel.community(as.undirected(vgg_f))
-plot(mc_f,as.undirected(vgg_f), vertex.size=3,edge.width=0.5*E(vgg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=NA)
-
-
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
-V(vgg)$name <- u_vdc
-cut <- 3
-vgg_f <- filter(cutoff = cut,
+transitivity(vgg)
+cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
+vgg_f <- filter(cutoff = cut85,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
                 vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_colors = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
 plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
      vertex.color = V(vgg_f)$color,
-     vertex.size=5,
-     vertex.label=V(vgg_f)$name, 
+     vertex.size=2,
+     vertex.label=NA, 
      vertex.label.color="black", 
      vertex.label.font=1, 
      vertex.label.cex=1, 
-     edge.width=(E(vgg_f)$weight),
+     edge.width=0.25*(E(vgg_f)$weight),
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
-mc_f <- multilevel.community(as.undirected(vgg_f))
-plot(mc_f,
-     as.undirected(vgg_f), 
-     vertex.size=3,
-     edge.width=0.5*E(vgg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(vgg_f)$name)
+# THE NEXT CUT IS TOO BIG OF A JUMP, WHICH WILL BE EVIDENT IN THE DEGREE DISTRIBUTION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+transitivity(vgg)
+cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
+vgg_f <- filter(cutoff = cut95,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+plot(as.undirected(vgg_f),
+     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size=2,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=0.25*(E(vgg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+# FURTHER FILTRATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+transitivity(vgg)
+cut99.5 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.995)
+vgg_f <- filter(cutoff = cut99.5,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+plot(as.undirected(vgg_f),
+     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     vertex.color = V(vgg_f)$color,
+     vertex.size=4,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1, 
+     edge.width=sqrt(E(vgg_f)$weight),
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
 
 
 # ANALYSIS OF THE TARGET VDC NETWORK ITSELF:
@@ -2265,19 +2243,6 @@ clusters(vgg)$no
 
 # SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
 sort(clusters(vgg)$csize,decreasing=TRUE)
-
-
-
-
-
-
-
-# CHECK FROM HERE ON
-
-
-
-
-
 
 
 
@@ -3680,10 +3645,30 @@ plot(vgg_f,
 
 
 
-# COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. We have already looked at the connected components, 
+# COMMUNITY STRUCTURES: This is a way of performing funcitonal clustering in complex networks. 
+# We have already looked at the connected components, 
 # this is an elementary community detection based on connectivity.
-strongclusters<-clusters(vgg)$membership
-plot(vgg,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=4, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Clustering for Store Network g200")
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("green",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.998)
+vgg_f <- filter(cutoff = cut99,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+strongclusters <- clusters(vgg_f)$membership
+plot(vgg_f,
+     vertex.color = strongclusters, 
+     layout = layout.fruchterman.reingold,
+     vertex.size = 4, 
+     edge.color = "black", 
+     edge.width = E(vgg_f)$weight,
+     vertex.label = NA,
+     main="Clustering for Store Network g200")
+
+
+
 
 # ADD SOME FILTERING AND TRY AGAIN
 
@@ -3692,52 +3677,178 @@ plot(sort(mc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the 
 hist(mc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Multilevel Community Values",main="Multilevel Community Distribution")
 
 
+# MULTILEVEL COMMUNITY DETECTION:
+
+mc<-multilevel.community(vgg)
+plot(mc,vgg, vertex.size=2,edge.width=0.1*E(vgg)$weight,
+     main="Example: ML Communities",
+     vertex.label=NA)
+
+
+# FILTER BY EDGE WEIGHT LEVELS
+
+# FIRST FILTRATION CUTOFF LEVEL DOES NOT REALLY INDUCE ANY FILTRATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
+vgg_f <- filter(cutoff = cut90,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+
+mc_f <- multilevel.community(as.undirected(vgg_f))
+plot(mc_f,
+     as.undirected(vgg_f), 
+     vertex.size=2,
+     edge.width=sqrt(E(vgg_f)$weight),
+     main="Example: ML Communities",
+     vertex.label=NA)
+
+
+# FURTHER FILTRATION, HUGE JUMP
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut97 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.97)
+vgg_f <- filter(cutoff = cut97,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+
+mc_f <- multilevel.community(as.undirected(vgg_f))
+plot(mc_f,
+     as.undirected(vgg_f), 
+     vertex.size=3,
+     edge.width=sqrt(E(vgg_f)$weight),
+     main="Example: ML Communities",
+     vertex.label=NA)
+
+
+# FURTHER FILTRATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99.8 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.998)
+vgg_f <- filter(cutoff = cut99.8,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+
+mc_f <- multilevel.community(as.undirected(vgg_f))
+plot(mc_f,
+     as.undirected(vgg_f), 
+     vertex.size = 7,
+     edge.width=sqrt(E(vgg_f)$weight),
+     main="Example: ML Communities",
+     vertex.label = V(vgg_f)$name)
+
+
+
+
+
+
 # Next, we show the walktrap community algorithm.
-wc<-walktrap.community(vgg)
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+wc <- walktrap.community(graph = vgg,
+                       weights = E(vgg)$weight)
 plot(sort(wc$membership), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network", ylab="Walktrap Community Values", main="Walktrap Community Values for g", pch=20)
 hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Community Values",main="Walktrap Community Distribution")
 
-
-plot(wc,vgg,vertex.size=4, vertex.label=NA,edge.width=E(vgg)$weight,main="Walktrap Community Detection for g200")
-plot(vgg, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(vgg)$weight,vertex.label=NA,main="Walktrap Community Detection for g200")
-
-
-
-
-
-
-
-
+# MULTILEVEL COMMUNITY DETECTION:
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+wc <- walktrap.community(graph = vgg,
+                         weights = E(vgg)$weight)
+plot(wc,vgg, vertex.size=2,edge.width=0.1*E(vgg)$weight,
+     main="Example: ML Communities",
+     vertex.label=NA)
 
 
+# FILTER BY EDGE WEIGHT LEVELS
+
+# FIRST FILTRATION CUTOFF LEVEL DOES NOT REALLY INDUCE ANY FILTRATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut90 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.90)
+vgg_f <- filter(cutoff = cut90,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+wc <- walktrap.community(graph = vgg_f,
+                         weights = E(vgg_f)$weight)
+plot(wc_f,
+     as.undirected(vgg_f), 
+     vertex.size=2,
+     edge.width=sqrt(E(vgg_f)$weight),
+     main="Example: ML Communities",
+     vertex.label=NA)
 
 
+# FURTHER FILTRATION, HUGE JUMP
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut97 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.97)
+vgg_f <- filter(cutoff = cut97,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+wc <- walktrap.community(graph = vgg_f,
+                         weights = E(vgg_f)$weight)
+plot(wc_f,
+     as.undirected(vgg_f), 
+     vertex.size=3,
+     edge.width=sqrt(E(vgg_f)$weight),
+     main="Example: ML Communities",
+     vertex.label=NA)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# FURTHER FILTRATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+cut99.8 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.998)
+vgg_f <- filter(cutoff = cut99.8,
+                edge_matrix = aid_vdc,
+                vertex_colors = V(vgg)$color,
+                vertex_names = V(vgg)$name)
+vgg_f <- as.undirected(vgg_f)
+vgg_f <- giant_comp(graph = vgg_f,
+                    vertex_colors = V(vgg_f)$color,
+                    vertex_names = V(vgg_f)$name)
+wc <- walktrap.community(graph = vgg_f,
+                         weights = E(vgg_f)$weight)
+plot(wc_f,
+     as.undirected(vgg_f), 
+     vertex.size = 7,
+     edge.width=sqrt(E(vgg_f)$weight),
+     main="Example: ML Communities",
+     vertex.label = V(vgg_f)$name)
 
 
 
@@ -3754,7 +3865,7 @@ plot(vgg, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.w
 
 # FOR THE AGENCIES: SIMILARITY MEASURE BASED ON AID TYPE AND QUANTITY
 
-# FOR THE VDC NETWORK: DIRECTED DISPLACEMENT TRACKING GRAPH
+
 # COMPARE VDC PROJECTION DISPLACEMENT TRACKING WITH SEVERITY INDEX
 # COMPARE AID DISTRIBUTION WITH SEVERITY INDEX
 # COMPARE DISPLACEMENT TRACKING WITH 
