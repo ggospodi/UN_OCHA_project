@@ -3183,7 +3183,7 @@ V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
 clu<-clusters(vgg)
 vgg1<-induced.subgraph(vgg, which(clu$membership == which.max(clu$csize)))
-ec<-evcent(vgg1)$vector
+ec <- evcent(graph = vgg1)$vector
 plot(sort(ec, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Closeness Centrality Values", main="Essential (first 200 nodes) Closeness Centrality for g", pch=20)
 hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Values",main="Essential Closeness Centrality Distribution")
 
@@ -3192,11 +3192,8 @@ hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Va
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-ec <- closeness(graph = vgg,
-                vids = V(vgg), 
-                weights = E(vgg)$weight,
-                normalized = TRUE)
-ec_int <- as.integer(round(10000*ec,0))
+ec <- evcent(graph = vgg)$vector
+ec_int <- as.integer(round(1000*ec,0))
 ec_int <- ec_int-min(ec_int)
 
 # FIND THE TOP 10% BETWEENNES NODES
@@ -3222,11 +3219,8 @@ vgg <- giant_comp(graph = vgg,
                   vertex_names = V(vgg)$name)
 
 # NOTE: MUST RECALCULATE EC AFTER GRAPH TRANSFORMATIONS
-ec <- closeness(graph = vgg,
-                vids = V(vgg), 
-                weights = E(vgg)$weight,
-                normalized = TRUE)
-ec_int <- as.integer(round(10000*ec,0))
+ec <- evcent(graph = vgg)$vector
+ec_int <- as.integer(round(1000*ec,0))
 ec_int <- ec_int-min(ec_int)
 
 for (k in 1:length(ec_int)){
@@ -3244,9 +3238,6 @@ plot(vgg,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
-
-
-
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
@@ -3260,12 +3251,10 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-ec <- closeness(graph = vgg_f,
-                vids = V(vgg_f), 
-                weights = E(vgg_f)$weight,
-                normalized = TRUE)
-ec_int <- as.integer(round(10000*ec,0))
+ec <- evcent(graph = vgg_f)$vector
+ec_int <- as.integer(round(1000*ec,0))
 ec_int <- ec_int-min(ec_int)
+
 for (k in 1:length(ec_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
@@ -3295,11 +3284,8 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-ec <- closeness(graph = vgg_f,
-                vids = V(vgg_f), 
-                weights = E(vgg_f)$weight,
-                normalized = TRUE)
-ec_int <- as.integer(round(10000*ec,0))
+ec <- evcent(graph = vgg)$vector
+ec_int <- as.integer(round(1000*ec,0))
 ec_int <- ec_int-min(ec_int)
 for (k in 1:length(ec_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -3315,6 +3301,8 @@ plot(vgg_f,
      edge.width = 0.1*E(vgg_f)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
+
+
 
 
 # AUTHORITY SCORE: This is a measure for DIRECTED NETWORKS, and it measures the number of nodes that are hubs and point 
