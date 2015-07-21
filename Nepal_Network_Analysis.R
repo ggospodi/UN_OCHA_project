@@ -3485,7 +3485,9 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-tr<-transitivity(vgg, type="local")
+tr <- transitivity(graph = vgg,
+                   vids = V(vgg), 
+                   type="local")
 plot(sort(tr), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:3200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
 
@@ -3495,25 +3497,6 @@ hist(tr,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient 
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
 V(vgg)$name <- u_vdc
-tr <- closeness(graph = vgg,
-                vids = V(vgg), 
-                weights = E(vgg)$weight,
-                normalized = TRUE)
-tr_int <- as.integer(round(10000*tr,0))
-tr_int <- tr_int-min(tr_int)
-
-# FIND THE TOP 10% BETWEENNES NODES
-top_tr <- tr[which(tr > quantile(tr,0.9))]
-top_tr
-
-# FIND THE TOP 10% BETWEENNES NODES
-top_tr <- tr[which(tr > quantile(tr,0.95))]
-top_tr
-
-# FIND THE TOP 10% BETWEENNES NODES
-top_tr <- tr[which(tr > quantile(tr,0.99))]
-top_tr
-
 # REMOVE ISOLATED
 vgg <- drop_isolated(graph = vgg,
                      vertex_colors = V(vgg)$color,
@@ -3523,13 +3506,12 @@ vgg <- drop_isolated(graph = vgg,
 vgg <- giant_comp(graph = vgg,
                   vertex_colors = V(vgg)$color,
                   vertex_names = V(vgg)$name)
-
-# NOTE: MUST RECALCULATE tr AFER GRAPH TRANSFORMATIONS
-tr <- closeness(graph = vgg,
-                vids = V(vgg), 
-                weights = E(vgg)$weight,
-                normalized = TRUE)
-tr_int <- as.integer(round(10000*tr,0))
+# CALCULATE LOCAL TRANSITIVITY
+tr <- transitivity(graph = vgg,
+                   vids = V(vgg),
+                   weights =  E(vgg)$weight,
+                   type="local")
+tr_int <- 100*tr
 tr_int <- tr_int-min(tr_int)
 
 for (k in 1:length(tr_int)){
@@ -3563,11 +3545,11 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-tr <- closeness(graph = vgg_f,
-                vids = V(vgg_f), 
-                weights = E(vgg_f)$weight,
-                normalized = TRUE)
-tr_int <- as.integer(round(10000*tr,0))
+tr <- transitivity(graph = vgg_f,
+                   vids = V(vgg_f),
+                   weights =  E(vgg_f)$weight,
+                   type="local")
+tr_int <- 100*tr
 tr_int <- tr_int-min(tr_int)
 for (k in 1:length(tr_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -3598,11 +3580,11 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-tr <- closeness(graph = vgg_f,
-                vids = V(vgg_f), 
-                weights = E(vgg_f)$weight,
-                normalized = TRUE)
-tr_int <- as.integer(round(10000*tr,0))
+tr <- transitivity(graph = vgg_f,
+                   vids = V(vgg_f),
+                   weights =  E(vgg_f)$weight,
+                   type="local")
+tr_int <- 100*tr
 tr_int <- tr_int-min(tr_int)
 for (k in 1:length(tr_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -3620,23 +3602,10 @@ plot(vgg_f,
      edge.color = gray.colors(1))
 
 
-
-
-
-
-
-
-
-
-
-
-
 # The weighted analogue of the clustering coefficient
 trw<-transitivity(vgg, type="weighted")
 plot(sort(trw), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Clustering Coefficient Values", main="Essential Clustering Coefficients for g", pch=20)
 hist(trw,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Clustering Coefficient Values",main="Clustering Coefficient Distribution for g")
-
-
 
 # DISPLAY THE GRAPH WITH THE APPORPRIATE COLORS FOR THE VERTICES
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
@@ -3653,7 +3622,7 @@ vgg <- giant_comp(graph = vgg,
 trw <- transitivity(graph = vgg,
                     type = "weighted",
                     vids = V(vgg))
-trw_int <- as.integer(round(1000*trw,0))
+trw_int <- as.integer(round(100*trw,0))
 trw_int <- trw_int-min(trw_int)
 
 
@@ -3673,9 +3642,6 @@ plot(vgg,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
-
-
-
 # FILTER AND REPEAT:
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("green",length(u_vdc))
@@ -3689,11 +3655,10 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-trw <- closeness(graph = vgg_f,
-                 vids = V(vgg_f), 
-                 weights = E(vgg_f)$weight,
-                 normalized = TRUE)
-trw_int <- as.integer(round(10000*trw,0))
+trw <- transitivity(graph = vgg_f,
+                    type = "weighted",
+                    vids = V(vgg_f))
+trw_int <- as.integer(round(100*trw,0))
 trw_int <- trw_int-min(trw_int)
 for (k in 1:length(trw_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -3724,11 +3689,10 @@ vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_color = V(vgg_f)$color,
                     vertex_names = V(vgg_f)$name)
-trw <- closeness(graph = vgg_f,
-                 vids = V(vgg_f), 
-                 weights = E(vgg_f)$weight,
-                 normalized = TRUE)
-trw_int <- as.integer(round(10000*trw,0))
+trw <- transitivity(graph = vgg_f,
+                    type = "weighted",
+                    vids = V(vgg_f))
+trw_int <- as.integer(round(100*trw,0))
 trw_int <- trw_int-min(trw_int)
 for (k in 1:length(trw_int)){
   V(vgg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -3744,10 +3708,6 @@ plot(vgg_f,
      edge.width = 0.1*E(vgg_f)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
-
-
-
-
 
 
 
