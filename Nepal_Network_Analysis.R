@@ -374,6 +374,17 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 # LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
 centroids <- read.csv(paste0(DIR,"centroids.csv"))
 
+# LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
+# AND LHCIT CODES 
+
+coords <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
+
+
+
+
+
+
+
 
 # Attempts to call the file directly from online HDX server:
 # library(XLConnect)
