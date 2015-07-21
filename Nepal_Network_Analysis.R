@@ -377,14 +377,10 @@ centroids <- read.csv(paste0(DIR,"centroids.csv"))
 # LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
 # AND LHCIT CODES 
 
-coords <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
-
-
-
-
-
-
-
+coords_all <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
+coords <- coords_all[,c("X","Y","VDC_NAME", "HLCIT_CODE","Implementi","Sourcing.A")]
+colnames(coords) <- c("lon","lat","vdc","hlcit","impl_agency","src_agency")
+coords$vdc <- as.character(coords$vdc)
 
 # Attempts to call the file directly from online HDX server:
 # library(XLConnect)
