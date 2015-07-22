@@ -373,6 +373,9 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 
 # LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
 centroids <- read.csv(paste0(DIR,"centroids.csv"))
+centroids$name <- as.character(centroids$name)
+
+
 
 # LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
 # AND LHCIT CODES 
