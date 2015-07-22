@@ -376,7 +376,11 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 centroids <- read.csv(paste0(DIR,"centroids.csv"))
 centroids$name <- as.character(centroids$name)
 
-
+# LOAD HLCIT CODES
+hlcit <- read.csv(paste0(DIR,"hlcit_codes.csv"))
+colnames(hlcit) <- c("vname","hlcit_code","vdc_name")
+hlcit$vname <- as.character(hlcit$vname)
+hlcit$vdc_name <- as.character(hlcit$vdc_name)
 
 # LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
 # AND LHCIT CODES 
@@ -495,6 +499,7 @@ dt_data$vdc <- mapvalues(dt_data$vdc,
                                 "Kathmandu Metropolitan","Kathmandu Metropolitan","Lalitpur Sub Metropolitan",
                                 "Mangkha","Manmaiju","NaikapNayaBhanjyang","PuranogaunDapcha",
                                 "Sangla","Sangkhu","TokhaSarswoti"))
+
 dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
                                     from = c("barabise","Barahbise"),
                                     to = c("Barhabise","Barhabise"))
@@ -503,17 +508,30 @@ dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
                                      to = c("Barhabise","Barhabise"))
 
 
-
-
 # ADD FROM CENTROIDS FILE TO DT_DATA
 # "Bharatpur","Bhirpani","Budanilkantha","Narikot","Dadhikot","Gokarneswor","Manmaiju","NaikapNayaBhanjyang",
 # "PuranogaunDapcha","Saipu","Samari","Shankarpur","Singati","TokhaSarswoti"
 
+
 # IDEA: REVERSE EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM COORDS
 
+need <- setdiff(dt_data$vdc,hlcit$vdc_name)
 for (k in 1:dim(dt_data)[1]){
-  dt_data$hlcit[k] <- coords[round(coords$lon,5,]$hlcit
+  if (dt_data$vdc[k] %in% hlcit$vdc_name){
+    dt_data$hlcit[k] <- hlcit[hlcit$vdc_name %in% dt_data$vdc[k],]$hlcit_code
+  } else {
+      if ((dt_data$vdc[k] %in% need) & (dt_data$vdc[k] %in% hlcit$vname)){
+        dt_data$hlcit[k] <- hlcit[hlcit$vname %in% dt_data$vdc[k],]$hlcit_code
+      }
+  }
 }
+  
+  
+ 
+
+
+
+
 
 
 
