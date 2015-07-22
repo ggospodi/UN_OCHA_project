@@ -1,6 +1,6 @@
 # Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 11, 2015"
+# date: "July 21, 2015"
 # 
 # Data Sources:
 #
@@ -475,9 +475,9 @@ dt_data <- dt_data[,2:dim(dt_data)[2]]
 
 
 # FORMAT THE VDC RELATED COLUMNS AS CHARACTER
-dt_data$vdc <- as.character(dt_data$vdc)
-dt_data$idp_origin_vdc <- as.character(dt_data$idp_origin_vdc)
-dt_data$idp2_origin_vdc <- as.character(dt_data$idp2_origin_vdc)
+dt_data$vdc <- trim(as.character(dt_data$vdc))
+dt_data$idp_origin_vdc <- trim(as.character(dt_data$idp_origin_vdc))
+dt_data$idp2_origin_vdc <- trim(as.character(dt_data$idp2_origin_vdc))
 
 
 # FILTER TO USE DESTINATION VDC LEVELS AS WELL AS ORIGIN (1 OR 2) VDC ENTRIES THAT ARE NON-EMPTY
@@ -488,8 +488,13 @@ dt_data <- dt_data[nchar(dt_data$vdc)>0 & (nchar(dt_data$idp_origin_vdc) + nchar
 # START USING HLCIT CODES INSTEAD:
 
 dt_data$vdc <- mapvalues(dt_data$vdc,
-                         from = "Barabise",
-                         to = "Barhabise")
+                         from = c("Barahbise","Barpak","Chandeni","Charikot","Gokarneshwar","Kathmandu",
+                                  "Kathmandu Municipality","Lalitpur","Mankha","Manmaijn","Naikap Naya",
+                                  "Puranagaun","Sanga","Sangkhu Suntol","Tokhasaraswati"),
+                         to = c("Barhabise","Warpak","Chandeni Mandan","Narikot","Gokarneswor",
+                                "Kathmandu Metropolitan","Kathmandu Metropolitan","Lalitpur Sub Metropolitan",
+                                "Mangkha","Manmaiju","NaikapNayaBhanjyang","PuranogaunDapcha",
+                                "Sangla","Sangkhu","TokhaSarswoti"))
 dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
                                     from = c("barabise","Barahbise"),
                                     to = c("Barhabise","Barhabise"))
@@ -500,8 +505,15 @@ dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
 
 
 
+# ADD FROM CENTROIDS FILE TO DT_DATA
+# "Bharatpur","Bhirpani","Budanilkantha","Narikot","Dadhikot","Gokarneswor","Manmaiju","NaikapNayaBhanjyang",
+# "PuranogaunDapcha","Saipu","Samari","Shankarpur","Singati","TokhaSarswoti"
 
+# IDEA: REVERSE EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM COORDS
 
+for (k in 1:dim(dt_data)[1]){
+  dt_data$hlcit[k] <- coords[round(coords$lon,5,]$hlcit
+}
 
 
 
