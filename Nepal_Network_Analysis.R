@@ -24,6 +24,8 @@
 #
 #
 # LOAD PACKAGES
+library(plyr)
+library(dplyr)
 library(igraph)
 library(RColorBrewer)
 
@@ -181,9 +183,8 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   return(g_f)
 }
 
-
-
-
+#
+#
 # SECTION 1: NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
 #
 #
@@ -481,6 +482,23 @@ dt_data$idp2_origin_vdc <- as.character(dt_data$idp2_origin_vdc)
 
 # FILTER TO USE DESTINATION VDC LEVELS AS WELL AS ORIGIN (1 OR 2) VDC ENTRIES THAT ARE NON-EMPTY
 dt_data <- dt_data[nchar(dt_data$vdc)>0 & (nchar(dt_data$idp_origin_vdc) + nchar(dt_data$idp2_origin_vdc))>0,]
+
+
+# RESOLVE VDC NAMES ACCORDING TO THE VDC COORDINATES FILE:
+# START USING HLCIT CODES INSTEAD:
+
+mapvalues(dt_data[,c(vdc,idp_origin_vdc,idp2_origin_vdc)], 
+          from = c("barabise","Barahbise"),
+          to = c("Barhabise","Barhabise"))
+
+
+
+
+
+
+
+
+
 
 
 # CREATE A LIST OF UNIQUE VDC DESTINATION NAMES
