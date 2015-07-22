@@ -487,10 +487,15 @@ dt_data <- dt_data[nchar(dt_data$vdc)>0 & (nchar(dt_data$idp_origin_vdc) + nchar
 # RESOLVE VDC NAMES ACCORDING TO THE VDC COORDINATES FILE:
 # START USING HLCIT CODES INSTEAD:
 
-mapvalues(dt_data[,c(vdc,idp_origin_vdc,idp2_origin_vdc)], 
-          from = c("barabise","Barahbise"),
-          to = c("Barhabise","Barhabise"))
-
+dt_data$vdc <- mapvalues(dt_data$vdc,
+                         from = "Barabise",
+                         to = "Barhabise")
+dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
+                                    from = c("barabise","Barahbise"),
+                                    to = c("Barhabise","Barhabise"))
+dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
+                                     from = c("barabise","Barahbise"),
+                                     to = c("Barhabise","Barhabise"))
 
 
 
