@@ -74,6 +74,13 @@ trim.trailing <- function (x) sub("\\s+$", "", x)
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
 
+# FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF A VARIABLE
+rm_space <- function(df,col_name){
+  level_names <- unique(levels(df[,which(names(df) %in% col_name)]))
+  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], from=level_names,to=gsub("[[:space:]]","",level_names))
+  return(df)
+}
+
 # FUNCTION THAT DROPS ISOLATED VERTICES
 drop_isolated <- function(graph, vertex_colors, vertex_names) {
   
@@ -379,8 +386,12 @@ centroids$name <- as.character(centroids$name)
 # LOAD HLCIT CODES
 hlcit <- read.csv(paste0(DIR,"hlcit_codes.csv"))
 colnames(hlcit) <- c("vname","hlcit_code","vdc_name")
+hlcit$hlcit_code <- as.factor(hlcit$hlcit_code)
 hlcit$vname <- as.character(hlcit$vname)
 hlcit$vdc_name <- as.character(hlcit$vdc_name)
+hlcit <- rm_space(hlcit,"hlcit_code")
+hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
+
 
 # LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
 # AND LHCIT CODES 
@@ -389,7 +400,9 @@ coords_all <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
 coords <- coords_all[,c("X","Y","VDC_NAME", "HLCIT_CODE","Implementi","Sourcing.A")]
 colnames(coords) <- c("lon","lat","vdc","hlcit","impl_agency","src_agency")
 coords$vdc <- as.character(coords$vdc)
-
+coords <- rm_space(coords,"hlcit")
+coords$hlcit <- as.numeric(levels(coords$hlcit))[coords$hlcit]
+  
 # Attempts to call the file directly from online HDX server:
 # library(XLConnect)
 # data1<-readWorksheetFromFile("http://data.hdx.rwlabs.org/dataset/io/CCCM Nepal Displacement Tracking Matrix.xlsx",sheet=1)
@@ -515,14 +528,19 @@ dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
 
 # IDEA: REVERSE EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM COORDS
 
+hl <- vector()
+
 need <- setdiff(dt_data$vdc,hlcit$vdc_name)
 for (k in 1:dim(dt_data)[1]){
   if (dt_data$vdc[k] %in% hlcit$vdc_name){
-    dt_data$hlcit[k] <- hlcit[hlcit$vdc_name %in% dt_data$vdc[k],]$hlcit_code
-  } else {
-      if ((dt_data$vdc[k] %in% need) & (dt_data$vdc[k] %in% hlcit$vname)){
-        dt_data$hlcit[k] <- hlcit[hlcit$vname %in% dt_data$vdc[k],]$hlcit_code
-      }
+    index <- which(as.character(hlcit$vdc_name)==as.character(dt_data$vdc[k]))[1]
+    hl[k] <- hlcit[index,2]
+  }
+}
+for (k in 1:dim(dt_data)[1]){
+  if ((dt_data$vdc[k] %in% need) & (dt_data$vdc[k] %in% hlcit$vname)){
+    index <- which(as.character(hlcit$vname)==as.character(dt_data$vdc[k]))[1]
+    hl[k] <- hlcit[hlcit$vname %in% dt_data$vdc[k],]$hlcit_code[1]
   }
 }
   
