@@ -534,22 +534,61 @@ for (k in 1:dim(dt_data)[1]){
 for (k in 1:dim(dt_data)[1]){
   if ((dt_data$vdc[k] %in% need) & (dt_data$vdc[k] %in% hlcit$vname)){
     index <- which(as.character(hlcit$vname)==as.character(dt_data$vdc[k]))[1]
-    hl[k] <- hlcit[hlcit$vname %in% dt_data$vdc[k],]$hlcit_code[1]
+    hl[k] <- hlcit[index,]$hlcit_code[1]
   }
 }
 
 # WE HAVE ONE LEFT, SO WE SET UP A MINIMAL DISTANCE CRITERION:
 index <- which(is.na(hl))
 latlon <- dt_data[index,c("lat","lon")] 
-
 closest <- vector()
-for (k in 1:dim(dt_data)[1]){
-  closest[k] <- min((latlon[[1]]-dt_data$lat[k])^2+(latlon[[2]]-dt_data$lon[k])^2)
+for (k in 1:dim(centroids)[1]){
+  closest[k] <- (latlon[[1]]-centroids$lat[k])^2+(latlon[[2]]-centroids$lon[k])^2
+}
+dt_data$vdc[60] <- centroids$name[which(closest==min(closest))]
+hl[index] <- hlcit$hlcit_code[which(hlcit$vname=="Lamidada")[1]]
+
+# ISOLATE THE DESTINATION DATA
+ddata <- dt_data[,c("vdc","lat","lon","idp_hh")]
+ddata <- cbind.data.frame(ddata,hl)
+colnames(ddata) <- c("vdc","lat","lon","idp_hh","hlcit")
+
+# FOR THE PURPOSES OF VISUALIZATION, WEIGHT THE NUMBER OF FAMILIES IN RATIO 2:1 
+# OF LARGEST TO SECOND LARGEST GROUP
+ddata$idp_hh <- ddata$idp_hh*(2/3)
+
+
+# ISOLATE THE ORIGIN DATA
+odata1 <- dt_data[,c("idp_origin_vdc","lat","lon","idp_hh")]
+
+odata1 <- odata1[,-which(is.na(as.numeric(odata1$idp_origin_vdc))]
+
+# CREATE HLCIT AND CORODINATES
+hl2 <- vector()
+lat2 <-vector()
+lon2 <- vector()
+need <- setdiff(odata1$idp_origin_vdc,ddata$vdc)
+need2 <- setdiff(need,coords$vdc)
+for (k in 1: (dim(odata1)[1])){
+  if (odata1$idp_origin_vdc[k] %in% ddata$vdc){
+    hl2[k] <- ddata$hlcit[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
+    lat2[k] <- ddata$lat[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
+    lon2[k] <- ddata$lon[which(ddata$vdc==odata1$idp_origin_vdc[k])][1] 
+  }
+  if ((odata1$idp_origin_vdc[k] %in% need) & (odata1$idp_origin_vdc[k] %in% coords$vdc)){
+    index <- which(coords$vdc==odata1$idp_origin_vdc[k])[1]
+    hl2[k] <- coords[index,]$hlcit[1]
+    lat2[k] <- coords[index,]$lat[1]
+    lon2[k] <- coords[index,]$lon[1]
+  }
 }
 
 
 
-
+# FOR THE PURPOSES OF VISUALIZATION, WEIGHT THE NUMBER OF FAMILIES IN RATIO 2:1 
+# OF LARGEST TO SECOND LARGEST GROUP
+odata1$idp_hh <- odata1$idp_hh*(2/3)
+odata2$idp_hh <- odata2$idp_hh*(1/3)
 
 
 dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
