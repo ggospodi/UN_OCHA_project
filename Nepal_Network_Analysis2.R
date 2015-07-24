@@ -241,12 +241,11 @@ colnames(aid_data) <- c("district_code","vdc_code","impl_agency","src_agency","d
 
 # AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
 
-
-
-
 # CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
 aid_data$vdc <- trim(as.character(aid_data$vdc))
 aid_data$impl_agency <- trim(as.character(aid_data$impl_agency))
+
+
 
 # FILTER OUT THE EMPTY ENTRIES
 aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
@@ -255,6 +254,10 @@ aid_data$vdc_code <- as.numeric(levels(aid_data$vdc_code))[aid_data$vdc_code]
 for (k in 1:dim(aid_data)[1]){
   aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$vdc_code[k])[1]]
 }
+aid_data$vdc[which(is.na(aid_data$vdc))] <- hlcit$vdc_name[which(is.na(aid_data$vdc))]
+
+
+
 
 # SELECT UNIQUE AGENCIES AND TARGET VDC
 ag <- unique(aid_data$impl_agency)
@@ -275,11 +278,10 @@ for (k in 1:length(vdc)){
 }
 koords<-cbind(xc,yc)
 
-
-
-
-
-
+xa <- 20+5*runif(75)
+ya <- 80+12*runif(75)
+koords1 <-cbind(xa,ya)
+koords2<- rbind(koords1,koords)
 
 
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
@@ -310,59 +312,45 @@ plot(av,
      vertex.label=NA, 
      vertex.label.color="black", 
      vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.5*sqrt(E(av)$weight),
+     vertex.label.cex=0.2, 
+     edge.width=0.2*sqrt(E(av)$weight),
      edge.arrow.size=0.3,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
-
-
-# CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
-aid_data$vdc <- trim(as.character(aid_data$vdc))
-aid_data$impl_agency <- trim(as.character(aid_data$impl_agency))
-
-# FILTER OUT THE EMPTY ENTRIES
-aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
-
-# SELECT UNIQUE AGENCIES AND TARGET VDC
-ag <- unique(aid_data$impl_agency)
-vd <- unique(aid_data$vdc)
-all <- union(ag,vd)
-
-# DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
-aid_m <- matrix(0,nrow=length(all),ncol=length(all))
-for (i in 1:length(ag)){
-  for (j in 1:length(vd)){
-    aid_m[[i,length(ag)+j]] <- 
-      dim(aid_data[aid_data$impl_agency==ag[i] & aid_data$vdc==vd[j],c(3,6)])[1]
-  }
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-1
+    V(av)$name[k] <- NA}
 }
 
-# BUILD THE AGENCY-VDC RELIEF EFFORT AID NETWORK
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
-
-# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
-for (k in 1:length(all)){
-  if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
-  }  
-}
 
 # PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
-     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
+     layout=koords2,
      vertex.color=V(av)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
+     vertex.size=V(av)$size,
+     vertex.label=V(av)$name, 
+     vertex.label.color="darkgreen", 
      vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.5*sqrt(E(av)$weight),
-     edge.arrow.size=0.3,
+     vertex.label.cex=0.75, 
+     edge.width=0.05*sqrt(E(av)$weight),
+     edge.arrow.size=0.2,
      edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     edge.color=gray.colors(1),
+     main="Nepal Agency Aid Relief Geo-Network")
+legend("topleft",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
+
+
+
+
+
+
+
+
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
