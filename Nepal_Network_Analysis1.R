@@ -547,7 +547,7 @@ closest <- vector()
 for (k in 1:dim(hlcit)[1]){
   closest[k] <- (latlon[[1]]-hlcit$lat[k])^2+(latlon[[2]]-hlcit$lon[k])^2
 }
-dt_data$vdc[60] <- hlcit$vdc_name[which(closest==min(closest))]
+dt_data$vdc[60] <- hlcit$vname[which(closest==min(closest))]
 hl[index] <- hlcit$hlcit_code[which(hlcit$vname=="Lamidada")[1]]
 
 # ISOLATE THE DESTINATION DATA
