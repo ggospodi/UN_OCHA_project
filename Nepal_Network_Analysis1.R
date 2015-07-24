@@ -568,11 +568,13 @@ dt_data <- dt_data[,c("vdc","idp_origin_vdc","idp2_origin_vdc","idp_hh")]
 vdc_m <- matrix(0,nrow=length(vdc),ncol=length(vdc))
 
 
-# CREATE A MATRIX THAT TRACKS THE NUMBERS OF DISPALCED POPULATIONS AS WELL (THIS COULD BE USED TO DERIVE EDGE WEIGHTS)
+# CREATE A MATRIX THAT TRACKS THE NUMBERS OF DISPLACED POPULATIONS AS WELL 
+# (THIS COULD BE USED TO DERIVE EDGE WEIGHTS)
 dtm <- matrix(nrow=length(vdc),ncol=length(vdc))
 
 
-# COMPUTE THE ENTRIES OF BOTH THE TRACKING DISPLACEMENT MATRIX AND THE WEIGHTED DISPLACEMENT TRACKING MATRIX
+# COMPUTE THE ENTRIES OF BOTH THE TRACKING DISPLACEMENT MATRIX 
+# AND THE WEIGHTED DISPLACEMENT TRACKING MATRIX
 for (i in 1:length(vdc)){
   for (j in 1:length(vdc)){
     vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],1])+
@@ -591,7 +593,8 @@ gv <- graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
 # COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
 V(gv)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gv)$color[k] <- "green"
@@ -634,17 +637,66 @@ gv <- drop_loops(graph = gv,
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gv,
-     layout=layout.fruchterman.reingold(gv, niter=20, area=2000*vcount(gv)),
+     layout=layout.fruchterman.reingold(gv, niter=200, area=20000*vcount(gv)),
      vertex.color=V(gv)$color,
      vertex.size=9, 
      vertex.label=V(gv)$name,
      vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=2*(E(gv)$weight),
-     edge.arrow.size=0.6,
+     vertex.label.font=1, 
+     vertex.label.cex=0.9, 
+     edge.width=(E(gv)$weight),
+     edge.arrow.size=0.7,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
+
+
+# PLOT THE GRAPH WITH COORDINATES
+
+
+library(png)
+img<-readPNG(paste0(DIR,"nepal.png"))
+plot(1, xlab = "", ylab = "", axes=FALSE)
+rasterImage(img,0.5,0.5,1.5,1.5, xlab = "", ylab = "")
+par(new=T)
+# SELECT THE COORDINATES
+gv_coords <- coords[which(vdc %in% V(gv)$name),]
+plot(gv,
+     layout=gv_coords,
+     vertex.color=V(gv)$color,
+     vertex.size=4, 
+     vertex.label=V(gv)$name,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.5, 
+     edge.width=(E(gv)$weight),
+     edge.arrow.size=0.7,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Nepal Displacement Network Flow (VDC Level)")
+legend("topright",c("Origins of Displacement",
+               "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
 gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
@@ -652,7 +704,8 @@ gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc==vdc[k]))
   d_count <- length(which(dt_data$vdc==vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
@@ -666,23 +719,32 @@ V(gd)$name <- vdc
 gd <- drop_isolated(graph = gd,
                     vertex_colors = V(gd)$color,
                     vertex_names = V(gd)$name)
-plot(gd,
-     layout=layout.fruchterman.reingold(gd, niter=20, area=2000*vcount(gd)),
-     vertex.color=V(gd)$color,
-     vertex.size=9, 
-     vertex.label=V(gd)$name,
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.2*sqrt(E(gd)$weight),
-     edge.arrow.size=0.7,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+
 
 # DROP LOOPS ONLY VERTICES AS WELL 
 gd <- drop_loops(graph = gd,
                  vertex_colors = V(gd)$color,
                  vertex_names = V(gd)$name)
+
+# SELECT THE COORDINATES
+gd_coords <- coords[which(vdc %in% V(gd)$name),]
+plot(gd,
+     layout=gd_coords,
+     vertex.color=V(gd)$color,
+     vertex.size=4, 
+     vertex.label=V(gd)$name,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.5, 
+     edge.width=0.2*sqrt(E(gd)$weight),
+     edge.arrow.size=0.7,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Weighted Nepal Displacement Network Flow (VDC Level)",
+     xlab = "", ylab = "")
+legend("bottomleft",c("Origins of Displacement",
+                      "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gd, 
@@ -705,19 +767,28 @@ gd_c <- giant_comp(graph = gd,
                    vertex_names = V(gd)$name)
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
+# SELECT THE COORDINATES
+gd_c_coords <- coords[which(vdc %in% V(gd_c)$name),]
 plot(gd_c,
-     layout=layout.fruchterman.reingold(gd_c, niter=200, area=2000*vcount(gd_c)),
+     layout=gd_c_coords,
      vertex.color=V(gd_c)$color,
-     vertex.size=12,
-     vertex.label=V(gd_c)$name, 
-     vertex.label.color="black",
-     vertex.label.font=2, 
-     vertex.label.cex=1, 
-     edge.width=0.5*sqrt(E(gd_c)$weight),
-     edge.arrow.size=1.0,edge.curved=TRUE,edge.color=gray.colors(1))
+     vertex.size=5, 
+     vertex.label=V(gd_c)$name,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.7, 
+     edge.width=0.2*sqrt(E(gd_c)$weight),
+     edge.arrow.size=0.7,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Weighted Nepal Displacement Network Flow (VDC Level)",
+     xlab = "", ylab = "")
+legend("bottomleft",c("Origins of Displacement",
+                      "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 25% quantile
-cut25 <- quantile(as.vector(dtm[dtm>0]),0.25)
+cut50 <- quantile(as.vector(dtm[dtm>0]),0.50)
 gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
@@ -728,7 +799,7 @@ for (k in 1:length(vdc)){
     V(gd)$color[k] <- "green"
   } 
 }
-gd_f <- filter(cutoff = cut25,
+gd_f <- filter(cutoff = cut50,
                edge_matrix = dtm,
                vertex_colors = V(gd)$color,
                vertex_names = V(gd)$name)
@@ -737,6 +808,23 @@ gd_f <- drop_loops(graph = gd_f,
                    vertex_names = V(gd_f)$name)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
+gd_f_coords <- coords[which(vdc %in% V(gd_f)$name),]
+plot(gd_f,
+     layout=gd_f_coords,
+     vertex.color=V(gd_f)$color,
+     vertex.size=5, 
+     vertex.label=V(gd_f)$name,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.7, 
+     edge.width=0.2*sqrt(E(gd_f)$weight),
+     edge.arrow.size=0.7,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Filtered Nepal Displacement Network Flow (VDC Level)")
+legend("bottomleft",c("Origins of Displacement",
+                      "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
      vertex.color=V(gd_f)$color,
@@ -744,12 +832,12 @@ plot(gd_f,
      vertex.label=V(gd_f)$name, 
      vertex.label.color="black", 
      vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.3*sqrt(E(gd_f)$weight),
-     edge.arrow.size=0.8,
+     vertex.label.cex=1.2, 
+     edge.width=0.4*sqrt(E(gd_f)$weight),
+     edge.arrow.size=01,
      edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
+     edge.color=gray.colors(1),
+     main="Filtered Nepal Displacement Network Flow (VDC Level)")
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 50% quantile
 cut50 <- quantile(as.vector(dtm[dtm>0]),0.5)
