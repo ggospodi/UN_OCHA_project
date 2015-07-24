@@ -558,7 +558,7 @@ for (k in 1:length(vdc)){
     yc[k] <- hlcit$lon[which(hlcit$vname==vdc[k])[1]]
   }
 }
-coords<-cbind(xc,yc)
+koords<-cbind(xc,yc)
 
 # FURTHER NARROW DOWN COLUMNS
 dt_data <- dt_data[,c("vdc","idp_origin_vdc","idp2_origin_vdc","idp_hh")]
@@ -659,7 +659,7 @@ plot(1, xlab = "", ylab = "", axes=FALSE)
 rasterImage(img,0.5,0.5,1.5,1.5, xlab = "", ylab = "")
 par(new=T)
 # SELECT THE COORDINATES
-gv_coords <- coords[which(vdc %in% V(gv)$name),]
+gv_coords <- koords[which(vdc %in% V(gv)$name),]
 plot(gv,
      layout=gv_coords,
      vertex.color=V(gv)$color,
@@ -711,7 +711,7 @@ gd <- drop_loops(graph = gd,
                  vertex_names = V(gd)$name)
 
 # SELECT THE COORDINATES
-gd_coords <- coords[which(vdc %in% V(gd)$name),]
+gd_coords <- koords[which(vdc %in% V(gd)$name),]
 plot(gd,
      layout=gd_coords,
      vertex.color=V(gd)$color,
@@ -750,7 +750,7 @@ gd_c <- giant_comp(graph = gd,
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
 # SELECT THE COORDINATES
-gd_c_coords <- coords[which(vdc %in% V(gd_c)$name),]
+gd_c_coords <- koords[which(vdc %in% V(gd_c)$name),]
 plot(gd_c,
      layout=gd_c_coords,
      vertex.color=V(gd_c)$color,
@@ -789,7 +789,7 @@ gd_f <- drop_loops(graph = gd_f,
                    vertex_names = V(gd_f)$name)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
-gd_f_coords <- coords[which(vdc %in% V(gd_f)$name),]
+gd_f_coords <- koords[which(vdc %in% V(gd_f)$name),]
 plot(gd_f,
      layout=gd_f_coords,
      vertex.color=V(gd_f)$color,
@@ -924,7 +924,7 @@ gd <- drop_loops(graph = gd,
                  vertex_names = V(gd)$name)
 
 # SELECT THE COORDINATES
-gd_coords <- coords[which(vdc %in% V(gd)$name),]
+gd_coords <- koords[which(vdc %in% V(gd)$name),]
 plot(gd,
      layout=gd_coords,
      vertex.color=V(gd)$color,
@@ -1252,7 +1252,7 @@ plot(gd,
      edge.color = E(gd)$color)
 
 
-gd_coords <- coords[which(vdc %in% V(gd)$name),]
+gd_coords <- koords[which(vdc %in% V(gd)$name),]
 plot(gd,
      layout=gd_coords,
      vertex.color=V(gd)$color,
@@ -1322,11 +1322,40 @@ gd <- drop_loops(graph = gd,
 ebc <- edge.betweenness.community(graph = gd)
 plot(ebc,
      gd, 
-     vertex.size=5,
-     edge.width=0.5*sqrt(E(gd)$weight),
-     main="Example: ML Communities",
-     vertex.label.cex=0.8,
-     vertex.label=V(gd)$name)
+     layout=gd_coords,
+     vertex.size=4, 
+     vertex.label=NA,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.85, 
+     edge.width=0.1*sqrt(E(gd)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+main="Weighted Nepal Displacement Network Communities (EB)")
+
+
+
+
+
+
+
+gd_coords <- coords[which(vdc %in% V(gd)$name),]
+plot(gd,
+     layout=gd_coords,
+     vertex.color=V(gd)$color,
+     vertex.size=4, 
+     vertex.label=NA,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.5, 
+     edge.width=0.25*sqrt(E(gd)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+     edge.color=E(gd)$color,
+     main="Weighted Nepal Displacement Network Flow (VDC Level)")
+legend("top",c("Highest EBC","Lowest EBC"),fill=c("red","white"),bty="n")
+
+
 
 
 
@@ -1358,9 +1387,32 @@ hist(cce/max(cce),breaks=200,col=adjustcolor(rgb(1/2,0,1,1)),xlab="Normalized Cl
 # It assigns relative scores to all nodes in the network based on the concept that connections to high-scoring nodes 
 # contribute more to the score of the given node than equal conenctions to low-scoring nodes. 
 # A variant of egenvector centrality is Google's PvdceRank algorithm.
-gd <- as.undirected(graph.adjacency(vdc_m,weighted=TRUE))
-V(gd)$color <- rep("green",length(vdc))
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+
+# SET VERTEX COLORS
+V(gd)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc==vdc[k]))
+  d_count <- length(which(dt_data$vdc==vdc[k]))
+  if(o_count>d_count){
+    V(gd)$color[k] <- "green"
+  } 
+}
+
+# SET THE VERTEX LABELS
 V(gd)$name <- vdc
+
+# PLOT THE WEIGHTED DISPLACEMENT GRAPH
+gd <- drop_isolated(graph = gd,
+                    vertex_colors = V(gd)$color,
+                    vertex_names = V(gd)$name)
+
+
+# DROP LOOPS ONLY VERTICES AS WELL 
+gd <- drop_loops(graph = gd,
+                 vertex_colors = V(gd)$color,
+                 vertex_names = V(gd)$name)
 clu<-clusters(gd)
 gd1<-induced.subgraph(gd, which(clu$membership == which.max(clu$csize)))
 ec<-evcent(gd1)$vector
@@ -1373,9 +1425,32 @@ hist(ec,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Closeness Centrality Va
 # matrix of the network. For undirected networks like ours, the adjacency matrix is symmetric, so the authority score 
 # is equivalent to the hub score. In subsequent analyses, we will be looking at directed extensions of this network 
 # model, so we are including these two scores in the analysis for completeness.
-gd <- as.undirected(graph.adjacency(vdc_m,weighted=TRUE))
-V(gd)$color <- rep("green",length(vdc))
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+
+# SET VERTEX COLORS
+V(gd)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc==vdc[k]))
+  d_count <- length(which(dt_data$vdc==vdc[k]))
+  if(o_count>d_count){
+    V(gd)$color[k] <- "green"
+  } 
+}
+
+# SET THE VERTEX LABELS
 V(gd)$name <- vdc
+
+# PLOT THE WEIGHTED DISPLACEMENT GRAPH
+gd <- drop_isolated(graph = gd,
+                    vertex_colors = V(gd)$color,
+                    vertex_names = V(gd)$name)
+
+
+# DROP LOOPS ONLY VERTICES AS WELL 
+gd <- drop_loops(graph = gd,
+                 vertex_colors = V(gd)$color,
+                 vertex_names = V(gd)$name)
 au<-authority.score(gd)$vector
 plot(sort(au, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Authority Score Values", main="Essential (first 200 nodes) Authority Scores for g", pch=20)
 hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values",main="Essential Authority Score Distribution")
@@ -1383,9 +1458,32 @@ hist(au,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Authority Score Values"
 
 
 # HUB SCORE: This is a measure FOR DIRECTED NETWORKS and it measures the number of authority nodes that a given hub node points to.
-gd <- as.undirected(graph.adjacency(vdc_m,weighted=TRUE))
-V(gd)$color <- rep("green",length(vdc))
+gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+
+# SET VERTEX COLORS
+V(gd)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc==vdc[k]))
+  d_count <- length(which(dt_data$vdc==vdc[k]))
+  if(o_count>d_count){
+    V(gd)$color[k] <- "green"
+  } 
+}
+
+# SET THE VERTEX LABELS
 V(gd)$name <- vdc
+
+# PLOT THE WEIGHTED DISPLACEMENT GRAPH
+gd <- drop_isolated(graph = gd,
+                    vertex_colors = V(gd)$color,
+                    vertex_names = V(gd)$name)
+
+
+# DROP LOOPS ONLY VERTICES AS WELL 
+gd <- drop_loops(graph = gd,
+                 vertex_colors = V(gd)$color,
+                 vertex_names = V(gd)$name)
 hb<-hub.score(gd)$vector
 plot(sort(hb, decreasing=TRUE), col=adjustcolor(rgb(0,0,1,1/2)), xlab="Node Id in the Network (1:200)", ylab="Hub Score Values", main="Essential (first 200 nodes) Hub Scores for g", pch=20)
 hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main="Essential Hub Score Distribution")
@@ -1432,13 +1530,33 @@ plot(gd, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.wi
 
 
 
+# quickyl explore severity
+
+sev <- read.csv(paste0(DIR,"severity.csv"))
+sev$vdc <- as.character(sev$vdc)
+sev$vdc <- mapvalues(sev$vdc,
+                     from = c("Agara","Baruneshwor","Betini","BhaktapurN.P.","BhimesworN.P.",
+                              "ChandeniMandan","Chhatara","GunsiBhadaure","HetaudaN.P.","JaisithokMandan",
+                              "JhangajholiRalmata","Jhyaku","JyamdiMandan","KakurThakur","KathmanduN.P.",
+                              "LalitpurN.P.","Sangu","KirtipurN.P.","TokhaChandeswori","Thulogoun",
+                              "Talkududechour","Sankhu","Puranagau","PokhariNarayansthan",
+                              "Pukhulachhi","NaikapPuranoBhanjya","Mankha","Mahankal","MadhyapurThimiN.P.",
+                              "Lamidada","Laharepouwa","Daxinkali","Bajrayogini","Budanilkantha","Fulpingkatti",
+                              "Orang"),
+                     to = c("Agra","Barudeshwor","Beteni","Bhaktapur Municipality","Bhimeswor Municipality",
+                            "Chandeni Mandan","Chautara","Gunsi","Hetauda Municipality","Jaisithok Mandan",
+                            "Jhangajholi Ratmata","Jhyanku","Jyamdi Mandan","Kakur Thakur","Kathmandu Metropolitan",
+                            "Lalitpur Sub Metropolitan","Sangkhu","Kirtipur Municipality","Tokhachandeshwari",
+                            "Thulo Gaun","Talkudunde Chaur","Sangkhu Suntol","Puranagaun","Pokhari Narayansthan",
+                            "Pukulachhi","Naikap Naya","Mangkha","Mahangkal","Madhyapur Thimi Municipality",
+                            "Lamidanda","Laharepauwa","Dakshinkali","Sangkhu Bajrayogini","Budhanilkantha",
+                            "Phulpingkatti","Worang"))
+
+sev$vdc[218] <- "Betini"
+sev$vdc[624] <-"Lamidada"
 
 
-
-
-
-
-
+bc
 
 
 
@@ -1514,11 +1632,37 @@ aid_data$impl_agency <- trim(as.character(aid_data$impl_agency))
 
 # FILTER OUT THE EMPTY ENTRIES
 aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
+aid_data <- rm_space(aid_data,"vdc_code")
+aid_data$vdc_code <- as.numeric(levels(aid_data$vdc_code))[aid_data$vdc_code]
+for (k in 1:dim(aid_data)[1]){
+  aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$vdc_code[k])[1]]
+}
 
 # SELECT UNIQUE AGENCIES AND TARGET VDC
 ag <- unique(aid_data$impl_agency)
 vd <- unique(aid_data$vdc)
 all <- union(ag,vd)
+
+
+vdc <- unique(aid_data$vdc)
+
+# EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM HLCIT_MASTER
+hl <- vector()
+xc <- vector()
+yc <- vector()
+for (k in 1:length(vdc)){
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name==vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vdc_name==vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vdc_name==vdc[k])[1]]
+    }
+koords<-cbind(xc,yc)
+
+
+
+
+
+
+
 
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
 aid_m <- matrix(0,nrow=length(all),ncol=length(all))
