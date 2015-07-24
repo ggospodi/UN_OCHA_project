@@ -513,6 +513,15 @@ dt_data$vdc <- mapvalues(dt_data$vdc,
                                 "Mangkha","Manmaiju","NaikapNayaBhanjyang","PuranogaunDapcha",
                                 "Sangla","Sangkhu","TokhaSarswoti"))
 
+dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
+                                    from = c("barabise","Bhimeshwor Municipality","Chautara Municipality","Maanka"),
+                                    to = c("Barhabise","Bhimeswor Municipality","Chautara","Mahangkal"))
+
+dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
+                                     from = c("barabise","Bhimeshwor Municipality","Jhaku"),
+                                     to = c("Barhabise","Bhimeswor Municipality","Jhyanku"))
+
+
 
 # AUGMENT DATA FOR MISSING LAT AND LON VALUES:
 index <- which(is.na(dt_data$lat))
@@ -520,10 +529,8 @@ dt_data$lat[index] <- coords[which(hlcit$vdc_name %in% dt_data$vdc[index]),c("la
 dt_data$lon[index] <- coords[which(hlcit$vdc_name %in% dt_data$vdc[index]),c("lat","lon")][1,2]
 
 
-# IDEA: REVERSE EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM COORDS
-
+# EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM HLCIT_MASTER
 hl <- vector()
-
 need <- setdiff(dt_data$vdc,hlcit$vdc_name)
 need2 <- setdiff(need,hlcit$vname)
 for (k in 1:dim(dt_data)[1]){
@@ -550,35 +557,30 @@ for (k in 1:dim(hlcit)[1]){
 dt_data$vdc[60] <- hlcit$vname[which(closest==min(closest))]
 hl[index] <- hlcit$hlcit_code[which(hlcit$vname=="Lamidada")[1]]
 
+
 # ISOLATE THE DESTINATION DATA
 ddata <- dt_data[,c("vdc","lat","lon","idp_hh")]
 ddata <- cbind.data.frame(ddata,hl)
 colnames(ddata) <- c("vdc","lat","lon","idp_hh","hlcit")
 
-# FOR THE PURPOSES OF VISUALIZATION, WEIGHT THE NUMBER OF FAMILIES IN RATIO 2:1 
-# OF LARGEST TO SECOND LARGEST GROUP
-ddata$idp_hh <- ddata$idp_hh*(2/3)
-
-
 # ISOLATE THE ORIGIN DATA
 odata1 <- dt_data[,c("idp_origin_vdc","lat","lon","idp_hh")]
-
-odata1 <- odata1[,-which(is.na(as.numeric(odata1$idp_origin_vdc))]
+odata1 <- odata1[-which(odata1$idp_origin_vdc==""),]
 
 # CREATE HLCIT AND CORODINATES
 hl2 <- vector()
 lat2 <-vector()
 lon2 <- vector()
 need <- setdiff(odata1$idp_origin_vdc,ddata$vdc)
-need2 <- setdiff(need,coords$vdc)
+need2 <- setdiff(need,hlcit$vdc_name)
 for (k in 1: (dim(odata1)[1])){
   if (odata1$idp_origin_vdc[k] %in% ddata$vdc){
     hl2[k] <- ddata$hlcit[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
     lat2[k] <- ddata$lat[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
     lon2[k] <- ddata$lon[which(ddata$vdc==odata1$idp_origin_vdc[k])][1] 
   }
-  if ((odata1$idp_origin_vdc[k] %in% need) & (odata1$idp_origin_vdc[k] %in% coords$vdc)){
-    index <- which(coords$vdc==odata1$idp_origin_vdc[k])[1]
+  if ((odata1$idp_origin_vdc[k] %in% need) & (odata1$idp_origin_vdc[k] %in% hlcit$vdc_name)){
+    index <- which(hlcit$vdc_name==odata1$idp_origin_vdc[k])[1]
     hl2[k] <- coords[index,]$hlcit[1]
     lat2[k] <- coords[index,]$lat[1]
     lon2[k] <- coords[index,]$lon[1]
@@ -586,19 +588,66 @@ for (k in 1: (dim(odata1)[1])){
 }
 
 
+# ISOLATE THE ORIGIN DATA
+odata1 <- dt_data[,c("idp_origin_vdc","lat","lon","idp_hh")]
+odata1 <- odata1[-which(odata1$idp_origin_vdc==""),]
+
+# CREATE HLCIT AND CORODINATES
+hl1 <- vector()
+lat1 <-vector()
+lon1 <- vector()
+need <- setdiff(odata1$idp_origin_vdc,ddata$vdc)
+need2 <- setdiff(need,hlcit$vdc_name)
+for (k in 1: (dim(odata1)[1])){
+  if (odata1$idp_origin_vdc[k] %in% ddata$vdc){
+    hl1[k] <- ddata$hlcit[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
+    lat1[k] <- ddata$lat[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
+    lon1[k] <- ddata$lon[which(ddata$vdc==odata1$idp_origin_vdc[k])][1] 
+  }
+  if ((odata1$idp_origin_vdc[k] %in% need) & (odata1$idp_origin_vdc[k] %in% hlcit$vdc_name)){
+    index <- which(hlcit$vdc_name==odata1$idp_origin_vdc[k])[1]
+    hl1[k] <- coords[index,]$hlcit[1]
+    lat1[k] <- coords[index,]$lat[1]
+    lon1[k] <- coords[index,]$lon[1]
+  }
+}
+
+odata1$hlcit <- hl1
+odata1$lat <- lat1
+odata1$lon <- lon1
+
+# ISOLATE THE ORIGIN DATA
+odata2 <- dt_data[,c("idp2_origin_vdc","lat","lon","idp_hh")]
+odata2 <- odata2[-which(odata2$idp2_origin_vdc==""),]
+
+# CREATE HLCIT AND CORODINATES
+hl2 <- vector()
+lat2 <-vector()
+lon2 <- vector()
+need <- setdiff(odata2$idp2_origin_vdc,ddata$vdc)
+need2 <- setdiff(need,hlcit$vdc_name)
+for (k in 1: (dim(odata2)[1])){
+  if (odata2$idp2_origin_vdc[k] %in% ddata$vdc){
+    hl2[k] <- ddata$hlcit[which(ddata$vdc==odata2$idp2_origin_vdc[k])][1]
+    lat2[k] <- ddata$lat[which(ddata$vdc==odata2$idp2_origin_vdc[k])][1]
+    lon2[k] <- ddata$lon[which(ddata$vdc==odata2$idp2_origin_vdc[k])][1] 
+  }
+  if ((odata2$idp2_origin_vdc[k] %in% need) & (odata2$idp2_origin_vdc[k] %in% hlcit$vdc_name)){
+    index <- which(hlcit$vdc_name==odata2$idp2_origin_vdc[k])[1]
+    hl2[k] <- coords[index,]$hlcit[1]
+    lat2[k] <- coords[index,]$lat[1]
+    lon2[k] <- coords[index,]$lon[1]
+  }
+}
+
+odata2$hlcit <- hl2
+odata2$lat <- lat2
+odata2$lon <- lon2
 
 # FOR THE PURPOSES OF VISUALIZATION, WEIGHT THE NUMBER OF FAMILIES IN RATIO 2:1 
 # OF LARGEST TO SECOND LARGEST GROUP
 odata1$idp_hh <- odata1$idp_hh*(2/3)
 odata2$idp_hh <- odata2$idp_hh*(1/3)
-
-
-dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
-                                    from = c("barabise","Barahbise"),
-                                    to = c("Barhabise","Barhabise"))
-dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
-                                     from = c("barabise","Barahbise"),
-                                     to = c("Barhabise","Barhabise"))
 
 
 # ADD FROM CENTROIDS FILE TO DT_DATA
