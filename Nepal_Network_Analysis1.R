@@ -522,172 +522,46 @@ dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
                                      to = c("Barhabise","Bhimeswor Municipality","Jhyanku"))
 
 
+# CREATE A LIST OF UNIQUE VDC DESTINATION NAMES
+vdc <- unique(c(dt_data$vdc, dt_data$idp_origin_vdc,dt_data$idp2_origin_vdc))
+vdc <- vdc[-which(vdc=="")]
+vdc1 <- intersect(vdc,hlcit$vdc_name)
+vdc2 <- setdiff(vdc,hlcit$vdc_name)
 
-# AUGMENT DATA FOR MISSING LAT AND LON VALUES:
-index <- which(is.na(dt_data$lat))
-dt_data$lat[index] <- coords[which(hlcit$vdc_name %in% dt_data$vdc[index]),c("lat","lon")][1,1]
-dt_data$lon[index] <- coords[which(hlcit$vdc_name %in% dt_data$vdc[index]),c("lat","lon")][1,2]
+
+# RESOLVE THE ONLY VDC NAME LEFT THAT IS NOT ON RECORD
+index <- which(dt_data$vdc==setdiff(vdc2,hlcit$vname))
+closest <- vector()
+for (k in 1:dim(hlcit)[1]){
+  closest[k] <- (dt_data$lat[index]-hlcit$lat[k])^2+(dt_data$lon[index]-hlcit$lon[k])^2
+}
+dt_data$vdc[index] <- hlcit$vname[which(closest==min(closest))]
+vdc <- unique(c(dt_data$vdc, dt_data$idp_origin_vdc,dt_data$idp2_origin_vdc))
+vdc <- vdc[-which(vdc=="")]
+vdc1 <- intersect(vdc,hlcit$vdc_name)
+vdc2 <- setdiff(vdc,hlcit$vdc_name)
 
 
 # EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM HLCIT_MASTER
 hl <- vector()
-need <- setdiff(dt_data$vdc,hlcit$vdc_name)
-need2 <- setdiff(need,hlcit$vname)
-for (k in 1:dim(dt_data)[1]){
-  if (dt_data$vdc[k] %in% hlcit$vdc_name){
-    index <- which(as.character(hlcit$vdc_name)==as.character(dt_data$vdc[k]))[1]
-    hl[k] <- hlcit[index,]$hlcit_code[1]
+xc <- vector()
+yc <- vector()
+for (k in 1:length(vdc)){
+  if (vdc[k] %in% vdc1){
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name==vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vdc_name==vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vdc_name==vdc[k])[1]]
+  }
+  if (vdc[k] %in% vdc2){
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vname==vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vname==vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vname==vdc[k])[1]]
   }
 }
-for (k in 1:dim(dt_data)[1]){
-  if ((dt_data$vdc[k] %in% need) & (dt_data$vdc[k] %in% hlcit$vname)){
-    index <- which(as.character(hlcit$vname)==as.character(dt_data$vdc[k]))[1]
-    hl[k] <- hlcit[index,]$hlcit_code[1]
-  }
-}
+coords<-cbind(xc,yc)
 
-
-# WE HAVE ONE LEFT, SO WE SET UP A MINIMAL DISTANCE CRITERION:
-index <- which(is.na(hl))
-latlon <- dt_data[index,c("lat","lon")] 
-closest <- vector()
-for (k in 1:dim(hlcit)[1]){
-  closest[k] <- (latlon[[1]]-hlcit$lat[k])^2+(latlon[[2]]-hlcit$lon[k])^2
-}
-dt_data$vdc[60] <- hlcit$vname[which(closest==min(closest))]
-hl[index] <- hlcit$hlcit_code[which(hlcit$vname=="Lamidada")[1]]
-
-
-# ISOLATE THE DESTINATION DATA
-ddata <- dt_data[,c("vdc","lat","lon","idp_hh")]
-ddata <- cbind.data.frame(ddata,hl)
-colnames(ddata) <- c("vdc","lat","lon","idp_hh","hlcit")
-
-# ISOLATE THE ORIGIN DATA
-odata1 <- dt_data[,c("idp_origin_vdc","lat","lon","idp_hh")]
-odata1 <- odata1[-which(odata1$idp_origin_vdc==""),]
-
-# CREATE HLCIT AND CORODINATES
-hl2 <- vector()
-lat2 <-vector()
-lon2 <- vector()
-need <- setdiff(odata1$idp_origin_vdc,ddata$vdc)
-need2 <- setdiff(need,hlcit$vdc_name)
-for (k in 1: (dim(odata1)[1])){
-  if (odata1$idp_origin_vdc[k] %in% ddata$vdc){
-    hl2[k] <- ddata$hlcit[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
-    lat2[k] <- ddata$lat[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
-    lon2[k] <- ddata$lon[which(ddata$vdc==odata1$idp_origin_vdc[k])][1] 
-  }
-  if ((odata1$idp_origin_vdc[k] %in% need) & (odata1$idp_origin_vdc[k] %in% hlcit$vdc_name)){
-    index <- which(hlcit$vdc_name==odata1$idp_origin_vdc[k])[1]
-    hl2[k] <- coords[index,]$hlcit[1]
-    lat2[k] <- coords[index,]$lat[1]
-    lon2[k] <- coords[index,]$lon[1]
-  }
-}
-
-
-# ISOLATE THE ORIGIN DATA
-odata1 <- dt_data[,c("idp_origin_vdc","lat","lon","idp_hh")]
-odata1 <- odata1[-which(odata1$idp_origin_vdc==""),]
-
-# CREATE HLCIT AND CORODINATES
-hl1 <- vector()
-lat1 <-vector()
-lon1 <- vector()
-need <- setdiff(odata1$idp_origin_vdc,ddata$vdc)
-need2 <- setdiff(need,hlcit$vdc_name)
-for (k in 1: (dim(odata1)[1])){
-  if (odata1$idp_origin_vdc[k] %in% ddata$vdc){
-    hl1[k] <- ddata$hlcit[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
-    lat1[k] <- ddata$lat[which(ddata$vdc==odata1$idp_origin_vdc[k])][1]
-    lon1[k] <- ddata$lon[which(ddata$vdc==odata1$idp_origin_vdc[k])][1] 
-  }
-  if ((odata1$idp_origin_vdc[k] %in% need) & (odata1$idp_origin_vdc[k] %in% hlcit$vdc_name)){
-    index <- which(hlcit$vdc_name==odata1$idp_origin_vdc[k])[1]
-    hl1[k] <- coords[index,]$hlcit[1]
-    lat1[k] <- coords[index,]$lat[1]
-    lon1[k] <- coords[index,]$lon[1]
-  }
-}
-
-odata1$hlcit <- hl1
-odata1$lat <- lat1
-odata1$lon <- lon1
-
-# ISOLATE THE ORIGIN DATA
-odata2 <- dt_data[,c("idp2_origin_vdc","lat","lon","idp_hh")]
-odata2 <- odata2[-which(odata2$idp2_origin_vdc==""),]
-
-# CREATE HLCIT AND CORODINATES
-hl2 <- vector()
-lat2 <-vector()
-lon2 <- vector()
-need <- setdiff(odata2$idp2_origin_vdc,ddata$vdc)
-need2 <- setdiff(need,hlcit$vdc_name)
-for (k in 1: (dim(odata2)[1])){
-  if (odata2$idp2_origin_vdc[k] %in% ddata$vdc){
-    hl2[k] <- ddata$hlcit[which(ddata$vdc==odata2$idp2_origin_vdc[k])][1]
-    lat2[k] <- ddata$lat[which(ddata$vdc==odata2$idp2_origin_vdc[k])][1]
-    lon2[k] <- ddata$lon[which(ddata$vdc==odata2$idp2_origin_vdc[k])][1] 
-  }
-  if ((odata2$idp2_origin_vdc[k] %in% need) & (odata2$idp2_origin_vdc[k] %in% hlcit$vdc_name)){
-    index <- which(hlcit$vdc_name==odata2$idp2_origin_vdc[k])[1]
-    hl2[k] <- coords[index,]$hlcit[1]
-    lat2[k] <- coords[index,]$lat[1]
-    lon2[k] <- coords[index,]$lon[1]
-  }
-}
-
-odata2$hlcit <- hl2
-odata2$lat <- lat2
-odata2$lon <- lon2
-
-# FOR THE PURPOSES OF VISUALIZATION, WEIGHT THE NUMBER OF FAMILIES IN RATIO 2:1 
-# OF LARGEST TO SECOND LARGEST GROUP
-odata1$idp_hh <- odata1$idp_hh*(2/3)
-odata2$idp_hh <- odata2$idp_hh*(1/3)
-
-
-# ADD FROM CENTROIDS FILE TO DT_DATA
-# "Bharatpur","Bhirpani","Budanilkantha","Narikot","Dadhikot","Gokarneswor","Manmaiju","NaikapNayaBhanjyang",
-# "PuranogaunDapcha","Saipu","Samari","Shankarpur","Singati","TokhaSarswoti"
-
-
-
-
-
-
-
-
-
-# CREATE A LIST OF UNIQUE VDC DESTINATION NAMES
-vdcs <- unique(dt_data$vdc)
-
-
-# CREATE TWO LISTS OF VDC ORIGIN NAMES, FOR THE LARGEST (1) AND SECOND LARGEST (2) POPULATION BY SHELTER VDC
-vdc1_o <- unique(dt_data$idp_origin_vdc[nchar(dt_data$idp_origin_vdc)>0])
-vdc2_o <- unique(dt_data$idp2_origin_vdc[nchar(dt_data$idp2_origin_vdc)>0])
-
-
-# UNION OF ALL LEVEL 1 AND 2 ORIGIN VDC NAMES
-vdc_o <- union(vdc1_o,vdc2_o)
-
-
-# OVERALL LIST OF VDC CODES, BOTH ORIGIN AND DESTINATION
-vdc <- unique(trim(union(vdc_o,vdcs)))
-
-
-# GET COORDINATES OF THE VDC CENTROIDS FROM CHRIS AFTER CONVERTING AND TRIMMING WHITESPACES FROM NAMES
-# centroids$name <- trim(as.character(centroids$name))
-# xc <- vector()
-# yc <- vector()
-# for (k in 1:length(vdc)){
-#     xc[k] <- centroids$lat[which(centroids$name==vdc[k])[1]]
-#     yc[k] <- centroids$lon[which(centroids$name==vdc[k])[1]]
-#     }
-# coords<-cbind(xc,yc)
+# FURTHER NARROW DOWN COLUMNS
+dt_data <- dt_data[,c("vdc","idp_origin_vdc","idp2_origin_vdc","idp_hh")]
 
 
 # VDC-LEVEL ADJACENCY MATRIX FOR THE DISPLACEMENT GRAPH, AT THE LEVEL OF DISPLACEMENT TRACK
@@ -703,10 +577,11 @@ for (i in 1:length(vdc)){
   for (j in 1:length(vdc)){
     vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],1])+
       length(dt_data[dt_data$idp2_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],1])
-    dtm[[i,j]]<-sum(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],18])+
-      sum(dt_data[dt_data$idp2_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],18])
-    }
+    dtm[[i,j]]<-(2/3)*sum(dt_data[dt_data$idp_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],]$idp_hh)+
+      (1/3)*sum(dt_data[dt_data$idp2_origin_vdc==vdc[i] & dt_data$vdc==vdc[j],]$idp_hh)
   }
+}
+
 
 
 # BUILD THE DIRECTED WEIGHTED VDC NETWORK
