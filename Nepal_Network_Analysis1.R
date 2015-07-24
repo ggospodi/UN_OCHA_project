@@ -384,8 +384,8 @@ centroids <- read.csv(paste0(DIR,"centroids.csv"))
 centroids$name <- as.character(centroids$name)
 
 # LOAD HLCIT CODES
-hlcit <- read.csv(paste0(DIR,"hlcit_codes.csv"))
-colnames(hlcit) <- c("vname","hlcit_code","vdc_name")
+hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
+colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
 hlcit$hlcit_code <- as.factor(hlcit$hlcit_code)
 hlcit$vname <- as.character(hlcit$vname)
 hlcit$vdc_name <- as.character(hlcit$vdc_name)
@@ -516,8 +516,8 @@ dt_data$vdc <- mapvalues(dt_data$vdc,
 
 # AUGMENT DATA FOR MISSING LAT AND LON VALUES:
 index <- which(is.na(dt_data$lat))
-dt_data$lat[index] <- coords[which(coords$vdc %in% dt_data$vdc[index]),c("lat","lon")][1,1]
-dt_data$lon[index] <- coords[which(coords$vdc %in% dt_data$vdc[index]),c("lat","lon")][1,2]
+dt_data$lat[index] <- coords[which(hlcit$vdc_name %in% dt_data$vdc[index]),c("lat","lon")][1,1]
+dt_data$lon[index] <- coords[which(hlcit$vdc_name %in% dt_data$vdc[index]),c("lat","lon")][1,2]
 
 
 # IDEA: REVERSE EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM COORDS
@@ -525,10 +525,11 @@ dt_data$lon[index] <- coords[which(coords$vdc %in% dt_data$vdc[index]),c("lat","
 hl <- vector()
 
 need <- setdiff(dt_data$vdc,hlcit$vdc_name)
+need2 <- setdiff(need,hlcit$vname)
 for (k in 1:dim(dt_data)[1]){
   if (dt_data$vdc[k] %in% hlcit$vdc_name){
     index <- which(as.character(hlcit$vdc_name)==as.character(dt_data$vdc[k]))[1]
-    hl[k] <- hlcit[index,2]
+    hl[k] <- hlcit[index,]$hlcit_code[1]
   }
 }
 for (k in 1:dim(dt_data)[1]){
@@ -538,14 +539,15 @@ for (k in 1:dim(dt_data)[1]){
   }
 }
 
+
 # WE HAVE ONE LEFT, SO WE SET UP A MINIMAL DISTANCE CRITERION:
 index <- which(is.na(hl))
 latlon <- dt_data[index,c("lat","lon")] 
 closest <- vector()
-for (k in 1:dim(centroids)[1]){
-  closest[k] <- (latlon[[1]]-centroids$lat[k])^2+(latlon[[2]]-centroids$lon[k])^2
+for (k in 1:dim(hlcit)[1]){
+  closest[k] <- (latlon[[1]]-hlcit$lat[k])^2+(latlon[[2]]-hlcit$lon[k])^2
 }
-dt_data$vdc[60] <- centroids$name[which(closest==min(closest))]
+dt_data$vdc[60] <- hlcit$vdc_name[which(closest==min(closest))]
 hl[index] <- hlcit$hlcit_code[which(hlcit$vname=="Lamidada")[1]]
 
 # ISOLATE THE DESTINATION DATA
