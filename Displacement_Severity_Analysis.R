@@ -1,12 +1,11 @@
-# Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
+# Nepal Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 21, 2015"
+# date: "July 27, 2015"
 # 
 # Data Sources:
 #
 # Tables: CCCM_Nepal_DTM_R2.csv
-# agency_relief.csv
-# centroids.csv
+# master_hlcit.csv
 # 
 # This report contains the initial displacement tracking network model construction and some analytics.
 # 
@@ -378,12 +377,7 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 # 11.1.h.1 Is everyone aware that donations do not need to be exchanged for anything?  
 # Site classification
 
-
-# LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
-centroids <- read.csv(paste0(DIR,"centroids.csv"))
-centroids$name <- as.character(centroids$name)
-
-# LOAD HLCIT CODES
+# LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
 hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
 colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
 hlcit$hlcit_code <- as.factor(hlcit$hlcit_code)
@@ -392,54 +386,36 @@ hlcit$vdc_name <- as.character(hlcit$vdc_name)
 hlcit <- rm_space(hlcit,"hlcit_code")
 hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
 
-
-# LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
-# AND LHCIT CODES 
-
-coords_all <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
-coords <- coords_all[,c("X","Y","VDC_NAME", "HLCIT_CODE","Implementi","Sourcing.A")]
-colnames(coords) <- c("lon","lat","vdc","hlcit","impl_agency","src_agency")
-coords$vdc <- as.character(coords$vdc)
-coords <- rm_space(coords,"hlcit")
-coords$hlcit <- as.numeric(levels(coords$hlcit))[coords$hlcit]
-  
-# Attempts to call the file directly from online HDX server:
-# library(XLConnect)
-# data1<-readWorksheetFromFile("http://data.hdx.rwlabs.org/dataset/io/CCCM Nepal Displacement Tracking Matrix.xlsx",sheet=1)
-# library(xlsx)
-# data1<-read.xlsx("https://www.dropbox.com/s/6powpj6wsp9r9aw/De-identified%20SPUS.xlsx", sheetIndex=1)
-
-
 # READ IN THE DISPLACEMENT FILE DATA
 dt_data <- read.csv(paste0(DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
 
 
 # SET VAIRABLE NAMES THAT ARE SHORTER AND DO NOT CONTAIN SPACES AND OTHER SYMBOLS
 nam <- c("ssid","site_name","survey_round","survey_date","zone","district","vdc","lat","lon","is_open","closing_date",
-       "site_class","site_type","if_other","site_start","expect_close","access","owner","shelter_type",
-       "specify","is_smc","women_smc","smc_locals","smc_members","member_phone","is_sma","sma_type",
-       "if_other2","sma_name","sma_member","sma_phone","is_idp","is_wash","wash_provider","is_health",
-       "health_provider","is_nfi","nfi_provider","is_food","food_provider","is_protect","protector",
-       "is_educate","educator","is_livelihood","livelihood_provider","idp_origin_zone","idp_origin_district",
-       "idp_origin_vdc","idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc",
-       "idp2_origin_ward","idp_hh","males_age_1","males_age_1-5","males_age_6-17","males_age_18-59",
-       "males_age_over60","total_idp_males","females_age_1","females_age_1-5","females_age_6-17",
-       "females_age_18-59","females_age_over60","total_idp_females","total_idp","preg","breastfeed",
-       "disabled","chronical","female_hh","child_hh","elder_hh","marginal","idp_arrival","idp_last_arrival",
-       "return_area","prev_idp","why_idp","if_other3","idp_pct_sleep","is_relocation","hh_pct_out","hh_pct_tents",
-       "hh_pct_mkshift","hh_pct_indoors","hh_pct_electricity","hh_pct_cooking","hh_pct_private","hh_pct_nets",
-       "nfi_most_need","if_other4","nfi2_most_need","if_other5","nfi3_most_need","if_other6","is_repairs",
-       "is_tools","water_loc","non_drinking_water","if_other7","drinking_water","if_other8","ave_water_per_day",
-       "water_prob","if_other9","latrines","no_wc","wc_locks","water_potable","m_f_wc","m_f_bath","garbage",
-       "if_other10","open_wc","hand_wash","is_hand_wash","food_access","market_access","food_src","if_other11",
-       "screening","food_for_preg","food_child","illness","if_other12","illness2","if_other13","illness3",
-       "if_other14","access_hosp","women_use_hosp","hosp_loc","who_doc","if_other15","access_meds","access_school",
-       "dist_school","girls_pct_school","boys_pct_school","school_loc","coping_mech","if_other16","hh_pct_income",
-       "paid_work","is_remittance","is_livestock","is_land","recruit","to_which","is_security","reported",
-       "main_security","if_other17","common_crimes","if_other18","before_reported","biggest_prob","if_other19",
-       "child_friendly","women_friendly","id","gbv_survivors","w_segregated","where","discrimination","men_safe",
-       "children_safe","women_safe","lights","info","if_other20","complaints","to_whom","info_need","if_other21",
-       "donations","site_class2")
+         "site_class","site_type","if_other","site_start","expect_close","access","owner","shelter_type",
+         "specify","is_smc","women_smc","smc_locals","smc_members","member_phone","is_sma","sma_type",
+         "if_other2","sma_name","sma_member","sma_phone","is_idp","is_wash","wash_provider","is_health",
+         "health_provider","is_nfi","nfi_provider","is_food","food_provider","is_protect","protector",
+         "is_educate","educator","is_livelihood","livelihood_provider","idp_origin_zone","idp_origin_district",
+         "idp_origin_vdc","idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc",
+         "idp2_origin_ward","idp_hh","males_age_1","males_age_1-5","males_age_6-17","males_age_18-59",
+         "males_age_over60","total_idp_males","females_age_1","females_age_1-5","females_age_6-17",
+         "females_age_18-59","females_age_over60","total_idp_females","total_idp","preg","breastfeed",
+         "disabled","chronical","female_hh","child_hh","elder_hh","marginal","idp_arrival","idp_last_arrival",
+         "return_area","prev_idp","why_idp","if_other3","idp_pct_sleep","is_relocation","hh_pct_out","hh_pct_tents",
+         "hh_pct_mkshift","hh_pct_indoors","hh_pct_electricity","hh_pct_cooking","hh_pct_private","hh_pct_nets",
+         "nfi_most_need","if_other4","nfi2_most_need","if_other5","nfi3_most_need","if_other6","is_repairs",
+         "is_tools","water_loc","non_drinking_water","if_other7","drinking_water","if_other8","ave_water_per_day",
+         "water_prob","if_other9","latrines","no_wc","wc_locks","water_potable","m_f_wc","m_f_bath","garbage",
+         "if_other10","open_wc","hand_wash","is_hand_wash","food_access","market_access","food_src","if_other11",
+         "screening","food_for_preg","food_child","illness","if_other12","illness2","if_other13","illness3",
+         "if_other14","access_hosp","women_use_hosp","hosp_loc","who_doc","if_other15","access_meds","access_school",
+         "dist_school","girls_pct_school","boys_pct_school","school_loc","coping_mech","if_other16","hh_pct_income",
+         "paid_work","is_remittance","is_livestock","is_land","recruit","to_which","is_security","reported",
+         "main_security","if_other17","common_crimes","if_other18","before_reported","biggest_prob","if_other19",
+         "child_friendly","women_friendly","id","gbv_survivors","w_segregated","where","discrimination","men_safe",
+         "children_safe","women_safe","lights","info","if_other20","complaints","to_whom","info_need","if_other21",
+         "donations","site_class2")
 colnames(dt_data) <- nam
 
 
@@ -474,16 +450,11 @@ dt_data$idp_hh <- as.numeric(levels(dt_data$idp_hh))[dt_data$idp_hh]
 
 # SELECT INITIAL COLUMNS, SAVE THE FILE
 names <- c("ssid","site_name","survey_round","survey_date","zone","district",
-         "vdc","lat","lon","idp_origin_zone","idp_origin_district","idp_origin_vdc",
-         "idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc",
-         "idp2_origin_ward","idp_hh")
+           "vdc","lat","lon","idp_origin_zone","idp_origin_district","idp_origin_vdc",
+           "idp_origin_ward","idp2_origin_zone","idp2_origin_district","idp2_origin_vdc",
+           "idp2_origin_ward","idp_hh")
 dt_data <- dt_data[,names]
 write.csv(dt_data,file=paste0(DIR,"Nepal_DTM_Network_model1.csv"))
-
-
-# COLUMN NAMES FOR agency_relief.csv ARE:
-aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
-colnames(aid_data) <- c("district_code","vdc_code","impl_agency","src_agency","district","vdc")
 
 
 # READ IN DISPLACEMENT DATA
@@ -501,8 +472,7 @@ dt_data$idp2_origin_vdc <- trim(as.character(dt_data$idp2_origin_vdc))
 dt_data <- dt_data[nchar(dt_data$vdc)>0 & (nchar(dt_data$idp_origin_vdc) + nchar(dt_data$idp2_origin_vdc))>0,]
 
 
-# RESOLVE VDC NAMES ACCORDING TO THE VDC COORDINATES FILE:
-# START USING HLCIT CODES INSTEAD:
+# RESOLVE VDC NAMES ACCORDING TO THE HLCIT MASTER LIST:
 
 dt_data$vdc <- mapvalues(dt_data$vdc,
                          from = c("Barahbise","Barpak","Chandeni","Charikot","Gokarneshwar","Kathmandu",
@@ -585,7 +555,6 @@ for (i in 1:length(vdc)){
 }
 
 
-
 # BUILD THE DIRECTED WEIGHTED VDC NETWORK
 gv <- graph.adjacency(vdc_m,mode="directed",weighted=TRUE)
 
@@ -604,14 +573,6 @@ for (k in 1:length(vdc)){
 
 # SET THE VERTEX LABELS
 V(gv)$name <- vdc
-
-
-# PLOT THE VDC DISPLACEMENT TRACKING GRAPH
-# plot(gv,
-#      layout=layout.fruchterman.reingold(gv, niter=20, area=2000*vcount(gv)),
-#      vertex.color=V(gv)$color,vertex.size=9, vertex.label=V(gv)$name,
-#      vertex.label.color="black", vertex.label.font=2, vertex.label.cex=0.7, 
-#      edge.width=0.3*(E(gv)$weight),edge.arrow.size=0.7,edge.curved=FALSE,edge.color=gray.colors(1))
 
 # DROP ISOLATED VERTICES (NO DISPLACEMENT)
 gv <- drop_isolated(graph = gv,
@@ -650,15 +611,7 @@ plot(gv,
      edge.color=gray.colors(1))
 
 
-# PLOT THE GRAPH WITH COORDINATES
-
-
-library(png)
-img<-readPNG(paste0(DIR,"nepal.png"))
-plot(1, xlab = "", ylab = "", axes=FALSE)
-rasterImage(img,0.5,0.5,1.5,1.5, xlab = "", ylab = "")
-par(new=T)
-# SELECT THE COORDINATES
+# PLOT THE GRAPH WITH SELECTED COORDINATES
 gv_coords <- koords[which(vdc %in% V(gv)$name),]
 plot(gv,
      layout=gv_coords,
@@ -674,12 +627,7 @@ plot(gv,
      edge.color=gray.colors(1),
      main="Nepal Displacement Network Flow (VDC Level)")
 legend("topright",c("Origins of Displacement",
-               "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
-
-
-
-
-
+                    "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -804,7 +752,7 @@ plot(gd_f,
      edge.color=gray.colors(1),
      main="Filtered Nepal Displacement Network Flow (VDC Level)")
 legend("topright",c("Origins of Displacement",
-                      "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+                    "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
 
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
@@ -892,7 +840,7 @@ plot(gd_f,
 
 
 
-# ANALYSIS OF THE vdcENCY NETWORK ITSELF: OVERLAP OF vdcENCY EFFORTS
+# ANALYSIS OF THE VDC NETWORK ITSELF
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -1146,14 +1094,14 @@ gd_f <- filter(cutoff = cut25,
                vertex_names = V(gd)$name)
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
 gd_f <- drop_isolated(graph = gd_f,
-                    vertex_colors = V(gd_f)$color,
-                    vertex_names = V(gd_f)$name)
+                      vertex_colors = V(gd_f)$color,
+                      vertex_names = V(gd_f)$name)
 
 
 # DROP LOOPS ONLY VERTICES AS WELL 
 gd_f <- drop_loops(graph = gd_f,
-                 vertex_colors = V(gd_f)$color,
-                 vertex_names = V(gd_f)$name)
+                   vertex_colors = V(gd_f)$color,
+                   vertex_names = V(gd_f)$name)
 bc<-betweenness(gd_f,v=V(gd_f), directed=FALSE)
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
@@ -1331,7 +1279,7 @@ plot(ebc,
      edge.width=0.1*sqrt(E(gd)$weight),
      edge.arrow.size=0.5,
      edge.curved=TRUE,
-main="Weighted Nepal Displacement Network Communities (EB)")
+     main="Weighted Nepal Displacement Network Communities (EB)")
 
 
 
@@ -1555,272 +1503,3 @@ sev$vdc <- mapvalues(sev$vdc,
 sev$vdc[218] <- "Betini"
 sev$vdc[624] <-"Lamidada"
 
-
-bc
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
-
-
-
-
-# CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
-aid_data$vdc <- trim(as.character(aid_data$vdc))
-aid_data$impl_agency <- trim(as.character(aid_data$impl_agency))
-
-# FILTER OUT THE EMPTY ENTRIES
-aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_agency)>0,]
-aid_data <- rm_space(aid_data,"vdc_code")
-aid_data$vdc_code <- as.numeric(levels(aid_data$vdc_code))[aid_data$vdc_code]
-for (k in 1:dim(aid_data)[1]){
-  aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$vdc_code[k])[1]]
-}
-
-# SELECT UNIQUE AGENCIES AND TARGET VDC
-ag <- unique(aid_data$impl_agency)
-vd <- unique(aid_data$vdc)
-all <- union(ag,vd)
-
-
-vdc <- unique(aid_data$vdc)
-
-# EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM HLCIT_MASTER
-hl <- vector()
-xc <- vector()
-yc <- vector()
-for (k in 1:length(vdc)){
-    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name==vdc[k])[1]]
-    xc[k] <- hlcit$lat[which(hlcit$vdc_name==vdc[k])[1]]
-    yc[k] <- hlcit$lon[which(hlcit$vdc_name==vdc[k])[1]]
-    }
-koords<-cbind(xc,yc)
-
-
-
-
-
-
-
-
-# DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
-aid_m <- matrix(0,nrow=length(all),ncol=length(all))
-for (i in 1:length(ag)){
-  for (j in 1:length(vd)){
-    aid_m[[i,length(ag)+j]] <- 
-      dim(aid_data[aid_data$impl_agency==ag[i] & aid_data$vdc==vd[j],c(3,6)])[1]
-  }
-}
-
-# BUILD THE AGENCY-VDC RELIEF EFFORT AID NETWORK
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
-
-# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
-for (k in 1:length(all)){
-  if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
-  }  
-}
-
-# PLOT THE AGENCY-VDC AID NETWORK
-plot(av,
-     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
-     vertex.color=V(av)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.5*sqrt(E(av)$weight),
-     edge.arrow.size=0.3,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
-cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
-av_f <- filter(cutoff = cut25,
-             edge_matrix = aid_m,
-             vertex_colors = V(av)$color,
-             vertex_names = all)
-
-# DISPLAY THE EDGE-FILTERED GRAPH
-plot(av_f,
-     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,
-     vertex.size=4,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.7*sqrt(E(av_f)$weight),
-     edge.arrow.size=0.5,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
-cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
-av_f <- filter(cutoff = cut50,
-             edge_matrix = aid_m,
-             vertex_colors = V(av)$color,
-             vertex_names = all)
-
-# DISPLAY THE EDGE-FILTERED GRAPH
-plot(av_f,
-     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,
-     vertex.size=3,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.3*(E(av_f)$weight),
-     edge.arrow.size=0.5,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% percentile
-cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
-av_f <- filter(cutoff = cut75,
-             edge_matrix = aid_m,
-             vertex_colors = V(av)$color,
-             vertex_names = all)
-
-# DISPLAY THE EDGE-FILTERED GRAPH
-plot(av_f,
-     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,
-     vertex.size=3,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.3*(E(av_f)$weight),
-     edge.arrow.size=0.6,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-# DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-av_f_c <- giant_comp(graph = av_f,
-                     vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
-
-# PLOT THE WEIGHTED DISPLACEMENT GRAPH
-plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,
-     vertex.size=4,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=1, 
-     edge.width=sqrt(E(av_f_c)$weight),
-     edge.arrow.size=0.6,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
-cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
-av_f <- filter(cutoff = cut90,
-               edge_matrix = aid_m,
-               vertex_colors = V(av)$color,
-               vertex_names = all)
-av_f_c <- giant_comp(graph = av_f,
-                     vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
-plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,
-     vertex.size=6,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=1, 
-     edge.width=sqrt(E(av_f_c)$weight),
-     edge.arrow.size=0.6,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 95% quantile
-cut95 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
-av_f<-filter(cutoff = cut95,
-             edge_matrix = aid_m,
-             vertex_colors = V(av)$color,
-             vertex_names = all)
-av_f_c<-giant_comp(graph = av_f,
-                   vertex_colors = V(av_f)$color,
-                   vertex_names = V(av_f)$name)
-plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,
-     vertex.size=12,
-     vertex.label=V(av_f_c)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1.2, 
-     edge.width=0.5*(E(av_f_c)$weight),
-     edge.arrow.size=0.8,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
