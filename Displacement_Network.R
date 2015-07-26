@@ -4,8 +4,12 @@
 # 
 # Data Sources:
 #
-# Tables: CCCM_Nepal_DTM_R2.csv
-# master_hlcit.csv
+# Tables:
+# 
+# https://data.hdx.rwlabs.org/dataset/nepal-earthquake-severity-index
+# https://data.hdx.rwlabs.org/dataset/io (sheet 3)
+# https://data.hdx.rwlabs.org/dataset/population-movements-after-the-nepal-earthquake-v-3-up-to-11th-june-2015
+
 # 
 # This report contains the initial displacement tracking network model construction and some analytics.
 # 
@@ -15,6 +19,12 @@
 # 4. Severity Index Correlation With Disaster Agency NEtwork. 
 # 
 # 
+# Relevant materials and data cna be found at:
+# 
+# https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl=0
+#
+# in the folder /Displacement Network
+
 # Definition of the Nepal Displacement Tracking Network: 
 #   
 # NOTE: This report is intended to only demonstrate the construction of the networks and some of the analytical tools. 
@@ -1475,31 +1485,3 @@ hist(wc$membership,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Walktrap Com
 
 plot(wc,gd,vertex.size=4, vertex.label=NA,edge.width=E(gd)$weight,main="Walktrap Community Detection for g200")
 plot(gd, vertex.color=membership(wc), vertex.size=6, edge.color="black", edge.width=E(gd)$weight,vertex.label=NA,main="Walktrap Community Detection for g200")
-
-
-
-# quickyl explore severity
-
-sev <- read.csv(paste0(DIR,"severity.csv"))
-sev$vdc <- as.character(sev$vdc)
-sev$vdc <- mapvalues(sev$vdc,
-                     from = c("Agara","Baruneshwor","Betini","BhaktapurN.P.","BhimesworN.P.",
-                              "ChandeniMandan","Chhatara","GunsiBhadaure","HetaudaN.P.","JaisithokMandan",
-                              "JhangajholiRalmata","Jhyaku","JyamdiMandan","KakurThakur","KathmanduN.P.",
-                              "LalitpurN.P.","Sangu","KirtipurN.P.","TokhaChandeswori","Thulogoun",
-                              "Talkududechour","Sankhu","Puranagau","PokhariNarayansthan",
-                              "Pukhulachhi","NaikapPuranoBhanjya","Mankha","Mahankal","MadhyapurThimiN.P.",
-                              "Lamidada","Laharepouwa","Daxinkali","Bajrayogini","Budanilkantha","Fulpingkatti",
-                              "Orang"),
-                     to = c("Agra","Barudeshwor","Beteni","Bhaktapur Municipality","Bhimeswor Municipality",
-                            "Chandeni Mandan","Chautara","Gunsi","Hetauda Municipality","Jaisithok Mandan",
-                            "Jhangajholi Ratmata","Jhyanku","Jyamdi Mandan","Kakur Thakur","Kathmandu Metropolitan",
-                            "Lalitpur Sub Metropolitan","Sangkhu","Kirtipur Municipality","Tokhachandeshwari",
-                            "Thulo Gaun","Talkudunde Chaur","Sangkhu Suntol","Puranagaun","Pokhari Narayansthan",
-                            "Pukulachhi","Naikap Naya","Mangkha","Mahangkal","Madhyapur Thimi Municipality",
-                            "Lamidanda","Laharepauwa","Dakshinkali","Sangkhu Bajrayogini","Budhanilkantha",
-                            "Phulpingkatti","Worang"))
-
-sev$vdc[218] <- "Betini"
-sev$vdc[624] <-"Lamidada"
-
