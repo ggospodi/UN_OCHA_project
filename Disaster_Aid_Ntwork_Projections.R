@@ -304,17 +304,26 @@ for (k in 1:length(all)){
   }  
 }
 
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
+
 # PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
      layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
      vertex.color=V(av)$color,
-     vertex.size=2,
+     vertex.size=V(av)$size,
      vertex.label=NA, 
      vertex.label.color="black", 
      vertex.label.font=2, 
      vertex.label.cex=0.2, 
      edge.width=0.2*sqrt(E(av)$weight),
-     edge.arrow.size=0.3,
+     edge.arrow.size=0.2,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
@@ -354,32 +363,84 @@ legend("topleft",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("gre
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
-cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-4
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
+cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
 av_f <- filter(cutoff = cut25,
              edge_matrix = aid_m,
              vertex_colors = V(av)$color,
-             vertex_names = all)
+             vertex_names = V(av)$name)
+
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
      vertex.color=V(av_f)$color,
-     vertex.size=4,
-     vertex.label=NA, 
-     vertex.label.color="black", 
+     vertex.size=6,
+     vertex.label=V(av_f)$name, 
+     vertex.label.color="darkgreen", 
      vertex.label.font=2, 
-     vertex.label.cex=0.7, 
+     vertex.label.cex=1.2, 
      edge.width=0.7*sqrt(E(av_f)$weight),
-     edge.arrow.size=0.5,
+     edge.arrow.size=0.3,
      edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     edge.color=gray.colors(1),
+     main="Filtered Nepal Agency Aid Relief Geo-Network")
+legend("topleft",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
+
+
+
+
+
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-1
+    V(av)$name[k] <- NA}
+}
+
+
+# PLOT THE AGENCY-VDC AID NETWORK
+av_coords <- koords[which(V(av)$name %in% V(av_f)$name),]
+plot(av_f,
+     layout=koords2,
+     vertex.color=V(av_f)$color,
+     vertex.size=V(av)$size,
+     vertex.label=V(av_f)$name, 
+     vertex.label.color="darkgreen", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.75, 
+     edge.width=0.05*sqrt(E(av_f)$weight),
+     edge.arrow.size=0.2,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Nepal Agency Aid Relief Geo-Network")
+legend("topleft",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
+
+
+
+
+
+
+
+
+
+
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
 cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
 av_f <- filter(cutoff = cut50,
              edge_matrix = aid_m,
              vertex_colors = V(av)$color,
-             vertex_names = all)
+             vertex_names = V(av)$name)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
@@ -457,25 +518,38 @@ plot(av_f_c,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
+
+
+
 # FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 95% quantile
+
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-1
+    V(av)$name[k] <- NA}
+}
+
 cut95 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
 av_f<-filter(cutoff = cut95,
              edge_matrix = aid_m,
              vertex_colors = V(av)$color,
-             vertex_names = all)
+             vertex_names = V(av)$name)
 av_f_c<-giant_comp(graph = av_f,
                    vertex_colors = V(av_f)$color,
                    vertex_names = V(av_f)$name)
 plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
+     layout=layout.fruchterman.reingold(av_f_c, niter=2000, area=20000*vcount(av_f_c)),
      vertex.color=V(av_f_c)$color,
-     vertex.size=12,
+     vertex.size=8,
      vertex.label=V(av_f_c)$name, 
      vertex.label.color="black", 
      vertex.label.font=1, 
-     vertex.label.cex=1.2, 
-     edge.width=0.5*(E(av_f_c)$weight),
-     edge.arrow.size=0.8,
+     vertex.label.cex=1.5, 
+     edge.width=0.3*(E(av_f_c)$weight),
+     edge.arrow.size=0.7,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
@@ -511,16 +585,17 @@ V(agg)$name <- ag
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
-     layout=layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     layout=layout.fruchterman.reingold(agg, niter=2000, area=20000*vcount(agg)),
      vertex.color="green",
      vertex.size=6,
      vertex.label=ag, 
      vertex.label.color="black", 
      vertex.label.font=1, 
-     vertex.label.cex=0.5, 
+     vertex.label.cex=0.75, 
      edge.width=0.5*E(agg)$weight,
      edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     edge.color=gray.colors(1),
+     main="Aid Agency Association Network")
 
 # BEFORE WE FILTER, MULTILEVEL COMMUNITY DETECTION:
 mc<-multilevel.community(agg)
@@ -754,7 +829,7 @@ plot(sort(degree(agg)),
 
 histP1(degree(agg),
        breaks = 50,
-       col = adjustcolor(rgb(1,0,1,1)),
+       col = "green",
        xlab = "Agency Network Degree Values", 
        main = "Agency Network Degree Distribution
   (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
@@ -880,7 +955,32 @@ agg <- giant_comp(graph = agg,
                   vertex_colors = V(agg)$color,
                   vertex_names = V(agg)$name)
 
+
+
+
+
+
+
+
+
+
+
 # SET THE GRAPH COLOR ACCORDING TO BC
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+# SET THE GRAPH COLOR
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+# REMOVE ISOLATED
+agg <- drop_isolated(graph = agg,
+                     vertex_colors = V(agg)$color,
+                     vertex_names = V(agg)$name)
+
+# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
+agg <- giant_comp(graph = agg,
+                  vertex_colors = V(agg)$color,
+                  vertex_names = V(agg)$name)
+
+
 
 bc<-betweenness(agg,v=V(agg), directed=FALSE)
 bc_int <- as.integer(round(bc,0))
@@ -888,7 +988,7 @@ for (k in 1:length(bc_int)){
   V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
 plot(agg,
-     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     layout = layout.fruchterman.reingold(agg, niter=2000, area=20000*vcount(agg)),
      vertex.color = V(agg)$color,
      vertex.size = 5,
      vertex.label = NA, 
@@ -897,7 +997,8 @@ plot(agg,
      vertex.label.cex = 0.5, 
      edge.width = 0.1*E(agg)$weight,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
+     edge.color = gray.colors(1),
+     main="Aid Agency Network Betweenness Centrality Heat Map")
 
 
 # FILTER AND REPEAT:
@@ -1174,7 +1275,7 @@ ebc <- edge.betweenness.community(graph = agg_f)
 plot(ebc,
      agg_f, 
      vertex.size=5,
-     edge.width=0.5*E(agg_f)$weight,
+     edge.width=0.1*E(agg_f)$weight,
      main="Example: ML Communities",
      vertex.label.cex=0.8,
      vertex.label=V(agg_f)$name)
@@ -1196,9 +1297,9 @@ ebc <- edge.betweenness.community(graph = agg_f)
 plot(ebc,
      agg_f, 
      vertex.size=5,
-     edge.width=0.5*E(agg_f)$weight,
+     edge.width=0.02*E(agg_f)$weight,
      main="Example: ML Communities",
-     vertex.label.cex=0.8,
+     vertex.label.cex=1.5,
      vertex.label=V(agg_f)$name)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.90
@@ -1217,10 +1318,10 @@ agg_f <- giant_comp(graph = agg_f,
 ebc <- edge.betweenness.community(graph = agg_f)
 plot(ebc,
      agg_f, 
-     vertex.size=5,
-     edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=0.8,
+     vertex.size=3,
+     edge.width=0.02*E(agg_f)$weight,
+     main="Aid Agency Betweenness Community Structure",
+     vertex.label.cex=1.2,
      vertex.label=V(agg_f)$name)
 
 # FILTER AND CLUSTER WITH CUTOFF = 0.95
@@ -1593,7 +1694,7 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 
 
 # ANALYSIS OF THE VDC AID TARGET NETWORK
-u_vdc <- as.character(unique(unique_aid$vdc))
+u_vdc <- as.character(unique(aid_data$vdc))
 
 # BUILD THE SHARED AGENCY ASSOCIATION NETWORK FOR THE VDCs
 aid_vdc <- matrix(0, nrow = length(u_vdc), ncol = length(u_vdc))
@@ -1649,7 +1750,8 @@ plot(vgg,
      vertex.label.cex = 0.5, 
      edge.width = 0.1*E(vgg)$weight,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
+     edge.color = gray.colors(1),
+     main="VDC Aid Association Network")
 
 
 # FILTER BY EDGE WEIGHT LEVELS, NOTE THAT LOWER CUTOFF VALUES
@@ -1755,8 +1857,8 @@ plot(sort(degree(vgg)),
 histP2(degree(vgg),
        breaks = 130,
        col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Target VDC Network Degree Values", 
-       main = "Target VDC Network Degree Distribution")
+       xlab = "VDC Aid Association Network Degree Values", 
+       main = "VDC Aid Association Network Degree Distribution")
 
 
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
@@ -1772,10 +1874,23 @@ plot(sort(graph.strength(vgg)),
 
 histP2(graph.strength(vgg), 
        breaks = 150,
-       col = adjustcolor(rgb(1,0,1,1)),
+       col = "SkyBlue2",
        xlab = "Weighted Degree Values", 
        main = "Agency Network Weighted Degree Distribution
   (Weighted VDC Overlap Counts Distribution)")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
@@ -1860,7 +1975,7 @@ for (k in 1:length(bc_int)){
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
      vertex.color = V(vgg)$color,
-     vertex.size = 7,
+     vertex.size = 4,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
@@ -1895,16 +2010,37 @@ for (k in 1:length(bc_int)){
   V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
 plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     layout = layout.fruchterman.reingold(vgg, niter=2000, area=20000*vcount(vgg)),
      vertex.color = V(vgg)$color,
-     vertex.size = 5,
+     vertex.size = 3,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.5, 
      edge.width = 0.1*E(vgg)$weight,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
+     edge.color = gray.colors(1),
+     main="VDC Aid Network Betweenness Centrality Heat Map")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # FILTER AND REPEAT:
@@ -2348,8 +2484,8 @@ ebc <- edge.betweenness.community(graph = vgg_f)
 plot(ebc,
      vgg_f, 
      vertex.size=4,
-     edge.width=0.25*E(vgg_f)$weight,
-     main="Example: ML Communities",
+     edge.width=0.05*E(vgg_f)$weight,
+     main="Filtered VDC Aid Network Betweenness Community Structure",
      vertex.label.cex=0.8,
      vertex.label=NA)
 
