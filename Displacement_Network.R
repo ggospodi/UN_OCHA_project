@@ -1,12 +1,11 @@
-# Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
+# Nepal Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 21, 2015"
+# date: "July 27, 2015"
 # 
 # Data Sources:
 #
 # Tables: CCCM_Nepal_DTM_R2.csv
-# agency_relief.csv
-# centroids.csv
+# master_hlcit.csv
 # 
 # This report contains the initial displacement tracking network model construction and some analytics.
 # 
@@ -378,12 +377,7 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 # 11.1.h.1 Is everyone aware that donations do not need to be exchanged for anything?  
 # Site classification
 
-
-# LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES
-centroids <- read.csv(paste0(DIR,"centroids.csv"))
-centroids$name <- as.character(centroids$name)
-
-# LOAD HLCIT CODES
+# LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
 hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
 colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
 hlcit$hlcit_code <- as.factor(hlcit$hlcit_code)
@@ -391,24 +385,6 @@ hlcit$vname <- as.character(hlcit$vname)
 hlcit$vdc_name <- as.character(hlcit$vdc_name)
 hlcit <- rm_space(hlcit,"hlcit_code")
 hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
-
-
-# LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
-# AND LHCIT CODES 
-
-coords_all <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
-coords <- coords_all[,c("X","Y","VDC_NAME", "HLCIT_CODE","Implementi","Sourcing.A")]
-colnames(coords) <- c("lon","lat","vdc","hlcit","impl_agency","src_agency")
-coords$vdc <- as.character(coords$vdc)
-coords <- rm_space(coords,"hlcit")
-coords$hlcit <- as.numeric(levels(coords$hlcit))[coords$hlcit]
-  
-# Attempts to call the file directly from online HDX server:
-# library(XLConnect)
-# data1<-readWorksheetFromFile("http://data.hdx.rwlabs.org/dataset/io/CCCM Nepal Displacement Tracking Matrix.xlsx",sheet=1)
-# library(xlsx)
-# data1<-read.xlsx("https://www.dropbox.com/s/6powpj6wsp9r9aw/De-identified%20SPUS.xlsx", sheetIndex=1)
-
 
 # READ IN THE DISPLACEMENT FILE DATA
 dt_data <- read.csv(paste0(DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
