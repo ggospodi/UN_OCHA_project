@@ -9,41 +9,30 @@
 # https://data.hdx.rwlabs.org/dataset/nepal-earthquake-severity-index
 # https://data.hdx.rwlabs.org/dataset/io (sheet 3)
 # https://data.hdx.rwlabs.org/dataset/population-movements-after-the-nepal-earthquake-v-3-up-to-11th-june-2015
-
-# 
-# This report contains the initial displacement tracking network model construction and some analytics.
-# 
-# 1. NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
-# 2. Nepal Disaster Relief Distribution Network Construction and Analysis
-# 3. Nepal Disaster Agency Network Construction and Analysis
-# 4. Severity Index Correlation With Disaster Agency NEtwork. 
-# 
+#
 # 
 # Relevant materials and data cna be found at:
 # 
 # https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl=0
 #
 # in the folder /Displacement Network
-
-# Definition of the Nepal Displacement Tracking Network: 
-#   
-# NOTE: This report is intended to only demonstrate the construction of the networks and some of the analytical tools. 
-# In subsequent reports, we will develop the analytics further and address the actionable advances that this apporach offers.
 #
-#
+# 
 #
 # LOAD PACKAGES
 library(plyr)
 library(dplyr)
 library(igraph)
 library(RColorBrewer)
-
+#
+#
 # SET FILE SOURCE PATH
 DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
-
+#
+#
 # DEFINE FUNCTIONS
-
-
+#
+#
 # FUNCTION TO DISPLAY RELATIVE PERCENTAGES FOR HSITOGRAM COLUMNS
 histP <- function(x,breaks, ...) {
   H <- hist(x, plot = FALSE, breaks=breaks)
@@ -199,12 +188,12 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   return(g_f)
 }
 
+
+# INITIAL DATA INPUT AND TRANSFORMATIONS
 #
 #
-# SECTION 1: NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
+# COLUMN NAMES FOR CCCM_Nepal_DTM_R2.csv
 #
-#
-# COLUMN NAMES FOR CCCM_Nepal_DTM_R2.csv ARE:
 #
 # 1.1.c.1 Site ID (SSID)
 # 1.1.d.1 Site Name
@@ -387,6 +376,7 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 # 11.1.h.1 Is everyone aware that donations do not need to be exchanged for anything?  
 # Site classification
 
+
 # LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
 hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
 colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
@@ -395,6 +385,7 @@ hlcit$vname <- as.character(hlcit$vname)
 hlcit$vdc_name <- as.character(hlcit$vdc_name)
 hlcit <- rm_space(hlcit,"hlcit_code")
 hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
+
 
 # READ IN THE DISPLACEMENT FILE DATA
 dt_data <- read.csv(paste0(DIR,"CCCM_Nepal_DTM_R2.csv"), sep=",")
@@ -483,7 +474,6 @@ dt_data <- dt_data[nchar(dt_data$vdc)>0 & (nchar(dt_data$idp_origin_vdc) + nchar
 
 
 # RESOLVE VDC NAMES ACCORDING TO THE HLCIT MASTER LIST:
-
 dt_data$vdc <- mapvalues(dt_data$vdc,
                          from = c("Barahbise","Barpak","Chandeni","Charikot","Gokarneshwar","Kathmandu",
                                   "Kathmandu Municipality","Lalitpur","Mankha","Manmaijn","Naikap Naya",
@@ -492,11 +482,9 @@ dt_data$vdc <- mapvalues(dt_data$vdc,
                                 "Kathmandu Metropolitan","Kathmandu Metropolitan","Lalitpur Sub Metropolitan",
                                 "Mangkha","Manmaiju","NaikapNayaBhanjyang","PuranogaunDapcha",
                                 "Sangla","Sangkhu","TokhaSarswoti"))
-
 dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
                                     from = c("barabise","Bhimeshwor Municipality","Chautara Municipality","Maanka"),
                                     to = c("Barhabise","Bhimeswor Municipality","Chautara","Mahangkal"))
-
 dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
                                      from = c("barabise","Bhimeshwor Municipality","Jhaku"),
                                      to = c("Barhabise","Bhimeswor Municipality","Jhyanku"))
@@ -539,6 +527,7 @@ for (k in 1:length(vdc)){
   }
 }
 koords<-cbind(xc,yc)
+
 
 # FURTHER NARROW DOWN COLUMNS
 dt_data <- dt_data[,c("vdc","idp_origin_vdc","idp2_origin_vdc","idp_hh")]
@@ -584,6 +573,7 @@ for (k in 1:length(vdc)){
 # SET THE VERTEX LABELS
 V(gv)$name <- vdc
 
+
 # DROP ISOLATED VERTICES (NO DISPLACEMENT)
 gv <- drop_isolated(graph = gv,
                     vertex_colors = V(gv)$color,
@@ -601,14 +591,16 @@ plot(gv,
      edge.curved=FALSE,
      edge.color=gray.colors(1))
 
+
 # DROP LOOPS ONLY VERTICES AS WELL ()
 gv <- drop_loops(graph = gv,
                  vertex_colors = V(gv)$color,
                  vertex_names = vdc)
 
+
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gv,
-     layout=layout.fruchterman.reingold(gv, niter=200, area=20000*vcount(gv)),
+     layout=layout.fruchterman.reingold(gv, niter=20, area=2000*vcount(gv)),
      vertex.color=V(gv)$color,
      vertex.size=9, 
      vertex.label=V(gv)$name,
@@ -616,26 +608,29 @@ plot(gv,
      vertex.label.font=1, 
      vertex.label.cex=0.9, 
      edge.width=(E(gv)$weight),
-     edge.arrow.size=0.7,
+     edge.arrow.size=0.5,
      edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     edge.color=gray.colors(1),
+     main="Nepal Displacement Network Flow (Abstract, VDC Level)")
+legend("topright",c("Origins of Displacement",
+                    "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
 
 
 # PLOT THE GRAPH WITH SELECTED COORDINATES
 gv_coords <- koords[which(vdc %in% V(gv)$name),]
 plot(gv,
-     layout=gv_coords,
-     vertex.color=V(gv)$color,
-     vertex.size=4, 
-     vertex.label=V(gv)$name,
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=0.5, 
-     edge.width=(E(gv)$weight),
-     edge.arrow.size=0.7,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1),
-     main="Nepal Displacement Network Flow (VDC Level)")
+     layout = gv_coords,
+     vertex.color = V(gv)$color,
+     vertex.size = 4, 
+     vertex.label = V(gv)$name,
+     vertex.label.color = "black", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.7, 
+     edge.width = (E(gv)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Nepal Displacement Geo-Network Flow (VDC Level)")
 legend("topright",c("Origins of Displacement",
                "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
 
@@ -654,8 +649,10 @@ for (k in 1:length(vdc)){
   } 
 }
 
+
 # SET THE VERTEX LABELS
 V(gd)$name <- vdc
+
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
 gd <- drop_isolated(graph = gd,
@@ -677,13 +674,13 @@ plot(gd,
      vertex.label=V(gd)$name,
      vertex.label.color="black", 
      vertex.label.font=1, 
-     vertex.label.cex=0.5, 
+     vertex.label.cex=0.6, 
      edge.width=0.15*sqrt(E(gd)$weight),
-     edge.arrow.size=0.5,
+     edge.arrow.size=0.4,
      edge.curved=TRUE,
      edge.color=gray.colors(1),
      main="Weighted Nepal Displacement Network Flow (VDC Level)")
-legend("top",c("Displacement Origin","Displacement Destination"),fill=c("green","SkyBlue2"),bty="n")
+legend("topright",c("Displacement Origin","Displacement Destination"),fill=c("green","SkyBlue2"),bty="n")
 
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
@@ -745,8 +742,6 @@ gd_f <- filter(cutoff = cut50,
 gd_f <- drop_loops(graph = gd_f,
                    vertex_colors = V(gd_f)$color,
                    vertex_names = V(gd_f)$name)
-
-# DISPLAY THE EDGE-FILTERED GRAPH
 gd_f_coords <- koords[which(vdc %in% V(gd_f)$name),]
 plot(gd_f,
      layout=gd_f_coords,
@@ -763,7 +758,6 @@ plot(gd_f,
      main="Filtered Nepal Displacement Network Flow (VDC Level)")
 legend("topright",c("Origins of Displacement",
                       "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
-
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
      vertex.color=V(gd_f)$color,
@@ -778,39 +772,6 @@ plot(gd_f,
      edge.color=gray.colors(1),
      main="Filtered Nepal Displacement Network Flow (VDC Level)")
 
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 50% quantile
-cut50 <- quantile(as.vector(dtm[dtm>0]),0.5)
-gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
-V(gd)$name <- vdc
-V(gd)$color <- rep("SkyBlue2",length(vdc))
-for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc==vdc[k]))+length(which(dt_data$idp2_origin_vdc==vdc[k]))
-  d_count <- length(which(dt_data$vdc==vdc[k]))
-  if(o_count>d_count){
-    V(gd)$color[k] <- "green"
-  } 
-}
-gd_f <- filter(cutoff = cut50,
-               edge_matrix = dtm,
-               vertex_colors = V(gd)$color,
-               vertex_names = V(gd)$name)
-gd_f <- drop_loops(graph = gd_f,
-                   vertex_colors = V(gd_f)$color,
-                   vertex_names = V(gd_f)$name)
-
-# DISPLAY THE EDGE-FILTERED GRAPH
-plot(gd_f,
-     layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
-     vertex.color=V(gd_f)$color,
-     vertex.size=10,
-     vertex.label=V(gd_f)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1.4, 
-     edge.width=0.4*sqrt(E(gd_f)$weight),
-     edge.arrow.size=01,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 75% quantile
 cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
@@ -831,8 +792,7 @@ gd_f <- filter(cutoff = cut75,
 gd_f <- drop_loops(graph = gd_f,
                    vertex_colors = V(gd_f)$color,
                    vertex_names = V(gd_f)$name)
-
-# DISPLAY THE EDGE-FILTERED GRAPH
+gd_f_coords <- koords[which(vdc %in% V(gd_f)$name),]
 plot(gd_f,
      layout=layout.fruchterman.reingold(gd_f, niter=200, area=2000*vcount(gd_f)),
      vertex.color=V(gd_f)$color,
@@ -843,7 +803,9 @@ plot(gd_f,
      vertex.label.cex=1.4, 
      edge.width=0.5*sqrt(E(gd_f)$weight),
      edge.arrow.size=1.4,
-     edge.curved=TRUE,edge.color=gray.colors(1))
+     edge.curved=TRUE,edge.color=gray.colors(1),
+     main="Filtered Nepal Displacement Network Flow (VDC Level)")
+
 
 
 
@@ -855,6 +817,7 @@ plot(gd_f,
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
 gd <- graph.adjacency(dtm,mode="directed",weighted=TRUE)
+
 
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
