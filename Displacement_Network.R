@@ -86,8 +86,8 @@ drop_isolated <- function(graph, vertex_colors, vertex_names) {
   g <- graph
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g) =  = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) =  = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
   
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
@@ -99,8 +99,8 @@ drop_isolated <- function(graph, vertex_colors, vertex_names) {
 # FUNCITON THAT DROPS LOOPS
 drop_loops <- function(graph, vertex_colors, vertex_names){
   g <- simplify(graph,remove.loops = TRUE)
-  g_f <- delete.vertices(g,V(g)[degree(g) =  = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) =  = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- vertex_colors[v_g_f]
@@ -122,8 +122,8 @@ filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   V(g)$color <- vertex_colors
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g) =  = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) =  = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- vertex_colors[v_g_f]
   
@@ -153,8 +153,8 @@ filter_deg <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   V(g)$color <- vertex_color
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g) =  = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) =  = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
@@ -173,8 +173,8 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   
   # identify the largest cluster
   clusters <- as.data.frame(table(clusters(g)$membership))
-  ind <- as.numeric(clusters[which(clusters$Freq =  = max(clusters$Freq)),]$Var1)
-  vertices <- which(clusters(g)$membership =  = ind)
+  ind <- as.numeric(clusters[which(clusters$Freq = max(clusters$Freq)),]$Var1)
+  vertices <- which(clusters(g)$membership = ind)
   vertices_complement <- which(clusters(g)$membership! = ind)
   
   # filter to only include the giant component
@@ -492,20 +492,20 @@ dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
 
 # CREATE A LIST OF UNIQUE VDC DESTINATION NAMES
 vdc <- unique(c(dt_data$vdc, dt_data$idp_origin_vdc,dt_data$idp2_origin_vdc))
-vdc <- vdc[-which(vdc =  = "")]
+vdc <- vdc[-which(vdc = "")]
 vdc1 <- intersect(vdc,hlcit$vdc_name)
 vdc2 <- setdiff(vdc,hlcit$vdc_name)
 
 
 # RESOLVE THE ONLY VDC NAME LEFT THAT IS NOT ON RECORD
-index <- which(dt_data$vdc =  = setdiff(vdc2,hlcit$vname))
+index <- which(dt_data$vdc = setdiff(vdc2,hlcit$vname))
 closest <- vector()
 for (k in 1:dim(hlcit)[1]){
   closest[k] <- (dt_data$lat[index]-hlcit$lat[k])^2+(dt_data$lon[index]-hlcit$lon[k])^2
 }
-dt_data$vdc[index] <- hlcit$vname[which(closest =  = min(closest))]
+dt_data$vdc[index] <- hlcit$vname[which(closest = min(closest))]
 vdc <- unique(c(dt_data$vdc, dt_data$idp_origin_vdc,dt_data$idp2_origin_vdc))
-vdc <- vdc[-which(vdc =  = "")]
+vdc <- vdc[-which(vdc = "")]
 vdc1 <- intersect(vdc,hlcit$vdc_name)
 vdc2 <- setdiff(vdc,hlcit$vdc_name)
 
@@ -516,14 +516,14 @@ xc <- vector()
 yc <- vector()
 for (k in 1:length(vdc)){
   if (vdc[k] %in% vdc1){
-    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name =  = vdc[k])[1]]
-    xc[k] <- hlcit$lat[which(hlcit$vdc_name =  = vdc[k])[1]]
-    yc[k] <- hlcit$lon[which(hlcit$vdc_name =  = vdc[k])[1]]
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name = vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vdc_name = vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vdc_name = vdc[k])[1]]
   }
   if (vdc[k] %in% vdc2){
-    hl[k] <- hlcit$hlcit_code[which(hlcit$vname =  = vdc[k])[1]]
-    xc[k] <- hlcit$lat[which(hlcit$vname =  = vdc[k])[1]]
-    yc[k] <- hlcit$lon[which(hlcit$vname =  = vdc[k])[1]]
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vname = vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vname = vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vname = vdc[k])[1]]
   }
 }
 koords<-cbind(xc,yc)
@@ -546,24 +546,26 @@ dtm <- matrix(nrow = length(vdc),ncol = length(vdc))
 # AND THE WEIGHTED DISPLACEMENT TRACKING MATRIX
 for (i in 1:length(vdc)){
   for (j in 1:length(vdc)){
-    vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc =  = vdc[i] & dt_data$vdc =  = vdc[j],1])+
-      length(dt_data[dt_data$idp2_origin_vdc =  = vdc[i] & dt_data$vdc =  = vdc[j],1])
-    dtm[[i,j]]<-(2/3)*sum(dt_data[dt_data$idp_origin_vdc =  = vdc[i] & dt_data$vdc =  = vdc[j],]$idp_hh)+
-      (1/3)*sum(dt_data[dt_data$idp2_origin_vdc =  = vdc[i] & dt_data$vdc =  = vdc[j],]$idp_hh)
+    vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],1])+
+      length(dt_data[dt_data$idp2_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],1])
+    dtm[[i,j]]<-(2/3)*sum(dt_data[dt_data$idp_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],]$idp_hh)+
+      (1/3)*sum(dt_data[dt_data$idp2_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],]$idp_hh)
   }
 }
 
 
 # BUILD THE DIRECTED WEIGHTED VDC NETWORK
-gv <- graph.adjacency(vdc_m,mode = "directed",weighted = TRUE)
+gv <- graph.adjacency(vdc_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 
 # COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
 V(gv)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gv)$color[k] <- "green"
   } 
@@ -575,28 +577,28 @@ V(gv)$name <- vdc
 
 
 # DROP ISOLATED VERTICES (NO DISPLACEMENT)
-gv <- drop_isolated(graph  =  gv,
-                    vertex_colors  =  V(gv)$color,
-                    vertex_names  =  vdc)
+gv <- drop_isolated(graph = gv,
+                    vertex_colors = V(gv)$color,
+                    vertex_names= vdc)
 plot(gv,
-     layout  =  layout.fruchterman.reingold(gv,
-                                          niter  =  20,
+     layout = layout.fruchterman.reingold(gv,
+                                          niter = 200,
                                           area = 2000*vcount(gv)),
-     vertex.color  =  V(gv)$color,
-     vertex.size  = 9, 
-     vertex.label  =  V(gv)$name,
-     vertex.label.color  =  "black", 
-     vertex.label.font  =  2, 
-     vertex.label.cex  =  0.7, 
-     edge.width  =  0.3*(E(gv)$weight),
-     edge.arrow.size  =  0.5,
-     edge.curved  =  FALSE,
-     edge.color  =  gray.colors(1),
-     main  =  "Abstract Nepal Displacement Network Flow (VDC Level, with Self-Loops)")
-legend("top",
+     vertex.color = V(gv)$color,
+     vertex.size = 9, 
+     vertex.label = V(gv)$name,
+     vertex.label.color = "black", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.9, 
+     edge.width = 2*(E(gv)$weight),
+     edge.arrow.size = 0.8,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Abstract Nepal Displacement Network Flow (VDC Level, with Self-Loops)")
+legend("topright",
        c("Displacement Origin","Displacement Destination"),
-       fill  =  c("green","SkyBlue2"),
-       bty  =  "n")
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
 
 # DROP LOOPS ONLY VERTICES AS WELL ()
@@ -606,14 +608,16 @@ gv <- drop_loops(graph  =  gv,
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gv,
-     layout = layout.fruchterman.reingold(gv, niter = 20, area = 2000*vcount(gv)),
+     layout = layout.fruchterman.reingold(gv,
+                                          niter = 200,
+                                          area = 2000*vcount(gv)),
      vertex.color = V(gv)$color,
      vertex.size = 9, 
      vertex.label = V(gv)$name,
      vertex.label.color = "black", 
      vertex.label.font = 1, 
      vertex.label.cex = 0.9, 
-     edge.width = (E(gv)$weight),
+     edge.width = 2*(E(gv)$weight),
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
@@ -651,9 +655,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -777,8 +781,8 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -827,8 +831,8 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -870,9 +874,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -974,7 +978,7 @@ transitivity(gd_f)
 max(clusters(gd)$csize)/vcount(gd)
 
 # RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
-sum(degree(gd) =  = 0)/vcount(gd)
+sum(degree(gd) = 0)/vcount(gd)
 
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
 sh<-shortest.paths(gd)
@@ -1096,9 +1100,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -1161,9 +1165,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -1267,9 +1271,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -1339,7 +1343,7 @@ gd <- as.undirected(graph.adjacency(vdc_m,weighted = TRUE))
 V(gd)$color <- rep("green",length(vdc))
 V(gd)$name <- vdc
 cl<-clusters(gd)
-gd1<-induced.subgraph(gd, which(cl$membership  =  =  which.max(cl$csize)))
+gd1<-induced.subgraph(gd, which(cl$membership  =  which.max(cl$csize)))
 cc<-closeness(graph  =  gd1,vids  =  V(gd1),weights  =  E(gd1)$weight)
 plot(sort(cc/max(cc), decreasing = TRUE), col = adjustcolor(rgb(1/2,0,1,1)), xlab = "Node Id in the Giant Conencted Component (gg1)", ylab = "Normalized Closeness Centrality", main = "Closeness Centrality for the Giant Component (gg1)")
 hist(cc/max(cc),breaks = 200,col = adjustcolor(rgb(1/2,0,1,1)),xlab = "Normalized Closeness Centrality Values for gg1",main = "Normalized Closeness Centrality Distribution for gg1")
@@ -1361,9 +1365,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -1383,7 +1387,7 @@ gd <- drop_loops(graph  =  gd,
                  vertex_colors  =  V(gd)$color,
                  vertex_names  =  V(gd)$name)
 clu<-clusters(gd)
-gd1<-induced.subgraph(gd, which(clu$membership  =  =  which.max(clu$csize)))
+gd1<-induced.subgraph(gd, which(clu$membership  =  which.max(clu$csize)))
 ec<-evcent(gd1)$vector
 plot(sort(ec, decreasing = TRUE), col = adjustcolor(rgb(0,0,1,1/2)), xlab = "Node Id in the Network (1:200)", ylab = "Closeness Centrality Values", main = "Essential (first 200 nodes) Closeness Centrality for g", pch = 20)
 hist(ec,breaks = 100,col = adjustcolor(rgb(0,0,1,1/2)),xlab = "Closeness Centrality Values",main = "Essential Closeness Centrality Distribution")
@@ -1399,9 +1403,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -1432,9 +1436,9 @@ gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc =  = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc =  = vdc[k]))
-  d_count <- length(which(dt_data$vdc =  = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc = vdc[k]))
+  d_count <- length(which(dt_data$vdc = vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
