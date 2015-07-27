@@ -602,9 +602,9 @@ legend("topright",
 
 
 # DROP LOOPS ONLY VERTICES AS WELL ()
-gv <- drop_loops(graph  =  gv,
-                 vertex_colors  =  V(gv)$color,
-                 vertex_names  =  vdc)
+gv <- drop_loops(graph = gv,
+                 vertex_colors = V(gv)$color,
+                 vertex_names = vdc)
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gv,
@@ -649,27 +649,17 @@ legend("topright",
        bty = "n")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
+gd <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc = vdc[k]))
-  d_count <- length(which(dt_data$vdc = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
