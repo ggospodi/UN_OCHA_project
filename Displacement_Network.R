@@ -589,14 +589,18 @@ plot(gv,
      edge.width=0.3*(E(gv)$weight),
      edge.arrow.size=0.5,
      edge.curved=FALSE,
-     edge.color=gray.colors(1))
+     edge.color=gray.colors(1),
+     main="Abstract Nepal Displacement Network Flow (VDC Level, with Self-Loops)")
+legend("top",
+       c("Displacement Origin","Displacement Destination"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
 
 
 # DROP LOOPS ONLY VERTICES AS WELL ()
 gv <- drop_loops(graph = gv,
                  vertex_colors = V(gv)$color,
                  vertex_names = vdc)
-
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gv,
@@ -611,9 +615,11 @@ plot(gv,
      edge.arrow.size=0.5,
      edge.curved=TRUE,
      edge.color=gray.colors(1),
-     main="Nepal Displacement Network Flow (Abstract, VDC Level)")
-legend("topright",c("Origins of Displacement",
-                    "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+     main="Abstract Nepal Displacement Network Flow (VDC Level, No Self-Loops)")
+legend("topright",
+       c("Origins of Displacement","Destinations of Displacement"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
 
 
 # PLOT THE GRAPH WITH SELECTED COORDINATES
@@ -631,8 +637,10 @@ plot(gv,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Nepal Displacement Geo-Network Flow (VDC Level)")
-legend("topright",c("Origins of Displacement",
-               "Destinations of Displacement"),fill=c("green","SkyBlue2"),bty="n")
+legend("topright",
+       c("Origins of Displacement","Destinations of Displacement"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -665,23 +673,6 @@ gd <- drop_loops(graph = gd,
                  vertex_colors = V(gd)$color,
                  vertex_names = V(gd)$name)
 
-# SELECT THE COORDINATES
-gd_coords <- koords[which(vdc %in% V(gd)$name),]
-plot(gd,
-     layout=gd_coords,
-     vertex.color=V(gd)$color,
-     vertex.size=4, 
-     vertex.label=V(gd)$name,
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=0.6, 
-     edge.width=0.15*sqrt(E(gd)$weight),
-     edge.arrow.size=0.4,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1),
-     main="Weighted Nepal Displacement Network Flow (VDC Level)")
-legend("topright",c("Displacement Origin","Displacement Destination"),fill=c("green","SkyBlue2"),bty="n")
-
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gd, 
@@ -695,7 +686,33 @@ plot(gd,
      edge.width=0.02*(E(gd)$weight),
      edge.arrow.size=0.7,
      edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     edge.color=gray.colors(1),
+     main="Weighted Abstract Nepal Displacement Network Flow (VDC Level)")
+legend("topright",
+       c("Displacement Origin","Displacement Destination"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
+
+
+# SELECT THE COORDINATES
+gd_coords <- koords[which(vdc %in% V(gd)$name),]
+plot(gd,
+     layout=gd_coords,
+     vertex.color=V(gd)$color,
+     vertex.size=4, 
+     vertex.label=V(gd)$name,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.6, 
+     edge.width=0.2*sqrt(E(gd)$weight),
+     edge.arrow.size=0.2,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Weighted Nepal Displacement Geo-Network Flow (VDC Level)")
+legend("topright",
+       c("Displacement Origin","Displacement Destination"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
 
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
@@ -704,8 +721,7 @@ gd_c <- giant_comp(graph = gd,
                    vertex_names = V(gd)$name)
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
-# SELECT THE COORDINATES
-gd_c_coords <- koords[which(vdc %in% V(gd_c)$name),]
+gd_c_coords <- koords[which(V(gd)$name %in% V(gd_c)$name),]
 plot(gd_c,
      layout=gd_c_coords,
      vertex.color=V(gd_c)$color,
@@ -715,12 +731,42 @@ plot(gd_c,
      vertex.label.font=1, 
      vertex.label.cex=0.7, 
      edge.width=0.2*sqrt(E(gd_c)$weight),
-     edge.arrow.size=0.7,
+     edge.arrow.size=0.5,
      edge.curved=TRUE,
      edge.color=gray.colors(1),
-     main="Weighted Nepal Displacement Network Flow (VDC Level)",
-     xlab = "", ylab = "")
-legend("top",c("Displacement Origin","Displacement Destination"),fill=c("green","SkyBlue2"),bty="n")
+     main="Weighted Nepal Displacement Network Flow (VDC Level)")
+legend("top",
+       c("Displacement Origin","Displacement Destination"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
+
+plot(gd_c,
+     layout=gd_c_coords,
+     vertex.color=V(gd_c)$color,
+     vertex.size=5, 
+     vertex.label=V(gd_c)$name,
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=0.7, 
+     edge.width=0.2*sqrt(E(gd_c)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Weighted Nepal Displacement Network Flow (VDC Level)")
+legend("top",
+       c("Displacement Origin","Displacement Destination"),
+       fill=c("green","SkyBlue2"),
+       bty="n")
+
+
+
+
+
+
+
+
+
+
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF = 25% quantile
