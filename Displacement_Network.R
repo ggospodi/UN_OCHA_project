@@ -671,20 +671,22 @@ V(gd)$name <- vdc
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
-gd <- drop_isolated(graph  =  gd,
-                    vertex_colors  =  V(gd)$color,
-                    vertex_names  =  V(gd)$name)
+gd <- drop_isolated(graph = gd,
+                    vertex_colors = V(gd)$color,
+                    vertex_names = V(gd)$name)
 
 
 # DROP LOOPS ONLY VERTICES AS WELL 
-gd <- drop_loops(graph  =  gd,
-                 vertex_colors  =  V(gd)$color,
-                 vertex_names  =  V(gd)$name)
+gd <- drop_loops(graph = gd,
+                 vertex_colors = V(gd)$color,
+                 vertex_names = V(gd)$name)
 
 
 # RESULTING CLEANED UP GRAPH SHOWING NONTRIVIAL MIGRATION
 plot(gd, 
-     layout = layout.fruchterman.reingold(gd, niter = 20, area = 2000*vcount(gd)),
+     layout = layout.fruchterman.reingold(gd,
+                                          niter = 200,
+                                          area = 2000*vcount(gd)),
      vertex.color = V(gd)$color,
      vertex.size = 9, 
      vertex.label = V(gd)$name,
@@ -724,9 +726,9 @@ legend("topright",
 
 
 # DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
-gd_c <- giant_comp(graph  =  gd,
-                   vertex_colors  =  V(gd)$color,
-                   vertex_names  =  V(gd)$name)
+gd_c <- giant_comp(graph = gd,
+                   vertex_colors = V(gd)$color,
+                   vertex_names = V(gd)$name)
 
 
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
@@ -749,7 +751,9 @@ legend("top",
        fill = c("green","SkyBlue2"),
        bty = "n")
 plot(gd_c,
-     layout = layout.fruchterman.reingold(gd_c, niter = 20, area = 2000*vcount(gd_c)),
+     layout = layout.fruchterman.reingold(gd_c,
+                                          niter = 200,
+                                          area = 2000*vcount(gd_c)),
      vertex.color = V(gd_c)$color,
      vertex.size = 7, 
      vertex.label = V(gd_c)$name,
