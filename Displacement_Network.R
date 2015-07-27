@@ -771,24 +771,17 @@ legend("top",
        bty = "n")
 
 
-
-
-
-
-
-
-
-
-
-
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF  =  25% quantile
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF  =  50% quantile
 cut50 <- quantile(as.vector(dtm[dtm>0]),0.50)
-gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
+gd <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+length(which(dt_data$idp2_origin_vdc = vdc[k]))
-  d_count <- length(which(dt_data$vdc = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))
+    + length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -810,14 +803,18 @@ plot(gd_f,
      vertex.label.font = 1, 
      vertex.label.cex = 0.7, 
      edge.width = 0.2*sqrt(E(gd_f)$weight),
-     edge.arrow.size = 0.7,
+     edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Filtered Nepal Displacement Network Flow (VDC Level)")
-legend("topright",c("Origins of Displacement",
-                      "Destinations of Displacement"),fill = c("green","SkyBlue2"),bty = "n")
+     main = "Filtered Abstract Nepal Displacement Network (Cut-Off = 50%))")
+legend("topright",
+       c("Origins of Displacement","Destinations of Displacement"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 plot(gd_f,
-     layout = layout.fruchterman.reingold(gd_f, niter = 200, area = 2000*vcount(gd_f)),
+     layout = layout.fruchterman.reingold(gd_f,
+                                          niter = 200,
+                                          area = 2000*vcount(gd_f)),
      vertex.color = V(gd_f)$color,
      vertex.size = 10,
      vertex.label = V(gd_f)$name, 
@@ -828,17 +825,24 @@ plot(gd_f,
      edge.arrow.size = 01,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Filtered Nepal Displacement Network Flow (VDC Level)")
+     main = "Filtered Nepal Displacement Geo-Network (Cut-Off = 50%))")
+legend("topright",
+       c("Origins of Displacement","Destinations of Displacement"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE WEIGHTED DISPLACEMENT GRAPH: CUT-OFF  =  75% quantile
 cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
-gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
+gd <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
 V(gd)$name <- vdc
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+length(which(dt_data$idp2_origin_vdc = vdc[k]))
-  d_count <- length(which(dt_data$vdc = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))
+  + length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
@@ -852,25 +856,57 @@ gd_f <- drop_loops(graph  =  gd_f,
                    vertex_names  =  V(gd_f)$name)
 gd_f_coords <- koords[which(vdc %in% V(gd_f)$name),]
 plot(gd_f,
-     layout = layout.fruchterman.reingold(gd_f, niter = 200, area = 2000*vcount(gd_f)),
+     layout = layout.fruchterman.reingold(gd_f,
+                                          niter = 200,
+                                          area = 2000*vcount(gd_f)),
      vertex.color = V(gd_f)$color,
      vertex.size = 14,
      vertex.label = V(gd_f)$name, 
      vertex.label.color = "black", 
      vertex.label.font = 1, 
      vertex.label.cex = 1.4, 
-     edge.width = 0.5*sqrt(E(gd_f)$weight),
+     edge.width = 0.05*(E(gd_f)$weight),
      edge.arrow.size = 1.4,
      edge.curved = TRUE,edge.color = gray.colors(1),
-     main = "Filtered Nepal Displacement Network Flow (VDC Level)")
+     main = "Filtered Abstract Nepal Displacement Network (Cut-Off = 75%))")
+legend("topright",
+       c("Origins of Displacement","Destinations of Displacement"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+plot(gd_f,
+     layout = layout.fruchterman.reingold(gd_f,
+                                          niter = 200,
+                                          area = 2000*vcount(gd_f)),
+     vertex.color = V(gd_f)$color,
+     vertex.size = 14,
+     vertex.label = V(gd_f)$name, 
+     vertex.label.color = "black", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1.4, 
+     edge.width = 0.05*(E(gd_f)$weight),
+     edge.arrow.size = 1.4,
+     edge.curved = TRUE,edge.color = gray.colors(1),
+     main = "Filtered Nepal Displacement Geo-Network (Cut-Off = 75%))")
+legend("topright",
+       c("Origins of Displacement","Destinations of Displacement"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
 
 
-
-
-
-
+#
+#
 # ANALYSIS OF THE VDC NETWORK ITSELF
+#
+#
+
+
+
+
+
+
+
+
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
