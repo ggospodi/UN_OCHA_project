@@ -475,37 +475,37 @@ dt_data <- dt_data[nchar(dt_data$vdc)>0 & (nchar(dt_data$idp_origin_vdc) + nchar
 
 # RESOLVE VDC NAMES ACCORDING TO THE HLCIT MASTER LIST:
 dt_data$vdc <- mapvalues(dt_data$vdc,
-                         from  =  c("Barahbise","Barpak","Chandeni","Charikot","Gokarneshwar","Kathmandu",
+                         from = c("Barahbise","Barpak","Chandeni","Charikot","Gokarneshwar","Kathmandu",
                                   "Kathmandu Municipality","Lalitpur","Mankha","Manmaijn","Naikap Naya",
                                   "Puranagaun","Sanga","Sangkhu Suntol","Tokhasaraswati"),
-                         to  =  c("Barhabise","Warpak","Chandeni Mandan","Narikot","Gokarneswor",
+                         to = c("Barhabise","Warpak","Chandeni Mandan","Narikot","Gokarneswor",
                                 "Kathmandu Metropolitan","Kathmandu Metropolitan","Lalitpur Sub Metropolitan",
                                 "Mangkha","Manmaiju","NaikapNayaBhanjyang","PuranogaunDapcha",
                                 "Sangla","Sangkhu","TokhaSarswoti"))
 dt_data$idp_origin_vdc <- mapvalues(dt_data$idp_origin_vdc,
-                                    from  =  c("barabise","Bhimeshwor Municipality","Chautara Municipality","Maanka"),
-                                    to  =  c("Barhabise","Bhimeswor Municipality","Chautara","Mahangkal"))
+                                    from = c("barabise","Bhimeshwor Municipality","Chautara Municipality","Maanka"),
+                                    to = c("Barhabise","Bhimeswor Municipality","Chautara","Mahangkal"))
 dt_data$idp2_origin_vdc <- mapvalues(dt_data$idp2_origin_vdc,
-                                     from  =  c("barabise","Bhimeshwor Municipality","Jhaku"),
-                                     to  =  c("Barhabise","Bhimeswor Municipality","Jhyanku"))
+                                     from = c("barabise","Bhimeshwor Municipality","Jhaku"),
+                                     to = c("Barhabise","Bhimeswor Municipality","Jhyanku"))
 
 
 # CREATE A LIST OF UNIQUE VDC DESTINATION NAMES
 vdc <- unique(c(dt_data$vdc, dt_data$idp_origin_vdc,dt_data$idp2_origin_vdc))
-vdc <- vdc[-which(vdc = "")]
+vdc <- vdc[-which(vdc == "")]
 vdc1 <- intersect(vdc,hlcit$vdc_name)
 vdc2 <- setdiff(vdc,hlcit$vdc_name)
 
 
 # RESOLVE THE ONLY VDC NAME LEFT THAT IS NOT ON RECORD
-index <- which(dt_data$vdc = setdiff(vdc2,hlcit$vname))
+index <- which(dt_data$vdc == setdiff(vdc2,hlcit$vname))
 closest <- vector()
 for (k in 1:dim(hlcit)[1]){
   closest[k] <- (dt_data$lat[index]-hlcit$lat[k])^2+(dt_data$lon[index]-hlcit$lon[k])^2
 }
-dt_data$vdc[index] <- hlcit$vname[which(closest = min(closest))]
+dt_data$vdc[index] <- hlcit$vname[which(closest == min(closest))]
 vdc <- unique(c(dt_data$vdc, dt_data$idp_origin_vdc,dt_data$idp2_origin_vdc))
-vdc <- vdc[-which(vdc = "")]
+vdc <- vdc[-which(vdc == "")]
 vdc1 <- intersect(vdc,hlcit$vdc_name)
 vdc2 <- setdiff(vdc,hlcit$vdc_name)
 
@@ -516,17 +516,17 @@ xc <- vector()
 yc <- vector()
 for (k in 1:length(vdc)){
   if (vdc[k] %in% vdc1){
-    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name = vdc[k])[1]]
-    xc[k] <- hlcit$lat[which(hlcit$vdc_name = vdc[k])[1]]
-    yc[k] <- hlcit$lon[which(hlcit$vdc_name = vdc[k])[1]]
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name == vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vdc_name == vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vdc_name == vdc[k])[1]]
   }
   if (vdc[k] %in% vdc2){
-    hl[k] <- hlcit$hlcit_code[which(hlcit$vname = vdc[k])[1]]
-    xc[k] <- hlcit$lat[which(hlcit$vname = vdc[k])[1]]
-    yc[k] <- hlcit$lon[which(hlcit$vname = vdc[k])[1]]
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vname == vdc[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vname == vdc[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vname == vdc[k])[1]]
   }
 }
-koords<-cbind(xc,yc)
+koords <- cbind(xc,yc)
 
 
 # FURTHER NARROW DOWN COLUMNS
@@ -546,10 +546,10 @@ dtm <- matrix(nrow = length(vdc),ncol = length(vdc))
 # AND THE WEIGHTED DISPLACEMENT TRACKING MATRIX
 for (i in 1:length(vdc)){
   for (j in 1:length(vdc)){
-    vdc_m[[i,j]]<-length(dt_data[dt_data$idp_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],1])+
-      length(dt_data[dt_data$idp2_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],1])
-    dtm[[i,j]]<-(2/3)*sum(dt_data[dt_data$idp_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],]$idp_hh)+
-      (1/3)*sum(dt_data[dt_data$idp2_origin_vdc = vdc[i] & dt_data$vdc = vdc[j],]$idp_hh)
+    vdc_m[[i,j]] <- length(dt_data[dt_data$idp_origin_vdc == vdc[i] & dt_data$vdc == vdc[j],1])+
+      length(dt_data[dt_data$idp2_origin_vdc == vdc[i] & dt_data$vdc == vdc[j],1])
+    dtm[[i,j]] <- (2/3)*sum(dt_data[dt_data$idp_origin_vdc == vdc[i] & dt_data$vdc == vdc[j],]$idp_hh)+
+      (1/3)*sum(dt_data[dt_data$idp2_origin_vdc == vdc[i] & dt_data$vdc == vdc[j],]$idp_hh)
   }
 }
 
@@ -563,9 +563,9 @@ gv <- graph.adjacency(vdc_m,
 # COLOR VDC NAMES OF ORIGIN (GREEN) AND VDC NAMES OF DESTINATION (BLUE)
 V(gv)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc = vdc[k]))
-  d_count <- length(which(dt_data$vdc = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
   if(o_count>d_count){
     V(gv)$color[k] <- "green"
   } 
@@ -590,8 +590,8 @@ plot(gv,
      vertex.label.color = "black", 
      vertex.label.font = 1, 
      vertex.label.cex = 0.9, 
-     edge.width = 2*(E(gv)$weight),
-     edge.arrow.size = 0.8,
+     edge.width = 0.2*(E(gv)$weight),
+     edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Abstract Nepal Displacement Network Flow (VDC Level, with Self-Loops)")
@@ -631,22 +631,34 @@ legend("topright",
 # PLOT THE GRAPH WITH SELECTED COORDINATES
 gv_coords <- koords[which(vdc %in% V(gv)$name),]
 plot(gv,
-     layout  =  gv_coords,
-     vertex.color  =  V(gv)$color,
-     vertex.size  =  4, 
-     vertex.label  =  V(gv)$name,
-     vertex.label.color  =  "black", 
-     vertex.label.font  =  1, 
-     vertex.label.cex  =  0.7, 
-     edge.width  =  (E(gv)$weight),
-     edge.arrow.size  =  0.5,
-     edge.curved  =  TRUE,
-     edge.color  =  gray.colors(1),
-     main  =  "Nepal Displacement Geo-Network Flow (VDC Level)")
+     layout = gv_coords,
+     vertex.color = V(gv)$color,
+     vertex.size = 4, 
+     vertex.label = V(gv)$name,
+     vertex.label.color = "black", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.7, 
+     edge.width = (E(gv)$weight),
+     edge.arrow.size = 0.4,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Nepal Displacement Geo-Network Flow (VDC Level)")
 legend("topright",
        c("Origins of Displacement","Destinations of Displacement"),
        fill = c("green","SkyBlue2"),
        bty = "n")
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
