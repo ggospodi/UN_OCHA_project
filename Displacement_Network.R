@@ -76,7 +76,9 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF A VARIABLE
 rm_space <- function(df,col_name){
   level_names <- unique(levels(df[,which(names(df) %in% col_name)]))
-  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], from=level_names,to=gsub("[[:space:]]","",level_names))
+  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], 
+                                                   from = level_names,
+                                                   to = gsub("[[:space:]]","",level_names))
   return(df)
 }
 
