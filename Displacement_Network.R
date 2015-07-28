@@ -33,30 +33,31 @@ DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
 # DEFINE FUNCTIONS
 #
 #
+#
 # FUNCTION TO DISPLAY RELATIVE PERCENTAGES FOR HSITOGRAM COLUMNS
 histP <- function(x,breaks, ...) {
-  H <- hist(x, plot  =  FALSE, breaks = breaks)
+  H <- hist(x, plot = FALSE, breaks=breaks)
   H$density <- with(H, 100 * density* diff(breaks)[1])
-  labs <- paste(round(H$density), "%", sep = "")
-  plot(H, freq  =  FALSE, labels  =  labs, ylim = c(0, 1.08*max(H$density)),...)
+  labs <- paste(round(H$density), "%", sep="")
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
 }
 
 
 # FUNCTION TO DISPLAY RELATIVE PERCENTAGE VALUES GREATER THAN 0
 histP1 <- function(x,breaks, ...) {
-  H <- hist(x, plot  =  FALSE, breaks = breaks)
+  H <- hist(x, plot = FALSE, breaks=breaks)
   H$density <- with(H, 100 * density* diff(breaks)[1])
-  labs <- ifelse(round(H$density)>0,paste(round(H$density), "%", sep = ""),NA)
-  plot(H, freq  =  FALSE, labels  =  labs, ylim = c(0, 1.08*max(H$density)),...)
+  labs <- ifelse(round(H$density)>0,paste(round(H$density), "%", sep=""),NA)
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
 }
 
 
 # FUNCITON TO DISPLAY RELATIVE PERCENTAGE VALUES GREATER THAN 5, CAN BE HARDCODED
 histP2 <- function(x,breaks, ...) {
-  H <- hist(x, plot  =  FALSE, breaks = breaks)
+  H <- hist(x, plot = FALSE, breaks=breaks)
   H$density <- with(H, 100 * density* diff(breaks)[1])
-  labs <- ifelse(round(H$density)>5,paste(round(H$density), "%", sep = ""),NA)
-  plot(H, freq  =  FALSE, labels  =  labs, ylim = c(0, 1.08*max(H$density)),...)
+  labs <- ifelse(round(H$density)>5,paste(round(H$density), "%", sep=""),NA)
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
 }
 
 
@@ -75,7 +76,7 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF A VARIABLE
 rm_space <- function(df,col_name){
   level_names <- unique(levels(df[,which(names(df) %in% col_name)]))
-  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], from = level_names,to = gsub("[[:space:]]","",level_names))
+  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], from=level_names,to=gsub("[[:space:]]","",level_names))
   return(df)
 }
 
@@ -86,8 +87,8 @@ drop_isolated <- function(graph, vertex_colors, vertex_names) {
   g <- graph
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
@@ -98,9 +99,9 @@ drop_isolated <- function(graph, vertex_colors, vertex_names) {
 
 # FUNCITON THAT DROPS LOOPS
 drop_loops <- function(graph, vertex_colors, vertex_names){
-  g <- simplify(graph,remove.loops = TRUE)
-  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
+  g <- simplify(graph,remove.loops=TRUE)
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   # filter names and color
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- vertex_colors[v_g_f]
@@ -118,12 +119,12 @@ filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   adj_0 <- adj
   
   # define the filtered graph
-  g <- graph.adjacency(adj_0,mode = "directed",weighted = TRUE)
+  g <- graph.adjacency(adj_0,mode="directed",weighted=TRUE)
   V(g)$color <- vertex_colors
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- vertex_colors[v_g_f]
   
@@ -149,12 +150,12 @@ filter_deg <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   }
   
   # define the filtered graph
-  g <- graph.adjacency(adj,mode = "directed",weighted = TRUE)
+  g <- graph.adjacency(adj,mode="directed",weighted=TRUE)
   V(g)$color <- vertex_color
   
   # filter to degree > 0 eliminate isolated vertices
-  g_f <- delete.vertices(g,V(g)[degree(g) = 0])
-  v_g_f <- setdiff(V(g),V(g)[degree(g) = 0])
+  g_f <- delete.vertices(g,V(g)[degree(g)==0])
+  v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   V(g_f)$name <- vertex_names[v_g_f]
   
   # color the filtered graph with sources and endpoints for the directed edges
@@ -173,9 +174,9 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   
   # identify the largest cluster
   clusters <- as.data.frame(table(clusters(g)$membership))
-  ind <- as.numeric(clusters[which(clusters$Freq = max(clusters$Freq)),]$Var1)
-  vertices <- which(clusters(g)$membership = ind)
-  vertices_complement <- which(clusters(g)$membership! = ind)
+  ind <- as.numeric(clusters[which(clusters$Freq==max(clusters$Freq)),]$Var1)
+  vertices <- which(clusters(g)$membership==ind)
+  vertices_complement <- which(clusters(g)$membership!=ind)
   
   # filter to only include the giant component
   g_f <- delete.vertices(g,V(g)[which(V(g) %in% vertices_complement)])
@@ -892,51 +893,44 @@ legend("topright",
        fill = c("green","SkyBlue2"),
        bty = "n")
 
-
-
 #
 #
 # ANALYSIS OF THE VDC NETWORK ITSELF
 #
 #
 
-
-
-
-
-
-
-
-
-
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
+gd <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
 
 
 # SET VERTEX COLORS
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc = vdc[k]))
-  d_count <- length(which(dt_data$vdc = vdc[k]))
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
   if(o_count>d_count){
     V(gd)$color[k] <- "green"
   } 
 }
 
+
 # SET THE VERTEX LABELS
 V(gd)$name <- vdc
 
+
 # PLOT THE WEIGHTED DISPLACEMENT GRAPH
-gd <- drop_isolated(graph  =  gd,
-                    vertex_colors  =  V(gd)$color,
-                    vertex_names  =  V(gd)$name)
+gd <- drop_isolated(graph = gd,
+                    vertex_colors = V(gd)$color,
+                    vertex_names = V(gd)$name)
 
 
 # DROP LOOPS ONLY VERTICES AS WELL 
-gd <- drop_loops(graph  =  gd,
-                 vertex_colors  =  V(gd)$color,
-                 vertex_names  =  V(gd)$name)
+gd <- drop_loops(graph = gd,
+                 vertex_colors = V(gd)$color,
+                 vertex_names = V(gd)$name)
 
 # SELECT THE COORDINATES
 gd_coords <- koords[which(vdc %in% V(gd)$name),]
@@ -953,80 +947,210 @@ plot(gd,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Nepal Displacement Network Flow (VDC Level)")
-legend("top",c("Displacement Origin","Displacement Destination"),fill = c("green","SkyBlue2"),bty = "n")
+legend("top",
+       c("Displacement Origin","Displacement Destination"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+# REGENERATE THE GRAPH AGAIN
+gd <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
 
 
-# THIS IS THE NUMBER OF vdcENCIES WITH COMMON VDC TARGETS AS A GIVEN vdcENCY
+# SET VERTEX COLORS
+V(gd)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
+  if(o_count>d_count){
+    V(gd)$color[k] <- "green"
+  } 
+}
+
+
+# SET THE VERTEX LABELS
+V(gd)$name <- vdc
+
+# THIS IS THE NUMBER OF EDGES FROM EACH NODE
+# IGNORING DIRECTION (TOTAL DEGREE)
 summary(degree(gd))
+
+
+# THIS IS THE IN DEGREE SUMMARY
+summary(degree(gd,mode = "in"))
+
+
+# THIS IS THE OUT DEGREE SUMMARY
+summary(degree(gd,mode = "out"))
+
 
 # THIS IS THE WEIGHTED NUMBER OF THE ABOVE vdcENCIES, SO THE NUMBER OF SHARED VDC
 # TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF vdcENCIES
 summary(graph.strength(gd))
 
-# PLOT THE NUMBER OF DISTINCT vdcENCIES THAT SHARE TARGETS WITH A GIVEN vdcENCY
+
+# AGAIN, THE INWARD WEIGHTED DEGREE
+summary(graph.strength(gd,mode = "in"))
+
+
+# AGAIN, THE OUTWARD WEIGHTED DEGREE
+summary(graph.strength(gd,mode = "out"))
+
+
+# PLOT THE NUMBER OF DISTINCT VDC-VDC CONNECTIONS
 plot(sort(degree(gd)),
-     col  =  adjustcolor(rgb(1,0,1,1)),
-     pch  =  19,
-     xlab  =  "vdcency index",
-     ylab  =  "Numer of vdcencies",
-     main  =  "Number of vdcencies with Shared Target with an vdcency (Sorted)")
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(degree(gd,mode = "in")),
+     col = "green",
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(degree(gd,mode = "out")),
+     col = "blue",
+     pch = 19,
+     xlab = "VDC Index",
+     ylab = "Number of VDC Transitions",
+     main = "Number of VDC Transitions To and From a Given VDC (Sorted)")
+legend("topleft",
+       c("Total VDC-VDC Transitions","VDC In-Transitions", "VDC Out-Transitions"),
+       fill = c(adjustcolor(rgb(1,0,1,1)),"green","blue"),
+       bty = "n")
 
-histP1(degree(gd),
-       breaks  =  50,
-       col  =  adjustcolor(rgb(1,0,1,1)),
-       xlab  =  "vdcency Network Degree Values", 
-       main  =  "vdcency Network Degree Distribution
-       (Distribution of the Number of vdcencies with Common Targets as a Given vdcency)")
 
-# PLOT THE NUMBER OF DISTINCT vdcENCIES THAT SHARE TARGETS WITH A GIVEN vdcENCY
-# WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF vdcENCIES
+# THE DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
+deg1 <- hist(degree(gd), breaks = 20)$counts
+deg1n <- 100*deg1/sum(deg1)
+deg2 <- hist(degree(gd,mode = "in"), breaks = 20)$counts
+deg2n <- 100*deg2/sum(deg2)
+deg3 <- hist(degree(gd,mode = "out"), breaks = 20)$counts
+deg3n <- 100*deg3/sum(deg3)
+maxn <- max(length(deg1n), length(deg2n),length(deg3n))
+d1 <- append(deg1n,rep(0,maxn-length(deg1n)))
+d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
+d3 <- append(deg3n,rep(0,maxn-length(deg3n)))
+ddata <- cbind(d1,d2,d3)
+barplot(t(ddata), 
+        beside = T, 
+        xlab = "Number of VDC-VDC Connection", 
+        ylab = "Relative VDC-VDC Conneciton %", 
+        main = "Distribution of VDC Transitions To and From a Given VDC",
+        col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"))
+axis(1, 
+     at = 4*(1:maxn)-2,
+     labels = as.character(1:maxn),
+     cex.axis = 1,
+     las = 1)
+legend("topright",
+       legend = c("Total VDC-VDC Transitions","VDC In-Transitions", "VDC Out-Transitions"),
+       col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"), 
+       bty = "n",pch = 15, 
+       cex = 1.5)
+
+
+# PLOT THE WEIGHTED NUMBER OF DISTINCT VDC-VDC CONNECTIONS
 plot(sort(graph.strength(gd)),
-     col  =  adjustcolor(rgb(1,0,1,1)),
-     pch  =  19,
-     xlab  =  "vdcency index",
-     ylab  =  "Numer of vdcencies",
-     main  =  "Number of vdcencies with Shared Target with an vdcency (Sorted)
-     (Weighted By The Number of Shared VDCs)")
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(graph.strength(gd,mode = "in")),
+     col = "green",
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(graph.strength(gd,mode = "out")),
+     col = "blue",
+     pch = 19,
+     xlab = "VDC Index",
+     ylab = "Weighted Number of VDC Transitions",
+     main = "Weighted Number of VDC Transitions To and From a Given VDC (Sorted)")
+legend("topleft",
+       c("Total Weighted VDC-VDC Transitions","Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       fill = c(adjustcolor(rgb(1,0,1,1)),"green","blue"),
+       bty = "n")
 
-histP1(graph.strength(gd), 
-       breaks  =  50,
-       col  =  adjustcolor(rgb(1,0,1,1)),
-       xlab  =  "Weighted Degree Values", 
-       main  =  "vdcency Network Weighted Degree Distribution
-       (Weighted VDC Overlap Counts Dsitribution)")
+
+# THE WEIGHTED DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
+deg1 <- hist(graph.strength(gd), breaks = 20)$counts
+deg1n <- 100*deg1/sum(deg1)
+deg2 <- hist(graph.strength(gd,mode = "in"), breaks = 20)$counts
+deg2n <- 100*deg2/sum(deg2)
+deg3 <- hist(graph.strength(gd,mode = "out"), breaks = 20)$counts
+deg3n <- 100*deg3/sum(deg3)
+maxn <- max(length(deg1n), length(deg2n),length(deg3n))
+d1 <- append(deg1n,rep(0,maxn-length(deg1n)))
+d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
+d3 <- append(deg3n,rep(0,maxn-length(deg3n)))
+wddata <- cbind(d1,d2,d3)
+barplot(t(wddata), 
+        beside = T, 
+        xlab = "Weighted Number of VDC-VDC Connection", 
+        ylab = "Weighted Relative VDC-VDC Conneciton %", 
+        main = "Distribution of Weighted VDC Transitions To and From a Given VDC",
+        col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"))
+axis(1, 
+     at = 4*(1:maxn)-2,
+     labels = as.character(1:maxn),
+     cex.axis = 1,
+     las = 1)
+legend("topright",
+       legend = c("Total Weighted VDC-VDC Transitions","Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"), 
+       bty = "n",pch = 15, 
+       cex = 1.5)
 
 
 # GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
 # TYPICALLY ON THE ORDER OF 1-10%
 100*graph.density(gd)
 
-# CLUSTERS ARE CONNECTED COMPONENTS, WE HAVE 4 in the UNFILTERED vdcENCY-VDC NETWORK 
+
+# CLUSTERS ARE CONNECTED COMPONENTS
 clusters(gd)$no
 
-# SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
+
+# SORTED CLUSTERS BY SIZE
 sort(clusters(gd)$csize,decreasing = TRUE)
 
-# GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO FO TRIANGLES AND CONNECTED TRIPLES
+
+# GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO OF TRIANGLES AND CONNECTED TRIPLES
 transitivity(gd)
-cut75 <- quantile(as.vector(vdc_m[vdc_m>0]),0.75)
-gd_f <- filter(cutoff  =  cut75,
-               edge_matrix  =  vdc_m,
-               vertex_colors  =  V(gd)$color,
-               vertex_names  =  vdc)
+cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
+gd_f <- filter(cutoff = cut75,
+               edge_matrix = dtm,
+               vertex_colors = V(gd)$color,
+               vertex_names = V(gd)$name)
 gd_f <- as.undirected(gd_f)
 transitivity(gd_f)
+
 
 # RELATIVE MAXIMAL CLUSTER SIZE (AS % OF NUMBER OF NODES) 
 max(clusters(gd)$csize)/vcount(gd)
 
+
 # RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
-sum(degree(gd) = 0)/vcount(gd)
+sum(degree(gd) == 0)/vcount(gd)
+
 
 # PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
-sh<-shortest.paths(gd)
-is.na(sh)<-sapply(sh,is.infinite)
-sh[1:5,1:5]
-paths<-na.omit(as.vector(sh))
+sh <- shortest.paths(graph = gd, 
+                     mode = "all",
+                     weights = E(gd)$weight)
+is.na(sh) <- sapply(sh,is.infinite)
+paths <- na.omit(as.vector(sh))
 length(paths)
 summary(paths)
 plot(sort(paths),
@@ -1034,36 +1158,43 @@ plot(sort(paths),
      ylab = "Path Length", 
      main = "Paths (sorted by length)", 
      pch = 20,
-     col = adjustcolor(rgb(1,0,1/2,1)))
-hist(paths,
-     breaks = 15,
-     col = adjustcolor(rgb(1,0,1/2,1)),
+     col = adjustcolor(rgb(1,0,1,1)))
+histP1(paths,
+     breaks = 50,
+     col = adjustcolor(rgb(1,0,1,1)),
      xlab = "Path Length Values",
      main = "Path Length Distribution for g")
 
 
-
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
-bc <- betweenness(gd,v = V(gd), directed = FALSE)
+gd <- drop_isolated(graph = gd,
+                    vertex_colors = V(gd)$color,
+                    vertex_names = V(gd)$name)
+gd <- drop_loops(graph = gd,
+                 vertex_colors = V(gd)$color,
+                 vertex_names = V(gd)$name)
+bc <- betweenness(gd,
+                  v = V(gd), 
+                  directed = FALSE)
 plot(sort(bc, decreasing = TRUE),
-     col = adjustcolor(rgb(1/2,0,0,1/2)), 
+     col = adjustcolor(rgb(1,0,1,1)), 
      xlab = "Node Index", 
      ylab = "Betweenness Centrality", 
-     main = "Sorted Relief vdcency Betweenness Centrality Values", 
+     main = "Sorted VDC Network Betweenness Centrality Values", 
      pch = 19)
 histP2(bc,
-       breaks = 100,
-       col = adjustcolor(rgb(1/2,0,0,1/2)),
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Betweenness Centrality Values",
-       main = "Relief vdcency Betweenness Centrality Distribution")
+       main = "Relief VDC Network Betweenness Centrality Distribution")
+
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
 bc_int <- as.integer(round(bc,0))/5
 for (k in 1:length(bc_int)){
   V(gd)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
-
-# PLOT vdcENCY GRAPH AND FILTER
+gd_coords <- koords[which(vdc %in% V(gd)$name),]
 plot(gd,
      layout  =  layout.fruchterman.reingold(gd, niter = 2000, area = 20000*vcount(gd)),
      vertex.color  =  V(gd)$color,
@@ -1071,11 +1202,16 @@ plot(gd,
      vertex.label  =  V(gd)$name, 
      vertex.label.color  =  "black",
      vertex.label.font  =  1, 
-     vertex.label.cex  =  0.75, 
+     vertex.label.cex  =  0.85, 
      edge.width = 0.2*sqrt(E(gd)$weight),
      edge.arrow.size = 0.5,
      edge.curved  =  TRUE,
-     edge.color  =  gray.colors(1))
+     edge.color  =  gray.colors(1),
+     main = "Weighted Nepal Displacement Network Flow (VDC Level)")
+legend("topleft",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
 plot(gd,
      layout  =  gd_coords,
      vertex.color  =  V(gd)$color,
@@ -1089,57 +1225,26 @@ plot(gd,
      edge.curved  =  TRUE,
      edge.color  =  gray.colors(1),
      main = "Weighted Nepal Displacement Network Flow (VDC Level)")
-legend("top",c("Highest BC","Lowest BC"),fill = c("red","White"),bty = "n")
-
+legend("top",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
 
 
 # FIND THE TOP 10% BETWEENNES NODES
 top_bc <- bc[which(bc > quantile(bc,0.9))]
 top_bc
 
+
 # FIND THE TOP 5% BETWENNES NODES
 top_bc <- bc[which(bc > quantile(bc,0.95))]
 top_bc
 
-# REMOVE ISOLATED
-gd <- drop_isolated(graph  =  gd,
-                    vertex_colors  =  V(gd)$color,
-                    vertex_names  =  V(gd)$name)
 
-# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
-gd <- giant_comp(graph  =  gd,
-                 vertex_colors  =  V(gd)$color,
-                 vertex_names  =  V(gd)$name)
-
-# SET THE GRAPH COLOR ACCORDING TO BC
-
-bc<-betweenness(gd,v = V(gd), directed = FALSE)
-bc_int <- as.integer(round(bc,0))
-for (k in 1:length(bc_int)){
-  V(gd)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
-}
-plot(gd,
-     layout  =  layout.fruchterman.reingold(gd, niter = 200, area = 2000*vcount(gd)),
-     vertex.color  =  V(gd)$color,
-     vertex.size  =  5,
-     vertex.label  =  NA, 
-     vertex.label.color  =  "black",
-     vertex.label.font  =  1, 
-     vertex.label.cex  =  0.5, 
-     edge.width  =  0.1*E(gd)$weight,
-     edge.curved  =  TRUE,
-     edge.color  =  gray.colors(1))
-
-
-
-
-
-
-# FILTER AND REPEAT:
-# DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-gd <- graph.adjacency(dtm,mode = "directed",weighted = TRUE)
-
-# SET VERTEX COLORS
+# FILTRATION AND BETWEENNESS CENTRALITY
+gd <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
 V(gd)$color <- rep("SkyBlue2",length(vdc))
 for (k in 1:length(vdc)){
   o_count <- length(which(dt_data$idp_origin_vdc = vdc[k]))+
@@ -1149,44 +1254,175 @@ for (k in 1:length(vdc)){
     V(gd)$color[k] <- "green"
   } 
 }
-
-# SET THE VERTEX LABELS
 V(gd)$name <- vdc
 
 
+# BETWEENNESS CENTRALITY AND FILTER AT CUTOFF = 25%
 cut25 <- quantile(as.vector(dtm[dtm>0]),0.25)
 gd_f <- filter(cutoff  =  cut25,
                edge_matrix  =  dtm,
                vertex_colors  =  V(gd)$color,
                vertex_names  =  V(gd)$name)
-# PLOT THE WEIGHTED DISPLACEMENT GRAPH
 gd_f <- drop_isolated(graph  =  gd_f,
                     vertex_colors  =  V(gd_f)$color,
                     vertex_names  =  V(gd_f)$name)
-
-
-# DROP LOOPS ONLY VERTICES AS WELL 
 gd_f <- drop_loops(graph  =  gd_f,
                  vertex_colors  =  V(gd_f)$color,
                  vertex_names  =  V(gd_f)$name)
-bc<-betweenness(gd_f,v = V(gd_f), directed = FALSE)
+bc <- betweenness(gd_f,
+                  v = V(gd_f), 
+                  directed = FALSE)
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
   V(gd_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
+gd_f_coords <- koords[which(V(gd)$name %in% V(gd_f)$name),]
 plot(gd_f,
      layout  =  layout.fruchterman.reingold(gd_f, niter = 200, area = 2000*vcount(gd_f)),
      vertex.color  =  V(gd_f)$color,
-     vertex.size  =  5,
+     vertex.size  =  8,
+     vertex.label  =  V(gd_f)$name, 
+     vertex.label.color  =  "black",
+     vertex.label.font  =  1, 
+     vertex.label.cex  =  0.9, 
+     edge.width  =  0.4*sqrt(E(gd_f)$weight),
+     edge.curved  =  TRUE,
+     edge.arrow.size = 0.75,
+     edge.color  =  gray.colors(1),
+     main = "Filtered (Threshold = 25%) Weighted Abstract Nepal Displacement Network")
+legend("topleft",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
+plot(gd_f,
+     layout  =  gd_f_coords,
+     vertex.color  =  V(gd_f)$color,
+     vertex.size  =  4,
      vertex.label  =  NA, 
      vertex.label.color  =  "black",
      vertex.label.font  =  1, 
-     vertex.label.cex  =  0.5, 
-     edge.width  =  0.1*sqrt(E(gd_f)$weight),
+     vertex.label.cex  =  0.75, 
+     edge.width  =  0.2*sqrt(E(gd_f)$weight),
+     edge.arrow.size = 0.5,
      edge.curved  =  TRUE,
-     edge.color  =  gray.colors(1))
+     edge.color  =  gray.colors(1),
+     main = "Filtered (Threshold = 25%) Weighted Nepal Displacement Geo-Network")
+legend("top",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
 
 
+# BETWEENNESS CENTRALITY AND FILTER AT CUTOFF = 50%
+cut50 <- quantile(as.vector(dtm[dtm>0]),0.50)
+gd_f <- filter(cutoff  =  cut50,
+               edge_matrix  =  dtm,
+               vertex_colors  =  V(gd)$color,
+               vertex_names  =  V(gd)$name)
+gd_f <- drop_isolated(graph  =  gd_f,
+                      vertex_colors  =  V(gd_f)$color,
+                      vertex_names  =  V(gd_f)$name)
+gd_f <- drop_loops(graph  =  gd_f,
+                   vertex_colors  =  V(gd_f)$color,
+                   vertex_names  =  V(gd_f)$name)
+bc <- betweenness(gd_f,
+                  v = V(gd_f), 
+                  directed = FALSE)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(gd_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+gd_f_coords <- koords[which(V(gd)$name %in% V(gd_f)$name),]
+plot(gd_f,
+     layout  =  layout.fruchterman.reingold(gd_f, niter = 200, area = 2000*vcount(gd_f)),
+     vertex.color  =  V(gd_f)$color,
+     vertex.size  =  8,
+     vertex.label  =  V(gd_f)$name, 
+     vertex.label.color  =  "black",
+     vertex.label.font  =  1, 
+     vertex.label.cex  =  0.9, 
+     edge.width  =  0.4*sqrt(E(gd_f)$weight),
+     edge.curved  =  TRUE,
+     edge.arrow.size = 0.75,
+     edge.color  =  gray.colors(1),
+     main = "Filtered (Threshold = 50%) Weighted Abstract Nepal Displacement Network")
+legend("topleft",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
+plot(gd_f,
+     layout  =  gd_f_coords,
+     vertex.color  =  V(gd_f)$color,
+     vertex.size  =  6,
+     vertex.label  =  V(gd_f)$name, 
+     vertex.label.color  =  "black",
+     vertex.label.font  =  1, 
+     vertex.label.cex  =  0.9, 
+     edge.width  =  0.2*sqrt(E(gd_f)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved  =  TRUE,
+     edge.color  =  gray.colors(1),
+     main = "Filtered (Threshold = 50%) Weighted Nepal Displacement Geo-Network")
+legend("top",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
+
+
+# BETWEENNESS CENTRALITY AND FILTER AT CUTOFF = 75%
+cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
+gd_f <- filter(cutoff  =  cut75,
+               edge_matrix  =  dtm,
+               vertex_colors  =  V(gd)$color,
+               vertex_names  =  V(gd)$name)
+gd_f <- drop_isolated(graph  =  gd_f,
+                      vertex_colors  =  V(gd_f)$color,
+                      vertex_names  =  V(gd_f)$name)
+gd_f <- drop_loops(graph  =  gd_f,
+                   vertex_colors  =  V(gd_f)$color,
+                   vertex_names  =  V(gd_f)$name)
+bc <- betweenness(gd_f,
+                  v = V(gd_f), 
+                  directed = FALSE)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(gd_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+gd_f_coords <- koords[which(V(gd)$name %in% V(gd_f)$name),]
+plot(gd_f,
+     layout  =  layout.fruchterman.reingold(gd_f, niter = 200, area = 2000*vcount(gd_f)),
+     vertex.color  =  V(gd_f)$color,
+     vertex.size  =  8,
+     vertex.label  =  V(gd_f)$name, 
+     vertex.label.color  =  "black",
+     vertex.label.font  =  1, 
+     vertex.label.cex  =  0.9, 
+     edge.width  =  0.4*sqrt(E(gd_f)$weight),
+     edge.curved  =  TRUE,
+     edge.arrow.size = 0.75,
+     edge.color  =  gray.colors(1),
+     main = "Filtered (Threshold = 75%) Weighted Abstract Nepal Displacement Network")
+legend("topleft",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
+plot(gd_f,
+     layout  =  gd_f_coords,
+     vertex.color  =  V(gd_f)$color,
+     vertex.size  =  8,
+     vertex.label  =  V(gd_f)$name, 
+     vertex.label.color  =  "black",
+     vertex.label.font  =  1, 
+     vertex.label.cex  =  1, 
+     edge.width  =  0.3*sqrt(E(gd_f)$weight),
+     edge.arrow.size = 0.75,
+     edge.curved  =  TRUE,
+     edge.color  =  gray.colors(1),
+     main = "Filtered (Threshold = 75%) Weighted Nepal Displacement Geo-Network")
+legend("top",
+       c("Highest BC","Lowest BC"),
+       fill = c("red","White"),
+       bty = "n")
 
 
 
