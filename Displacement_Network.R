@@ -15,7 +15,7 @@
 # 
 # https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
 #
-# in the folder /Displacement Network
+# in the folder /Displacement Network Model/
 #
 # 
 #

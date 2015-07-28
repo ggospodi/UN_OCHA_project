@@ -19,30 +19,10 @@ Relevant materials and data cna be found at:
 
 https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
 
-in the folder /Displacement Network
+in the folder /Displacement Network Model/
 
 
-```{r,echo=TRUE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=10, dpi=200,out.width='1200px',out.height='1000px'}
-# Nepal Displacement Tracking Network Analysis
-# author: Georgi D. Gospodinov
-# date: "July 27, 2015"
-# 
-# Data Sources:
-#
-# Tables:
-# 
-# https://data.hdx.rwlabs.org/dataset/nepal-earthquake-severity-index
-# https://data.hdx.rwlabs.org/dataset/io (sheet 3)
-# https://data.hdx.rwlabs.org/dataset/population-movements-after-the-nepal-earthquake-v-3-up-to-11th-june-2015
-#
-# 
-# Relevant materials and data cna be found at:
-# 
-# https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
-#
-# in the folder /Displacement Network
-#
-# 
+```{r,echo=TRUE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=10, dpi=100,out.width='1200px',out.height='1000px'}
 #
 # LOAD PACKAGES
 library(plyr)
