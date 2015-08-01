@@ -1,12 +1,12 @@
 # Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 21, 2015"
+# date: "July 30, 2015"
 # 
 # Data Sources:
 #
-# Tables: CCCM_Nepal_DTM_R2.csv
-# agency_relief.csv
-# centroids.csv
+# https://data.hdx.rwlabs.org/dataset/scnepal-agency-data
+# master_hlcit.csv
+# 
 # 
 # This report contains the initial displacement tracking network model construction and some analytics.
 # 

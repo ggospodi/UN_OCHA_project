@@ -1,6 +1,6 @@
 # Nepal Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 27, 2015"
+# date: "July 30, 2015"
 # 
 # Data Sources:
 #
@@ -9,7 +9,7 @@
 # https://data.hdx.rwlabs.org/dataset/nepal-earthquake-severity-index
 # https://data.hdx.rwlabs.org/dataset/io (sheet 3)
 # https://data.hdx.rwlabs.org/dataset/population-movements-after-the-nepal-earthquake-v-3-up-to-11th-june-2015
-#
+# master_hlcit.csv
 # 
 # Relevant materials and data cna be found at:
 # 
@@ -536,11 +536,7 @@ koords <- cbind(xc,yc)
 dt_data <- dt_data[,c("vdc","idp_origin_vdc","idp2_origin_vdc","idp_hh")]
 
 
-
-
-
-
-# quickyl explore severity
+# INCORPORATE SEVERITY
 
 sev <- read.csv(paste0(DIR,"severity.csv"))
 sev$vdc <- as.character(sev$vdc)

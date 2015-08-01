@@ -9,7 +9,7 @@
 # https://data.hdx.rwlabs.org/dataset/nepal-earthquake-severity-index
 # https://data.hdx.rwlabs.org/dataset/io (sheet 3)
 # https://data.hdx.rwlabs.org/dataset/population-movements-after-the-nepal-earthquake-v-3-up-to-11th-june-2015
-#
+# master_hlcit.csv
 # 
 # Relevant materials and data cna be found at:
 # 
