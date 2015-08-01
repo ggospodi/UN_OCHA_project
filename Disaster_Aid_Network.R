@@ -7,34 +7,30 @@
 # https://data.hdx.rwlabs.org/dataset/scnepal-agency-data
 # master_hlcit.csv
 # 
+# Relevant materials and data can be found at:
 # 
-# This report contains the initial displacement tracking network model construction and some analytics.
-# 
-# 1. NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
-# 2. Nepal Disaster Relief Distribution Network Construction and Analysis
-# 3. Nepal Disaster Agency Network Construction and Analysis
-# 4. Severity Index Correlation With Disaster Agency NEtwork. 
-# 
-# 
-# Definition of the Nepal Displacement Tracking Network: 
-#   
-# NOTE: This report is intended to only demonstrate the construction of the networks and some of the analytical tools. 
-# In subsequent reports, we will develop the analytics further and address the actionable advances that this apporach offers.
+# https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
 #
+# in the folder /Displacement Network Model/
 #
+# 
 #
 # LOAD PACKAGES
 library(plyr)
 library(dplyr)
 library(igraph)
 library(RColorBrewer)
-
+#
+#
+#
 # SET FILE SOURCE PATH
 DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
-
+#
+#
 # DEFINE FUNCTIONS
-
-
+#
+#
+#
 # FUNCTION TO DISPLAY RELATIVE PERCENTAGES FOR HSITOGRAM COLUMNS
 histP <- function(x,breaks, ...) {
   H <- hist(x, plot = FALSE, breaks=breaks)
@@ -77,7 +73,9 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF A VARIABLE
 rm_space <- function(df,col_name){
   level_names <- unique(levels(df[,which(names(df) %in% col_name)]))
-  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], from=level_names,to=gsub("[[:space:]]","",level_names))
+  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], 
+                                                   from = level_names,
+                                                   to = gsub("[[:space:]]","",level_names))
   return(df)
 }
 
@@ -189,194 +187,6 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   
   return(g_f)
 }
-
-#
-#
-# SECTION 1: NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
-#
-#
-# COLUMN NAMES FOR CCCM_Nepal_DTM_R2.csv ARE:
-#
-# 1.1.c.1 Site ID (SSID)
-# 1.1.d.1 Site Name
-# 1.1.a.2 Survey Round
-# 1.1.a.1 Survey date (DD.MM.YYYY)
-# 1.1.e.2 Zone
-# 1.1.e.3 District
-# 1.1.e.4 VDC
-# 1.1.f.2 Site GPS Latitude
-# 1.1.f.1 Site GPS Longitude
-# 1.4.a.2 Site open?  
-# 1.4.c.1 Closing Date (DD.MM.YYYY)  
-# 1.3.a.1 Site Classification  
-# 1.3.b.1 Site Type  
-# If other, please specify  
-# 1.4.a.1 Site start/open date (DD.MM.YYYY)  
-# 1.4.b.1 Site Expected Closing Date  
-# 1.1.i.1 Accessibility to site  
-# 1.3.d.1 Ownership of land of site  
-# 1.3.c.1 What is the most common type of shelter  
-# If other or No Answer, please specify  
-# 1.2.b.1 Is there a Site Management Committee (SMC) at the site?  
-# 1.2.b.10 % of women participating in the Site Management Committee (SMC)  
-# 1.2.b.2 Is the site management committee (SMC) made up from the community at the site?  
-# 1.2.b.7 SMC member name or focal point at site  
-# 1.2.b.8 SMC member phone number  
-# 1.2.c.1 Is there a Site Management Agency (SMA) at the site?  
-# 1.2.c.2 Type of SMA  
-# If other, Specify.  
-# 1.2.c.3 Name of SMA  
-# 1.2.c.4 SMA member name or focal point at site  
-# 1.2.c.5 SMA member phone number  
-# 1.2.a.1 Is there any registration activity/IDP List Maintained  
-# 1.2.n.1 Is WASH support being provided at the site ?  
-# If yes who provides the service?  
-# 1.2.o.1 Is HEALTH support being provided at the site  
-# If yes who provides the service?  
-# 1.2.p.1 Is SHELTER/NFI support provided at the site ?  
-# If yes who provides the service?  
-# 1.2.q.1 Is FOOD support provided at the site ?  
-# If yes who provides the service?  
-# 1.2.r.1 Is PROTECTION support provided at the site ?  
-# If yes who provides the service?  
-# 1.2.s.1 Is EDUCATION support provided at the site ?  
-# If yes who provides the service?  
-# 1.2.t.1 Is LIVELIHOOD support being provided at the site?  
-# If yes who provides the service?  
-# 1.5.b.2 Place of Origin of the largest IDP group in camp (Zone)  
-# 1.5.b.2 Place of Origin of the largest IDP group in camp (District)  
-# 1.5.b.2 Place of Origin of the largest IDP group in camp (VDC)  
-# 1.5.b.2 Place of Origin of the largest IDP group in camp (Ward)  
-# 1.5.c.2 Place of Origin of the second largest IDP group (Zone)  
-# 1.5.c.2 Place of Origin of the second largest IDP group District)  
-# 1.5.c.2 Place of Origin of the second largest IDP group (VDC)  
-# 1.5.c.2 Place of Origin of the second largest IDP group (Ward)  
-# 2.1.a.1 Total Number of IDP Families/HHs  
-# 2.1.c.1 Number of Males by age: <1 year  
-# 2.1.c.1 Number of Males by age: 1-5 year  
-# 2.1.c.1 Number of Males by age: 6-17 year  
-# 2.1.c.1 Number of Males by age: 18-59 year  
-# 2.1.c.1 Number of Males by age: 60+ year  
-# 2.1.b.2 Total number of IDP Male Individuals  
-# 2.1.d.1 Number of Females by age: <1 year  
-# 2.1.d.1 Number of Females by age: 1-5 year  
-# 2.1.d.1 Number of Females by age: 6-17 year  
-# 2.1.d.1 Number of Females by age: 18-59 year  
-# 2.1.d.1 Number of Females by age: 60+ year  
-# 2.1.b.2 Total number of IDP Female Individuals  
-# 2.1.b.2 Total number of IDP  
-# 2.2.c.1 Number of pregnant women  
-# 2.2.d.1 Number of breastfeeding mothers  
-# 2.2.g.1 Number of persons with Disabilities  
-# 2.2.f.1 Number of Persons with Chronic Diseases or Serious Medical Conditions  
-# 2.2.n.1 Number of single female-headed households  
-# 2.2.p.1 Number of child-headed households  
-# 2.2.x.3 Number of elderly-headed households  
-# 2.2.u.1 Number of members of marginalized caste/ethnicity  
-# 2.3.c.1 Date of arrival of first IDP group  
-# 2.3.c.2 Date of arrival of last IDP group  
-# 2.3.e.1 Area of intended return for largest IDP group  
-# 2.3.b.4 Have IDPs previously been displaced  
-# 2.3.e.7 What is preventing the largest IDP group from returning home?  
-# If other, please specify  
-# 2.3.g.1 Estimated % of IDPs sleeping in the site  
-# 2.3.f.1 Is there relocation plan for the IDPs?  
-# 3.1.a.1 Percentage of HH living outside (no shelter)  
-# 3.1.b.1 Percentage of HH living in tents  
-# 3.1.c.1 Percentage of HH living in makeshift shelters  
-# 3.1.d.1 Percentage of HH living indoors (solid walls)  
-# 3.2.a.1 Percentage of HH with access to electricity  
-# 3.2.b.1 Percentage of HH with access to safe cooking facilities  
-# 3.2.c.1 Percentage of HH with private living area  
-# 3.7.c.2 Percentage of HH with mosquito nets  
-# 3.7.j.1 Most needed type of NFI  
-# If other or No Answer, please specify  
-# 3.7.j.2 Second most needed type of NFI  
-# If other or No Answer, please specify  
-# 3.7.j.3 Third most needed type of NFI  
-# If other or No Answer, please specify  
-# 3.8.b.1 Is there a need for shelter repair materials  
-# 3.8.b.1 Is there a need for tools for shelter construction?  
-# 4.1.a.1 Location of site's main water source (walking, one-way)  
-# 4.1.b.1 Main non-drinking water source provided or available  
-# If other, please specify  
-# 4.1.f.1 What is the main drinking water source provided or available  
-# If other, please specify  
-# 4.2.a.1 Average amount of water available per day and per person  
-# 4.3.e.1 What is the main problem with the water?  
-# If other, please specify  
-# 4.4.j.1 Condition of most of the latrines  
-# 4.4.a.1 Number of functioning toilets available on-site  
-# 4.8.b.1 Do toilets and bathrooms have locks from the inside  
-# 4.1.g.1 Is the drinking water potable ?  
-# 4.4.b.1 Availability of separate male and female toilets  
-# 4.5.b.1 Availability of separate male and female bathing areas  
-# 4.6.a.1 Garbage Disposal Type  
-# If other, please specify  
-# 4.4.n.1 Evidence of open defecation?  
-# 4.7.g.1 Availability of hand-washing station filled in with water and soap close to the toilets?  
-# 4.7.g.2 Evidence of hand-washing practices?  
-# 5.1.a.1 Is there access to food (distribution, vouchers, trade, fishing…)  
-# 5.1.e.1 Is there access to a market near from the site?  
-# 5.1.d.1 Most common source for obtaining food  
-# If other, please specify  
-# 6.1.a.1 Screening for malnutrition conducted in the area? (i.e. weight, height, mid-upper arm circumference screening)  
-# 6.1.b.1 Availability of supplementary feeding for pregnant and lactating mothers  
-# 6.1.c.1 Availability of supplementary feeding for children  
-# 7.1.b.1 What is the most prevalent health problem at the site  
-# If other, please specify  
-# 7.1.b.2 What is the second most prevalent health problem at the site  
-# If other, please specify  
-# 7.1.b.3 What is the third most prevalent health problem at the site  
-# If other, please specify  
-# 7.2.a.1 Access to health facilities  
-# 7.2.a.4 Do most women utilize health facilities?  
-# 7.2.b.1 Location of health facilities/services  
-# 7.2.c.2 Who provides health facilities/services  
-# If other, please specify  
-# 7.2.a.3 Regular access to medicine  
-# 8.1.b.1 Access to formal/informal education services for children from displaced HHs  
-# 8.2.b.1 Distance to nearest education facility  
-# 8.3.a.2 Of children in site attending school, what % are girls?  
-# 8.3.a.2 Of children in site attending school, what % are boys?  
-# 8.2.a.1 Location of formal/informal education facilities/services for children from displaced HHs  
-# 9.1.a.1 Occupation/trade of majority of displaced households (coping mechanism)  
-# If other, please specify  
-# 9.2.h.1 Percentage of HH in the site with a source of income  
-# 9.2.i.1 Access to income generating activities  
-# 9.2.k.1 Do the majority of HHs in the site receive remittances?  
-# 9.3.a.2 Is there livestock on site  
-# 9.1.c.1 Do IDPs have access to land for cultivation?  
-# 11.3.b.1 Do any recruiters come to the site for day labour, domestic work or working abroad?  
-# 11.3.a.2 if yes, to which city/country  
-# 10.1.a.2 Is there security on-site/settlement areas  
-# 10.1.e.1 Are security incidents reported in the site  
-# 10.1.b.1 Who provides main security in the site  
-# If other, please specify  
-# 10.2.g.1 Most common type of security incidents reported/known occurring in the settlement area  
-# If others, please specify  
-# 10.2.g.5 Are security incidents commonly reported in the community before the earthquake?  
-# 10.2.i.4 Most reported problem in receiving support  
-# If other, please specify  
-# 10.1.c.1 Number of children friendly spaces  
-# 10.1.d.1 Number of women friendly spaces  
-# 10.1.f.1 Do the majority of people have identification card or other documentation?  
-# 10.2.j.2 Reporting/referral mechanism for GBV survivors  
-# 10.2.t.2 Are women segregated during menstruation?  
-# If yes, where do they go?  
-# 10.2.t.1 Are there issues of discrimination towards minority groups?  
-# 10.3.a.1 Do men feel safe in site?  
-# 10.3.a.2 Do children feel safe in site  
-# 10.3.a.3 Do women feel safe at the site  
-# 10.1.s.1 Is there adequate lighting in the majority of communal point (WASH facilities, public spaces…)  
-# 11.1.a.1 Where do residents mostly get their information from?  
-# If other, please specify  
-# 11.2.c.1 Are complaints being reported?  
-# 11.2.c.2 If yes, to whom?  
-# 11.1.c.1 What is the main topic on which the community is requesting information on?  
-# If other, please specify  
-# 11.1.h.1 Is everyone aware that donations do not need to be exchanged for anything?  
-# Site classification
 
 
 # LOAD VDC CENTROIDS FOR VISUALIZATION PURPOSES

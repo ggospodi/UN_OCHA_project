@@ -11,7 +11,7 @@
 # https://data.hdx.rwlabs.org/dataset/population-movements-after-the-nepal-earthquake-v-3-up-to-11th-june-2015
 # master_hlcit.csv
 # 
-# Relevant materials and data cna be found at:
+# Relevant materials and data can be found at:
 # 
 # https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
 #
