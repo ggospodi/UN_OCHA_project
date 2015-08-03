@@ -270,3 +270,129 @@ plot(av,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
+
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
+cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
+av_f <- filter(cutoff = cut25,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+
+# DISPLAY THE EDGE-FILTERED GRAPH
+plot(av_f,
+     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
+     vertex.color=V(av_f)$color,
+     vertex.size=4,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.7*sqrt(E(av_f)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
+cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
+av_f <- filter(cutoff = cut50,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+
+# DISPLAY THE EDGE-FILTERED GRAPH
+plot(av_f,
+     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
+     vertex.color=V(av_f)$color,
+     vertex.size=3,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.3*(E(av_f)$weight),
+     edge.arrow.size=0.5,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% percentile
+cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
+av_f <- filter(cutoff = cut75,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+
+# DISPLAY THE EDGE-FILTERED GRAPH
+plot(av_f,
+     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
+     vertex.color=V(av_f)$color,
+     vertex.size=3,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.7, 
+     edge.width=0.3*(E(av_f)$weight),
+     edge.arrow.size=0.6,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+# DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+
+# PLOT THE WEIGHTED DISPLACEMENT GRAPH
+plot(av_f_c,
+     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
+     vertex.color=V(av_f_c)$color,
+     vertex.size=4,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=1, 
+     edge.width=sqrt(E(av_f_c)$weight),
+     edge.arrow.size=0.6,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
+cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
+av_f <- filter(cutoff = cut90,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+plot(av_f_c,
+     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
+     vertex.color=V(av_f_c)$color,
+     vertex.size=6,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=1, 
+     edge.width=sqrt(E(av_f_c)$weight),
+     edge.arrow.size=0.6,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 95% quantile
+cut95 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
+av_f<-filter(cutoff = cut95,
+             edge_matrix = aid_m,
+             vertex_colors = V(av)$color,
+             vertex_names = all)
+av_f_c<-giant_comp(graph = av_f,
+                   vertex_colors = V(av_f)$color,
+                   vertex_names = V(av_f)$name)
+plot(av_f_c,
+     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
+     vertex.color=V(av_f_c)$color,
+     vertex.size=12,
+     vertex.label=V(av_f_c)$name, 
+     vertex.label.color="black", 
+     vertex.label.font=1, 
+     vertex.label.cex=1.2, 
+     edge.width=0.5*(E(av_f_c)$weight),
+     edge.arrow.size=0.8,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
