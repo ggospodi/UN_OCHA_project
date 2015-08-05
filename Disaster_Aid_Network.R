@@ -1,6 +1,6 @@
 # Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 30, 2015"
+# date: "Augist 5, 2015"
 # 
 # Data Sources:
 #
@@ -200,13 +200,6 @@ hlcit <- rm_space(hlcit,"hlcit_code")
 hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
 
 
-# Attempts to call the file directly from online HDX server:
-# library(XLConnect)
-# data1<-readWorksheetFromFile("http://data.hdx.rwlabs.org/dataset/io/CCCM Nepal Displacement Tracking Matrix.xlsx",sheet=1)
-# library(xlsx)
-# data1<-read.xlsx("https://www.dropbox.com/s/6powpj6wsp9r9aw/De-identified%20SPUS.xlsx", sheetIndex=1)
-
-
 # COLUMN NAMES FOR agency_relief.csv ARE:
 aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
 
@@ -222,31 +215,38 @@ aid_data$impl_ag <- trim(as.character(aid_data$impl_ag))
 
 # FILTER OUT THE EMPTY ENTRIES
 aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_ag)>0,]
-aid_data <- rm_space(aid_data,"vdc_code")
-aid_data$vdc_code <- as.numeric(levels(aid_data$vdc_code))[aid_data$vdc_code]
+aid_data <- rm_space(aid_data,"hlcit")
+aid_data$hlcit <- as.numeric(levels(aid_data$hlcit))[aid_data$hlcit]
 for (k in 1:dim(aid_data)[1]){
-  aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$vdc_code[k])[1]]
+  aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$hlcit[k])[1]]
 }
+
+# SINCE aid_data$hlcit AND aid_data$vdc HAVE 239 ROWS OF SIMULTANEOUS NAs,
+# WE DROP THESE ROWS
+
+aid_data <- aid_data[!is.na(aid_data$hlcit),]
+
 
 # SELECT UNIQUE AGENCIES AND TARGET VDC
 ag <- unique(aid_data$impl_ag)
 vd <- unique(aid_data$vdc)
 all <- union(ag,vd)
 
-
-vdc <- unique(aid_data$vdc)
-
 # EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM HLCIT_MASTER
 hl <- vector()
 xc <- vector()
 yc <- vector()
-for (k in 1:length(vdc)){
-    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name==vdc[k])[1]]
-    xc[k] <- hlcit$lat[which(hlcit$vdc_name==vdc[k])[1]]
-    yc[k] <- hlcit$lon[which(hlcit$vdc_name==vdc[k])[1]]
+for (k in 1:length(vd)){
+    hl[k] <- hlcit$hlcit_code[which(hlcit$vdc_name==vd[k])[1]]
+    xc[k] <- hlcit$lat[which(hlcit$vdc_name==vd[k])[1]]
+    yc[k] <- hlcit$lon[which(hlcit$vdc_name==vd[k])[1]]
     }
 koords<-cbind(xc,yc)
 
+xa <- 20+5*runif(length(ag))
+ya <- 80+12*runif(length(ag))
+koords1 <-cbind(xa,ya)
+koords2<- rbind(koords1,koords)
 
 
 
@@ -259,7 +259,7 @@ aid_m <- matrix(0,nrow=length(all),ncol=length(all))
 for (i in 1:length(ag)){
   for (j in 1:length(vd)){
     aid_m[[i,length(ag)+j]] <- 
-      dim(aid_data[aid_data$impl_ag==ag[i] & aid_data$vdc==vd[j],c(3,6)])[1]
+      dim(aid_data[aid_data$impl_ag==ag[i] & aid_data$vdc==vd[j],c(3,5)])[1]
   }
 }
 
@@ -276,7 +276,7 @@ for (k in 1:length(all)){
 
 # PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
-     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
+     layout=koords2,
      vertex.color=V(av)$color,
      vertex.size=2,
      vertex.label=NA, 
@@ -287,6 +287,99 @@ plot(av,
      edge.arrow.size=0.3,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
+
+
+
+
+
+
+
+
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
+
+# PLOT THE AGENCY-VDC AID NETWORK
+plot(av,
+     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
+     vertex.color=V(av)$color,
+     vertex.size=V(av)$size,
+     vertex.label=NA, 
+     vertex.label.color="black", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.2, 
+     edge.width=0.2*sqrt(E(av)$weight),
+     edge.arrow.size=0.2,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1))
+
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-1
+    V(av)$name[k] <- NA}
+}
+
+
+# PLOT THE AGENCY-VDC AID NETWORK
+plot(av,
+     layout=koords2,
+     vertex.color=V(av)$color,
+     vertex.size=V(av)$size,
+     vertex.label=V(av)$name, 
+     vertex.label.color="darkgreen", 
+     vertex.label.font=2, 
+     vertex.label.cex=0.75, 
+     edge.width=0.05*sqrt(E(av)$weight),
+     edge.arrow.size=0.2,
+     edge.curved=TRUE,
+     edge.color=gray.colors(1),
+     main="Nepal Agency Aid Relief Geo-Network")
+legend("topleft",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
