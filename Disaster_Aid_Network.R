@@ -275,24 +275,6 @@ for (k in 1:length(all)){
 }
 
 # PLOT THE AGENCY-VDC AID NETWORK
-plot(av,
-     layout=koords2,
-     vertex.color=V(av)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.5*sqrt(E(av)$weight),
-     edge.arrow.size=0.3,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-
-
-
-
-
 
 
 V(av)$color<-rep("green",length(all))
@@ -325,6 +307,10 @@ plot(av,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
 
+
+
+
+# PLOT THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
     V(av)$size[k] <-3
@@ -334,8 +320,6 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$name[k] <- NA}
 }
 
-
-# PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
      layout=koords2,
      vertex.color=V(av)$color,
@@ -349,7 +333,7 @@ plot(av,
      edge.curved=TRUE,
      edge.color=gray.colors(1),
      main="Nepal Agency Aid Relief Geo-Network")
-legend("topleft",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
+legend("topright",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
 
 
 
