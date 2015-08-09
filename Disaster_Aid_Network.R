@@ -335,36 +335,6 @@ plot(av,
 legend("topright",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
 cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
 av_f <- filter(cutoff = cut25,
@@ -490,3 +460,750 @@ plot(av_f_c,
      edge.arrow.size=0.8,
      edge.curved=TRUE,
      edge.color=gray.colors(1))
+
+
+
+
+
+
+
+
+
+
+
+
+# EDIT
+
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+# ANALYSIS OF THE AGENCY-VDC NETWORK ITSELF
+#
+#
+#
+#
+#
+#
+#
+
+
+# DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+
+
+
+# THIS IS THE NUMBER OF EDGES FROM EACH NODE
+# IGNORING DIRECTION (TOTAL DEGREE)
+summary(degree(av))
+
+
+# THIS IS THE IN DEGREE SUMMARY
+summary(degree(av,mode = "in"))
+
+
+# THIS IS THE OUT DEGREE SUMMARY
+summary(degree(av,mode = "out"))
+
+
+# THIS IS THE WEIGHTED NUMBER OF THE ABOVE vdcENCIES, SO THE NUMBER OF SHARED VDC
+# TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF vdcENCIES
+summary(graph.strength(av))
+
+
+# AGAIN, THE INWARD WEIGHTED DEGREE
+summary(graph.strength(av,mode = "in"))
+
+
+# AGAIN, THE OUTWARD WEIGHTED DEGREE
+summary(graph.strength(av,mode = "out"))
+
+
+# PLOT THE NUMBER OF DISTINCT VDC-VDC CONNECTIONS
+plot(sort(degree(av)),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(degree(av,mode = "in")),
+     col = "green",
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(degree(av,mode = "out")),
+     col = "blue",
+     pch = 19,
+     xlab = "VDC Index",
+     ylab = "Number of VDC Transitions",
+     main = "Number of VDC Transitions To and From a Given VDC (Sorted)")
+legend("topleft",
+       c("Total VDC-VDC Transitions","VDC In-Transitions", "VDC Out-Transitions"),
+       fill = c(adjustcolor(rgb(1,0,1,1)),"green","blue"),
+       bty = "n")
+
+
+# THE DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
+deg1 <- hist(degree(av), breaks = 20)$counts
+deg1n <- 100*deg1/sum(deg1)
+deg2 <- hist(degree(av,mode = "in"), breaks = 20)$counts
+deg2n <- 100*deg2/sum(deg2)
+deg3 <- hist(degree(av,mode = "out"), breaks = 20)$counts
+deg3n <- 100*deg3/sum(deg3)
+maxn <- max(length(deg1n), length(deg2n),length(deg3n))
+d1 <- append(deg1n,rep(0,maxn-length(deg1n)))
+d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
+d3 <- append(deg3n,rep(0,maxn-length(deg3n)))
+ddata <- cbind(d1,d2,d3)
+barplot(t(ddata), 
+        beside = T, 
+        xlab = "Number of VDC-VDC Connection", 
+        ylab = "Relative VDC-VDC Conneciton %", 
+        main = "Distribution of VDC Transitions To and From a Given VDC",
+        col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"))
+axis(1, 
+     at = 4*(1:maxn)-2,
+     labels = as.character(1:maxn),
+     cex.axis = 1,
+     las = 1)
+legend("topright",
+       legend = c("Total VDC-VDC Transitions","VDC In-Transitions", "VDC Out-Transitions"),
+       col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"), 
+       bty = "n",pch = 15, 
+       cex = 1.5)
+
+
+# PLOT THE WEIGHTED NUMBER OF DISTINCT VDC-VDC CONNECTIONS
+plot(sort(graph.strength(av)),
+     col = adjustcolor(rgb(1,0,1,1)),
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(graph.strength(av,mode = "in")),
+     col = "green",
+     pch = 19,
+     xaxt = "n",
+     yaxt = "n",
+     ann = FALSE)
+par(new=T)
+plot(sort(graph.strength(av,mode = "out")),
+     col = "blue",
+     pch = 19,
+     xlab = "VDC Index",
+     ylab = "Weighted Number of VDC Transitions",
+     main = "Weighted Number of VDC Transitions To and From a Given VDC (Sorted)")
+legend("topleft",
+       c("Total Weighted VDC-VDC Transitions","Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       fill = c(adjustcolor(rgb(1,0,1,1)),"green","blue"),
+       bty = "n")
+
+
+# THE WEIGHTED DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
+deg1 <- hist(graph.strength(av), breaks = 20)$counts
+deg1n <- 100*deg1/sum(deg1)
+deg2 <- hist(graph.strength(av,mode = "in"), breaks = 20)$counts
+deg2n <- 100*deg2/sum(deg2)
+deg3 <- hist(graph.strength(av,mode = "out"), breaks = 20)$counts
+deg3n <- 100*deg3/sum(deg3)
+maxn <- max(length(deg1n), length(deg2n),length(deg3n))
+d1 <- append(deg1n,rep(0,maxn-length(deg1n)))
+d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
+d3 <- append(deg3n,rep(0,maxn-length(deg3n)))
+wddata <- cbind(d1,d2,d3)
+barplot(t(wddata), 
+        beside = T, 
+        xlab = "Weighted Number of VDC-VDC Connection", 
+        ylab = "Weighted Relative VDC-VDC Conneciton %", 
+        main = "Distribution of Weighted VDC Transitions To and From a Given VDC",
+        col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"))
+axis(1, 
+     at = 4*(1:maxn)-2,
+     labels = as.character(1:maxn),
+     cex.axis = 1,
+     las = 1)
+legend("topright",
+       legend = c("Total Weighted VDC-VDC Transitions","Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"), 
+       bty = "n",pch = 15, 
+       cex = 1.5)
+
+
+# GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
+# TYPICALLY ON THE ORDER OF 1-10%
+100*graph.density(av)
+
+
+# CLUSTERS ARE CONNECTED COMPONENTS
+clusters(av)$no
+
+
+# SORTED CLUSTERS BY SIZE
+sort(clusters(av)$csize,decreasing = TRUE)
+
+
+# GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO OF TRIANGLES AND CONNECTED TRIPLES
+transitivity(av)
+cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
+av_f <- filter(cutoff = cut75,
+               edge_matrix = dtm,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name)
+av_f <- as.undirected(av_f)
+transitivity(av_f)
+
+
+# RELATIVE MAXIMAL CLUSTER SIZE (AS % OF NUMBER OF NODES) 
+max(clusters(av)$csize)/vcount(av)
+
+
+# RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
+sum(degree(av) == 0)/vcount(av)
+
+
+# PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
+sh <- shortest.paths(graph = av, 
+                     mode = "all",
+                     weights = E(av)$weight)
+is.na(sh) <- sapply(sh,is.infinite)
+paths <- na.omit(as.vector(sh))
+length(paths)
+summary(paths)
+plot(sort(paths),
+     xlab = "Path Index", 
+     ylab = "Path Length", 
+     main = "Paths (sorted by length)", 
+     pch = 20,
+     col = adjustcolor(rgb(1,0,1,1)))
+histP1(paths,
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Path Length Values",
+       main = "Path Length Distribution for g")
+
+#
+#
+#
+#
+#
+#
+#
+# CENTRALITY ANALYSIS OF THE NETWORK
+#
+#
+#
+#
+#
+#
+#
+
+#
+#
+#
+# EIGENVECTOR CENTRALITY: THIS IS A MEASURE OF THE INFLUENCE OF A NODE IN A NETWORK.
+# IT ASSIGNS RELATIVE SCORES TO ALL NODES BASED ON THE CONCEPT THAT CONNECTIONS
+# TO HIGH-SCORING NODES CONTRIBUTE MORE TO THE SCORE OF A GIVEN NODE THAN CONNECTIONS
+# TO LOW-SCORING NODES. A VARIANT OF EIGNEVECTOR CENTRALITY IS GOOGLE'S PAGERANK.
+#
+#
+# NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
+# BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
+#
+#
+
+av <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
+  if(o_count>d_count){
+    V(av)$color[k] <- "green"
+  } 
+}
+V(av)$name <- vdc
+av <- drop_isolated(graph = av,
+                    vertex_colors = V(av)$color,
+                    vertex_names = V(av)$name)
+av <- drop_loops(graph = av,
+                 vertex_colors = V(av)$color,
+                 vertex_names = V(av)$name)
+ec <- evcent(av)$vector
+ec <- 10*ec
+plot(sort(ec, decreasing = TRUE),
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index", 
+     ylab = "Eigenvector Centrality", 
+     main = "Sorted VDC Network Eigenvector Centrality Values", 
+     pch = 19)
+histP2(ec,
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Eigenvector Centrality Values",
+       main = "VDC Network Eigenvector Centrality Distribution")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO EIGENVECTOR CENTRALITY
+for (k in 1:length(ec)){
+  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(ec))))[as.integer(ec[k])+1]
+}
+av_coords <- koords[which(vdc %in% V(av)$name),]
+plot(av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = V(av)$color,
+     vertex.size = 9,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Flow (VDC Level)")
+legend("topleft",
+       c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
+       fill = c("red","White"),
+       bty = "n")
+
+# PLOT THE HEAT MAP OF THE AGENCY AID NETWORK
+plot(av,
+     layout = av_coords,
+     vertex.color = V(av)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+legend("topright",
+       c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
+       fill = c("red","White"),
+       bty = "n")
+
+#
+#
+#
+# AUTHORITY SCORE: THIS IS A MEASURE FOR DIRECTED NETWORKS, THE NUMBER OF NODES THAT ARE
+# HUBS AND POINT TO A GIVEN NODE. IT IS DEFIEND AS THE PRINCIPAL EIGENVECTOR FOR t(A)*A, 
+# WHERE A SANDS FOR THE ADJACENCY MATRIX OF THE NETWORK. FOR UNDIRECTED NETWORKS, 
+# AUTHORITY SCORE IS EQUAL TO THE HUB SCORE
+#
+# NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
+# BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
+#
+#
+#
+
+av <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
+  if(o_count>d_count){
+    V(av)$color[k] <- "green"
+  } 
+}
+V(av)$name <- vdc
+av <- drop_isolated(graph = av,
+                    vertex_colors = V(av)$color,
+                    vertex_names = V(av)$name)
+av <- drop_loops(graph = av,
+                 vertex_colors = V(av)$color,
+                 vertex_names = V(av)$name)
+au <- authority.score(av)$vector
+au <- 100*au
+plot(sort(au, decreasing = TRUE),
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index", 
+     ylab = "Eigenvector Centrality", 
+     main = "Sorted VDC Network Authority Score Values", 
+     pch = 19)
+histP2(au,
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Authority Score Values",
+       main = "VDC Network Authority Score Distribution")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
+for (k in 1:length(au)){
+  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(au))))[as.integer(au[k])+1]
+}
+av_coords <- koords[which(vdc %in% V(av)$name),]
+plot(av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = V(av)$color,
+     vertex.size = 9,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Flow (VDC Level)")
+legend("topleft",
+       c("Highest Authority Score","Lowest Authority Score"),
+       fill = c("red","White"),
+       bty = "n")
+
+# PLOT THE HEAT MAP OF THE AGENCY AID NETWORK
+plot(av,
+     layout = av_coords,
+     vertex.color = V(av)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+legend("topright",
+       c("Highest Authority Score","Lowest Authority Score"),
+       fill = c("red","White"),
+       bty = "n")
+
+#
+#
+#
+# HUB SCORE: MEASURE THE NUMBER OF AUTHORITY NODES THAT A GIVEN
+# HUB NODE POINTS TO
+#
+# NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
+# BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
+#
+#
+
+av <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
+  if(o_count>d_count){
+    V(av)$color[k] <- "green"
+  } 
+}
+V(av)$name <- vdc
+av <- drop_isolated(graph = av,
+                    vertex_colors = V(av)$color,
+                    vertex_names = V(av)$name)
+av <- drop_loops(graph = av,
+                 vertex_colors = V(av)$color,
+                 vertex_names = V(av)$name)
+hb <- hub.score(av)$vector
+hb <- 100*hb
+plot(sort(hb, decreasing = TRUE),
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index", 
+     ylab = "Eigenvector Centrality", 
+     main = "Sorted VDC Network Hub Score Values", 
+     pch = 19)
+histP2(hb,
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Hub Score Values",
+       main = "VDC Network Hub Score Distribution")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
+for (k in 1:length(hb)){
+  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(hb))))[as.integer(hb[k])+1]
+}
+av_coords <- koords[which(vdc %in% V(av)$name),]
+plot(av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = V(av)$color,
+     vertex.size = 9,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Flow (VDC Level)")
+legend("topleft",
+       c("Highest Hub Score","Lowest Hub Score"),
+       fill = c("red","White"),
+       bty = "n")
+
+# PLOT THE HUB SCORES OF THE AGENCY AID NETWORK
+plot(av,
+     layout = av_coords,
+     vertex.color = V(av)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+legend("topright",
+       c("Highest Hub Score","Lowest Hub Score"),
+       fill = c("red","White"),
+       bty = "n")
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
+# for (k in 1:length(hb)){
+#   V(av)$color[k] <- rev(heat.colors(1+as.integer(max(hb))))[as.integer(hb[k])+1]
+# }
+# av_coords <- koords[which(vdc %in% V(av)$name),]
+# plot(av,
+#      layout = layout.fruchterman.reingold(av, 
+#                                           niter = 200, 
+#                                           area = 2000*vcount(av)),
+#      vertex.color = V(av)$color,
+#      vertex.size = 9,
+#      vertex.label = V(av)$name, 
+#      vertex.label.color = "black",
+#      vertex.label.font = 1, 
+#      vertex.label.cex = 0.85, 
+#      edge.width = 0.2*sqrt(E(av)$weight),
+#      edge.arrow.size = 0.5,
+#      edge.curved = TRUE,
+#      edge.color = gray.colors(1),
+#      main = "Weighted Agency Aid Network Flow (VDC Level)")
+# legend("topleft",
+#        c("Highest Hub Score","Lowest Hub Score"),
+#        fill = c("red","White"),
+#        bty = "n")
+# plot(av,
+#      layout = av_coords,
+#      vertex.color = V(av)$color,
+#      vertex.size = 4,
+#      vertex.label = NA, 
+#      vertex.label.color = "black",
+#      vertex.label.font = 1, 
+#      vertex.label.cex = 0.75, 
+#      edge.width = 0.2*sqrt(E(av)$weight),
+#      edge.arrow.size = 0.5,
+#      edge.curved = TRUE,
+#      edge.color = gray.colors(1),
+#      main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+# legend("topright",
+#        c("Highest Hub Score","Lowest Hub Score"),
+#        fill = c("red","White"),
+#        bty = "n")
+#
+#
+#
+#
+# COMMUNITY STRUCTURES FOR THE DISPLACEMENT NETWORK
+#
+#
+#
+#
+#
+# MULTILEVEL COMMUNITY DETECTION
+#
+# NOTE: THIS APPLEIS TO UNDIRECTED GRAPHS ONLY
+#
+# Multilevel community detection is based on the following approach. 
+# Assume that we start with a weighted network of N nodes. 
+# First, we assign a different community to each node of the network. 
+# So, in this initial partition there are as many communities as there are nodes. 
+# Then, for each node i we consider the neighbours j of i and we evaluate 
+# the gain of modularity that would take place by removing i from its community 
+# and by placing it in the community of j. The node i is then placed in the community 
+# for which this gain is maximum (in case of a tie we use a breaking rule), 
+# but only if this gain is positive. If no positive gain is possible, 
+# i stays in its original community. This process is applied repeatedly 
+# and sequentially for all nodes until no further improvement can be achieved. 
+# Note that a node may be, and often is, considered several times. Also, 
+# the output of the algorithm depends on the order in which the nodes 
+# are considered, although it can be shown that the order has little effect.
+#
+#
+av <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
+  if(o_count>d_count){
+    V(av)$color[k] <- "green"
+  } 
+}
+V(av)$name <- vdc
+av <- drop_isolated(graph = av,
+                    vertex_colors = V(av)$color,
+                    vertex_names = V(av)$name)
+av <- drop_loops(graph = av,
+                 vertex_colors = V(av)$color,
+                 vertex_names = V(av)$name)
+av_coords <- koords[which(vdc %in% V(av)$name),]
+av <- as.undirected(av)
+mc <- multilevel.community(graph = av,
+                           weights = E(av)$weights)
+plot(mc,
+     av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = mc,
+     vertex.size = 9,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Multilevel Communities")
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(mc,
+     av,
+     layout = av_coords,
+     vertex.color = strongclusters,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Geo-Network Multilevel Communities")
+
+
+# SOME BASIC MULTILEVEL COMMUNITY STATS
+plot(sort(mc$membership), 
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index (VDC) in the Network", 
+     ylab = "Multilevel Community Values", 
+     main = "Sorted Multilevel Community Values for Nepal Displacement Network", 
+     pch = 19)
+histP1(mc$membership,
+       breaks = 60,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Multilevel Community Values",
+       main = "Multilevel Community Distribution for Nepal Displacement Network")
+
+#
+#
+#
+# WALKTRAP COMMUNITY DETECTION
+#
+#
+# Walktrap community detection aims to find 
+# densely connected subgraphs using random walks with the 
+# premise that short random walks should be contained within the same cluster.
+#
+#
+#
+
+av <- graph.adjacency(dtm,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("SkyBlue2",length(vdc))
+for (k in 1:length(vdc)){
+  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
+    length(which(dt_data$idp2_origin_vdc == vdc[k]))
+  d_count <- length(which(dt_data$vdc == vdc[k]))
+  if(o_count>d_count){
+    V(av)$color[k] <- "green"
+  } 
+}
+V(av)$name <- vdc
+av <- drop_isolated(graph = av,
+                    vertex_colors = V(av)$color,
+                    vertex_names = V(av)$name)
+av <- drop_loops(graph = av,
+                 vertex_colors = V(av)$color,
+                 vertex_names = V(av)$name)
+av_coords <- koords[which(vdc %in% V(av)$name),]
+av <- as.undirected(av)
+wc <- walktrap.community(graph = av,
+                         weights = E(av)$weights)
+plot(wc,
+     av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = mc,
+     vertex.size = 9,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(wc,
+     av,
+     layout = av_coords,
+     vertex.color = strongclusters,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Geo-Network Walktrap Communities")
+
+
+# SOME BASIC WALKTRAP STATS
+plot(sort(wc$membership), 
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index (VDC) in the Network", 
+     ylab = "Walktrap Community Values", 
+     main = "Sorted Walktrap Community Values for Nepal Displacement Network", 
+     pch = 19)
+histP1(wc$membership,
+       breaks = 60,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Walktrap Community Values",
+       main = "Walktrap Community Distribution for Nepal Displacement Network")
