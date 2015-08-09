@@ -1214,6 +1214,11 @@ histP1(paths,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Path Length Values",
        main = "Path Length Distribution for g")
+
+#
+#
+#
+#
 #
 #
 #
@@ -1223,9 +1228,15 @@ histP1(paths,
 #
 #
 #
+#
+#
+
+#
+#
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
 #
 #
+
 gd <- drop_isolated(graph = gd,
                     vertex_colors = V(gd)$color,
                     vertex_names = V(gd)$name)
@@ -1272,6 +1283,8 @@ legend("topleft",
        c("Highest Betweenness Centrality","Lowest Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# BETWEENNESS CENTRALITY OF THE GEO-NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = V(gd)$color,
@@ -1355,6 +1368,8 @@ legend("topleft",
        c("Highest Betweenness Centrality","Lowest Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -1412,6 +1427,8 @@ legend("topleft",
        c("Highest Betweenness Centrality","Lowest Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -1469,6 +1486,8 @@ legend("topleft",
        c("Highest Betweenness Centrality","Lowest Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -1487,11 +1506,16 @@ legend("top",
        fill = c("red","White"),
        bty = "n")
 
+
+#
 #
 #
 # EDGE-BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH AN EDGE
 #
 #
+#
+
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -1550,6 +1574,8 @@ legend("topleft",
        c("Highest Edge Betweenness Centrality","Lowest Edge Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = V(gd)$color,
@@ -1622,6 +1648,8 @@ legend("topleft",
        c("Highest Betweenness Centrality","Lowest Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -1678,6 +1706,8 @@ legend("topleft",
        c("Highest Betweenness Centrality","Lowest Betweenness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -1752,6 +1782,8 @@ legend("topright",
        fill = c("red","White"),
        bty = "n")
 
+
+#
 #
 #
 # CLOSENES CENTRALITY: THIS MEASURE TAKES INTO ACCOUNT THE DISTRIBUTION OF DISTANCES
@@ -1761,6 +1793,9 @@ legend("topright",
 # NODES.
 #
 #
+#
+
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -1823,6 +1858,8 @@ legend("topleft",
        c("Highest Closeness Centrality","Lowest Closeness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE HEAT MAP OF THE GEO NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = V(gd)$color,
@@ -1897,6 +1934,8 @@ legend("topleft",
        c("Highest Closeness Centrality","Lowest Closeness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -1955,6 +1994,8 @@ legend("topleft",
        c("Highest Closeness Centrality","Lowest Closeness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -2013,6 +2054,8 @@ legend("topleft",
        c("Highest Closeness Centrality","Lowest Closeness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO NETWORK
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -2030,6 +2073,7 @@ legend("topright",
        c("Highest Closeness Centrality","Lowest Closeness Centrality"),
        fill = c("red","White"),
        bty = "n")
+
 #
 #
 #
@@ -2043,6 +2087,7 @@ legend("topright",
 # BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
 #
 #
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -2101,6 +2146,8 @@ legend("topleft",
        c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE HEAT MAP OF THE GEO NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = V(gd)$color,
@@ -2118,6 +2165,7 @@ legend("topright",
        c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
        fill = c("red","White"),
        bty = "n")
+
 #
 #
 #
@@ -2128,6 +2176,8 @@ legend("topright",
 #
 # NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
 # BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
+#
+#
 #
 
 gd <- graph.adjacency(dtm,
@@ -2188,6 +2238,8 @@ legend("topleft",
        c("Highest Authority Score","Lowest Authority Score"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE HEAT MAP OF THE GEO NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = V(gd)$color,
@@ -2215,6 +2267,8 @@ legend("topright",
 # NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
 # BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
 #
+#
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -2273,6 +2327,8 @@ legend("topleft",
        c("Highest Hub Score","Lowest Hub Score"),
        fill = c("red","White"),
        bty = "n")
+
+# PLOT THE HUB SCORES OF THE GEO NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = V(gd)$color,
@@ -2301,6 +2357,7 @@ legend("topright",
 # THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
 # BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
 #
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -2395,6 +2452,7 @@ histP2(hb,
 #
 #
 #
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -2430,6 +2488,8 @@ plot(ebc,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      main = "Weighted Nepal Displacement Geo-Network Communities (EB)")
+
+# PLOT THE COMMUNITIES OF THE GEO NETWORK
 plot(ebc,
      gd,
      layout = layout.fruchterman.reingold(gd, 
@@ -2459,6 +2519,7 @@ histP1(ebc$membership,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Edge-Betweenness Community Values",
        main = "Edge-Betweenness Community Distribution for Nepal Displacement Network")
+
 #
 #
 #
@@ -2472,6 +2533,7 @@ histP1(ebc$membership,
 #
 #
 #
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -2508,6 +2570,8 @@ plot(gd,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Nepal Displacement Network Clusters")
+
+# PLOT THE CLUSTERING OF THE GEO NETWORK
 plot(gd,
      layout = gd_coords,
      vertex.color = strongclusters,
@@ -2598,6 +2662,8 @@ plot(mc,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Nepal Displacement Network Multilevel Communities")
+
+# PLOT THE COMMUNITIES OF THE GEO NETWORK
 plot(mc,
      gd,
      layout = gd_coords,
@@ -2626,6 +2692,7 @@ histP1(mc$membership,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Multilevel Community Values",
        main = "Multilevel Community Distribution for Nepal Displacement Network")
+
 #
 #
 #
@@ -2638,6 +2705,7 @@ histP1(mc$membership,
 #
 #
 #
+
 gd <- graph.adjacency(dtm,
                       mode = "directed",
                       weighted = TRUE)
@@ -2677,6 +2745,8 @@ plot(wc,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Nepal Displacement Network Walktrap Communities")
+
+# PLOT THE COMMUNITIES OF THE GEO NETWORK
 plot(wc,
      gd,
      layout = gd_coords,
