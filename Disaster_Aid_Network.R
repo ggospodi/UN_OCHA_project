@@ -189,7 +189,6 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
 }
 
 
-
 # LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
 hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
 colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
@@ -204,9 +203,15 @@ hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
 aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
 
 
+#
+#
+#
+#
 # AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
-
-
+#
+#
+#
+#
 
 
 # CHANGE FOMRAT TO CHARACTER FOR VDC AND AGENCY NAMES
@@ -247,12 +252,6 @@ xa <- 20+5*runif(length(ag))
 ya <- 80+12*runif(length(ag))
 koords1 <-cbind(xa,ya)
 koords2<- rbind(koords1,koords)
-
-
-
-
-
-
 
 # DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
 aid_m <- matrix(0,nrow=length(all),ncol=length(all))
@@ -295,19 +294,19 @@ for (k in 1:dim(aid_m)[1]){
 
 # PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
-     layout=layout.fruchterman.reingold(av, niter=200, area=2000*vcount(av)),
-     vertex.color=V(av)$color,
-     vertex.size=V(av)$size,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.2, 
-     edge.width=0.2*sqrt(E(av)$weight),
-     edge.arrow.size=0.2,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200,
+                                          area = 2000*vcount(av)),
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = NA, 
+     vertex.label.color = "black", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.2, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1))
 
 
 # PLOT THE AGENCY-VDC AID NETWORK
