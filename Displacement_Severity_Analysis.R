@@ -1,6 +1,6 @@
 # Nepal Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 30, 2015"
+# date: "August 9, 2015"
 # 
 # Data Sources:
 #
@@ -562,24 +562,6 @@ sev$vdc[218] <- "Betini"
 sev$vdc[624] <-"Lamidada"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # VDC-LEVEL ADJACENCY MATRIX FOR THE DISPLACEMENT GRAPH, AT THE LEVEL OF DISPLACEMENT TRACK
 vdc_m <- matrix(0,nrow = length(vdc),ncol = length(vdc))
 
@@ -792,11 +774,13 @@ plot(gd_c,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Nepal Displacement Network Flow (VDC Level)")
+     main = "Weighted Nepal Displacement Network Flow (Giant Component)")
 legend("top",
        c("Displacement Origin","Displacement Destination"),
        fill = c("green","SkyBlue2"),
        bty = "n")
+
+# PLOT THE GIANT COMPONENT OF THE ABSTRACT GRAPH
 plot(gd_c,
      layout = layout.fruchterman.reingold(gd_c,
                                           niter = 200,
@@ -811,8 +795,8 @@ plot(gd_c,
      edge.arrow.size = 0.7,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Nepal Displacement Network Flow (VDC Level)")
-legend("top",
+     main = "Weighted Nepal Displacement Network Flow (Giant Component)")
+legend("topleft",
        c("Displacement Origin","Displacement Destination"),
        fill = c("green","SkyBlue2"),
        bty = "n")
@@ -841,6 +825,8 @@ gd_f <- drop_loops(graph = gd_f,
                    vertex_colors = V(gd_f)$color,
                    vertex_names = V(gd_f)$name)
 gd_f_coords <- koords[which(vdc %in% V(gd_f)$name),]
+
+# PLOT THE FILTRATION OF THE GEO GRAPH
 plot(gd_f,
      layout = gd_f_coords,
      vertex.color = V(gd_f)$color,
@@ -858,6 +844,8 @@ legend("topright",
        c("Origins of Displacement","Destinations of Displacement"),
        fill = c("green","SkyBlue2"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE ABSTRACT GRAPH
 plot(gd_f,
      layout = layout.fruchterman.reingold(gd_f,
                                           niter = 200,
@@ -902,6 +890,8 @@ gd_f <- drop_loops(graph = gd_f,
                    vertex_colors = V(gd_f)$color,
                    vertex_names = V(gd_f)$name)
 gd_f_coords <- koords[which(vdc %in% V(gd_f)$name),]
+
+# PLOT THE FILTRATION OF THE ABSTRACT GRAPH
 plot(gd_f,
      layout = layout.fruchterman.reingold(gd_f,
                                           niter = 200,
@@ -920,6 +910,8 @@ legend("topright",
        c("Origins of Displacement","Destinations of Displacement"),
        fill = c("green","SkyBlue2"),
        bty = "n")
+
+# PLOT THE FILTRATION OF THE GEO GRAPH
 plot(gd_f,
      layout = layout.fruchterman.reingold(gd_f,
                                           niter = 200,
@@ -939,11 +931,23 @@ legend("topright",
        fill = c("green","SkyBlue2"),
        bty = "n")
 
+
+#
+#
+#
+#
+#
 #
 #
 # ANALYSIS OF THE VDC NETWORK ITSELF
 #
 #
+#
+#
+#
+#
+#
+
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
 gd <- graph.adjacency(dtm,
