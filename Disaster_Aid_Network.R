@@ -500,12 +500,38 @@ plot(av_f_c,
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+# PLOT THE AGENCY-VDC AID NETWORK
+
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
 
 
 
 # THIS IS THE NUMBER OF EDGES FROM EACH NODE
 # IGNORING DIRECTION (TOTAL DEGREE)
-summary(degree(av))
 
 
 # THIS IS THE IN DEGREE SUMMARY
@@ -518,8 +544,6 @@ summary(degree(av,mode = "out"))
 
 # THIS IS THE WEIGHTED NUMBER OF THE ABOVE vdcENCIES, SO THE NUMBER OF SHARED VDC
 # TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF vdcENCIES
-summary(graph.strength(av))
-
 
 # AGAIN, THE INWARD WEIGHTED DEGREE
 summary(graph.strength(av,mode = "in"))
@@ -529,14 +553,7 @@ summary(graph.strength(av,mode = "in"))
 summary(graph.strength(av,mode = "out"))
 
 
-# PLOT THE NUMBER OF DISTINCT VDC-VDC CONNECTIONS
-plot(sort(degree(av)),
-     col = adjustcolor(rgb(1,0,1,1)),
-     pch = 19,
-     xaxt = "n",
-     yaxt = "n",
-     ann = FALSE)
-par(new=T)
+# PLOT THE AGENCY ADN VDC DEGREE DISTRIBUTIONS 
 plot(sort(degree(av,mode = "in")),
      col = "green",
      pch = 19,
@@ -545,55 +562,56 @@ plot(sort(degree(av,mode = "in")),
      ann = FALSE)
 par(new=T)
 plot(sort(degree(av,mode = "out")),
-     col = "blue",
+     col = "SkyBlue2",
      pch = 19,
      xlab = "VDC Index",
      ylab = "Number of VDC Transitions",
      main = "Number of VDC Transitions To and From a Given VDC (Sorted)")
 legend("topleft",
-       c("Total VDC-VDC Transitions","VDC In-Transitions", "VDC Out-Transitions"),
-       fill = c(adjustcolor(rgb(1,0,1,1)),"green","blue"),
+       c("Agency Aid Degree Distribution", "VDC Aid Degree Distribution"),
+       fill = c("green","SkyBlue2"),
+       cex = 1.8,
        bty = "n")
+text(300,200, paste("  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   0.000   4.782   0.000 337.000 "),
+     col = "green",
+     cex = 1.6,
+     font = 2)
+text(300,150, paste("   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   1.000   3.000   4.782   6.000  64.000"),
+     col = "SkyBlue2",
+     cex = 1.6,
+     font = 2)
 
 
 # THE DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
-deg1 <- hist(degree(av), breaks = 20)$counts
+deg1 <- hist(degree(av,mode = "in"), breaks = 20)$counts
 deg1n <- 100*deg1/sum(deg1)
-deg2 <- hist(degree(av,mode = "in"), breaks = 20)$counts
+deg2 <- hist(degree(av,mode = "out"), breaks = 20)$counts
 deg2n <- 100*deg2/sum(deg2)
-deg3 <- hist(degree(av,mode = "out"), breaks = 20)$counts
-deg3n <- 100*deg3/sum(deg3)
-maxn <- max(length(deg1n), length(deg2n),length(deg3n))
+maxn <- max(length(deg1n), length(deg2n))
 d1 <- append(deg1n,rep(0,maxn-length(deg1n)))
 d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
-d3 <- append(deg3n,rep(0,maxn-length(deg3n)))
-ddata <- cbind(d1,d2,d3)
+ddata <- cbind(d1,d2)
 barplot(t(ddata), 
         beside = T, 
         xlab = "Number of VDC-VDC Connection", 
         ylab = "Relative VDC-VDC Conneciton %", 
         main = "Distribution of VDC Transitions To and From a Given VDC",
-        col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"))
+        col = c("green","SkyBlue2"))
 axis(1, 
      at = 4*(1:maxn)-2,
      labels = as.character(1:maxn),
      cex.axis = 1,
      las = 1)
 legend("topright",
-       legend = c("Total VDC-VDC Transitions","VDC In-Transitions", "VDC Out-Transitions"),
-       col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"), 
+       legend = c("VDC In-Transitions", "VDC Out-Transitions"),
+       col = c("green","SkyBlue2"), 
        bty = "n",pch = 15, 
        cex = 1.5)
 
 
 # PLOT THE WEIGHTED NUMBER OF DISTINCT VDC-VDC CONNECTIONS
-plot(sort(graph.strength(av)),
-     col = adjustcolor(rgb(1,0,1,1)),
-     pch = 19,
-     xaxt = "n",
-     yaxt = "n",
-     ann = FALSE)
-par(new=T)
 plot(sort(graph.strength(av,mode = "in")),
      col = "green",
      pch = 19,
@@ -602,98 +620,43 @@ plot(sort(graph.strength(av,mode = "in")),
      ann = FALSE)
 par(new=T)
 plot(sort(graph.strength(av,mode = "out")),
-     col = "blue",
+     col = "SkyBlue2",
      pch = 19,
      xlab = "VDC Index",
      ylab = "Weighted Number of VDC Transitions",
      main = "Weighted Number of VDC Transitions To and From a Given VDC (Sorted)")
 legend("topleft",
-       c("Total Weighted VDC-VDC Transitions","Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
-       fill = c(adjustcolor(rgb(1,0,1,1)),"green","blue"),
+       c("Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       fill = c("green","SkyBlue2"),
        bty = "n")
 
 
 # THE WEIGHTED DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
-deg1 <- hist(graph.strength(av), breaks = 20)$counts
+deg1 <- hist(graph.strength(av,mode = "in"), breaks = 20)$counts
 deg1n <- 100*deg1/sum(deg1)
-deg2 <- hist(graph.strength(av,mode = "in"), breaks = 20)$counts
+deg2 <- hist(graph.strength(av,mode = "out"), breaks = 20)$counts
 deg2n <- 100*deg2/sum(deg2)
-deg3 <- hist(graph.strength(av,mode = "out"), breaks = 20)$counts
-deg3n <- 100*deg3/sum(deg3)
-maxn <- max(length(deg1n), length(deg2n),length(deg3n))
+maxn <- max(length(deg1n), length(deg2n))
 d1 <- append(deg1n,rep(0,maxn-length(deg1n)))
 d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
-d3 <- append(deg3n,rep(0,maxn-length(deg3n)))
-wddata <- cbind(d1,d2,d3)
+wddata <- cbind(d1,d2)
 barplot(t(wddata), 
         beside = T, 
         xlab = "Weighted Number of VDC-VDC Connection", 
         ylab = "Weighted Relative VDC-VDC Conneciton %", 
         main = "Distribution of Weighted VDC Transitions To and From a Given VDC",
-        col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"))
+        col = c("green","SkyBlue2"))
 axis(1, 
      at = 4*(1:maxn)-2,
      labels = as.character(1:maxn),
      cex.axis = 1,
      las = 1)
 legend("topright",
-       legend = c("Total Weighted VDC-VDC Transitions","Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
-       col = c(adjustcolor(rgb(1,0,1,1)),"green","blue"), 
+       legend = c("Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       col = c("green","SkyBlue2"), 
        bty = "n",pch = 15, 
        cex = 1.5)
 
-
-# GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
-# TYPICALLY ON THE ORDER OF 1-10%
-100*graph.density(av)
-
-
-# CLUSTERS ARE CONNECTED COMPONENTS
-clusters(av)$no
-
-
-# SORTED CLUSTERS BY SIZE
-sort(clusters(av)$csize,decreasing = TRUE)
-
-
-# GLOBAL CLUSTERING COEFFICIENT (TRANSITIVITY) IS THE RATIO OF TRIANGLES AND CONNECTED TRIPLES
-transitivity(av)
-cut75 <- quantile(as.vector(dtm[dtm>0]),0.75)
-av_f <- filter(cutoff = cut75,
-               edge_matrix = dtm,
-               vertex_colors = V(av)$color,
-               vertex_names = V(av)$name)
-av_f <- as.undirected(av_f)
-transitivity(av_f)
-
-
-# RELATIVE MAXIMAL CLUSTER SIZE (AS % OF NUMBER OF NODES) 
-max(clusters(av)$csize)/vcount(av)
-
-
-# RELATIVE NUMBER OF ISOLATED NODES (AS % OF NUMBER OF NODES)  
-sum(degree(av) == 0)/vcount(av)
-
-
-# PATH DISTRIBUTION: This shows the different lengths of shortest paths (geodesics) in our network. 
-sh <- shortest.paths(graph = av, 
-                     mode = "all",
-                     weights = E(av)$weight)
-is.na(sh) <- sapply(sh,is.infinite)
-paths <- na.omit(as.vector(sh))
-length(paths)
-summary(paths)
-plot(sort(paths),
-     xlab = "Path Index", 
-     ylab = "Path Length", 
-     main = "Paths (sorted by length)", 
-     pch = 20,
-     col = adjustcolor(rgb(1,0,1,1)))
-histP1(paths,
-       breaks = 50,
-       col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Path Length Values",
-       main = "Path Length Distribution for g")
 
 #
 #
@@ -1032,42 +995,121 @@ legend("topright",
 # COMMUNITY STRUCTURES FOR THE DISPLACEMENT NETWORK
 #
 #
+
 #
 #
 #
-# MULTILEVEL COMMUNITY DETECTION
-#
-# NOTE: THIS APPLEIS TO UNDIRECTED GRAPHS ONLY
-#
-# Multilevel community detection is based on the following approach. 
-# Assume that we start with a weighted network of N nodes. 
-# First, we assign a different community to each node of the network. 
-# So, in this initial partition there are as many communities as there are nodes. 
-# Then, for each node i we consider the neighbours j of i and we evaluate 
-# the gain of modularity that would take place by removing i from its community 
-# and by placing it in the community of j. The node i is then placed in the community 
-# for which this gain is maximum (in case of a tie we use a breaking rule), 
-# but only if this gain is positive. If no positive gain is possible, 
-# i stays in its original community. This process is applied repeatedly 
-# and sequentially for all nodes until no further improvement can be achieved. 
-# Note that a node may be, and often is, considered several times. Also, 
-# the output of the algorithm depends on the order in which the nodes 
-# are considered, although it can be shown that the order has little effect.
+# SPINGLASS COMMUNITY DETECTION
 #
 #
-av <- graph.adjacency(dtm,
-                      mode = "directed",
-                      weighted = TRUE)
-V(av)$color <- rep("SkyBlue2",length(vdc))
-for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc == vdc[k]))
-  d_count <- length(which(dt_data$vdc == vdc[k]))
-  if(o_count>d_count){
-    V(av)$color[k] <- "green"
-  } 
+# Spinglass community detection aims to find 
+# communities using a spin-glass model 
+# and simulated annealing. 
+# Edge directions are ignored.
+#
+#
+#
+
+
+# DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
 }
-V(av)$name <- vdc
+
+# SET UP THE VERTEX SIZES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(sp,
+     av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = sp,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Spinglass Communities")
+
+# PLOT THE SPINGLASS COMMUNITIES FOR THE GEO-NETWORK
+plot(sp,
+     av,
+     layout = koords2,
+     vertex.color = sp,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Spinglass Communities")
+
+
+
+
+
+
+
+
+
+
+
+
+
+# SOME BASIC SPINGLASS COMMUNITY STATS
+plot(sort(sp$membership), 
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index in the Network", 
+     ylab = "Spinglass Community Values", 
+     main = "Sorted Spinglass Community Values for Nepal Agency Aid Network", 
+     pch = 19)
+
+histP1(sp$membership,
+       breaks = 60,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Spinglass Community Values",
+       main = "Spinglass Community Distribution for Nepal Displacement Network")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 av <- drop_isolated(graph = av,
                     vertex_colors = V(av)$color,
                     vertex_names = V(av)$name)
@@ -1125,18 +1167,6 @@ histP1(mc$membership,
        xlab = "Multilevel Community Values",
        main = "Multilevel Community Distribution for Nepal Displacement Network")
 
-#
-#
-#
-# WALKTRAP COMMUNITY DETECTION
-#
-#
-# Walktrap community detection aims to find 
-# densely connected subgraphs using random walks with the 
-# premise that short random walks should be contained within the same cluster.
-#
-#
-#
 
 av <- graph.adjacency(dtm,
                       mode = "directed",
