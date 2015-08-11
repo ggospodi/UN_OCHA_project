@@ -858,6 +858,53 @@ legend("topright",
        fill = c("red","White"),
        bty = "n")
 
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
+# for (k in 1:length(hb)){
+#   V(av)$color[k] <- rev(heat.colors(1+as.integer(max(hb))))[as.integer(hb[k])+1]
+# }
+# av_coords <- koords[which(vdc %in% V(av)$name),]
+# plot(av,
+#      layout = layout.fruchterman.reingold(av, 
+#                                           niter = 200, 
+#                                           area = 2000*vcount(av)),
+#      vertex.color = V(av)$color,
+#      vertex.size = 9,
+#      vertex.label = V(av)$name, 
+#      vertex.label.color = "black",
+#      vertex.label.font = 1, 
+#      vertex.label.cex = 0.85, 
+#      edge.width = 0.2*sqrt(E(av)$weight),
+#      edge.arrow.size = 0.5,
+#      edge.curved = TRUE,
+#      edge.color = gray.colors(1),
+#      main = "Weighted Agency Aid Network Flow (VDC Level)")
+# legend("topleft",
+#        c("Highest Hub Score","Lowest Hub Score"),
+#        fill = c("red","White"),
+#        bty = "n")
+# plot(av,
+#      layout = av_coords,
+#      vertex.color = V(av)$color,
+#      vertex.size = 4,
+#      vertex.label = NA, 
+#      vertex.label.color = "black",
+#      vertex.label.font = 1, 
+#      vertex.label.cex = 0.75, 
+#      edge.width = 0.2*sqrt(E(av)$weight),
+#      edge.arrow.size = 0.5,
+#      edge.curved = TRUE,
+#      edge.color = gray.colors(1),
+#      main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+# legend("topright",
+#        c("Highest Hub Score","Lowest Hub Score"),
+#        fill = c("red","White"),
+#        bty = "n")
+#
+#
+
+
+
 #
 #
 #
@@ -947,49 +994,7 @@ legend("topright",
        fill = c("red","White"),
        bty = "n")
 
-# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
-# for (k in 1:length(hb)){
-#   V(av)$color[k] <- rev(heat.colors(1+as.integer(max(hb))))[as.integer(hb[k])+1]
-# }
-# av_coords <- koords[which(vdc %in% V(av)$name),]
-# plot(av,
-#      layout = layout.fruchterman.reingold(av, 
-#                                           niter = 200, 
-#                                           area = 2000*vcount(av)),
-#      vertex.color = V(av)$color,
-#      vertex.size = 9,
-#      vertex.label = V(av)$name, 
-#      vertex.label.color = "black",
-#      vertex.label.font = 1, 
-#      vertex.label.cex = 0.85, 
-#      edge.width = 0.2*sqrt(E(av)$weight),
-#      edge.arrow.size = 0.5,
-#      edge.curved = TRUE,
-#      edge.color = gray.colors(1),
-#      main = "Weighted Agency Aid Network Flow (VDC Level)")
-# legend("topleft",
-#        c("Highest Hub Score","Lowest Hub Score"),
-#        fill = c("red","White"),
-#        bty = "n")
-# plot(av,
-#      layout = av_coords,
-#      vertex.color = V(av)$color,
-#      vertex.size = 4,
-#      vertex.label = NA, 
-#      vertex.label.color = "black",
-#      vertex.label.font = 1, 
-#      vertex.label.cex = 0.75, 
-#      edge.width = 0.2*sqrt(E(av)$weight),
-#      edge.arrow.size = 0.5,
-#      edge.curved = TRUE,
-#      edge.color = gray.colors(1),
-#      main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
-# legend("topright",
-#        c("Highest Hub Score","Lowest Hub Score"),
-#        fill = c("red","White"),
-#        bty = "n")
-#
-#
+
 #
 #
 # COMMUNITY STRUCTURES FOR THE DISPLACEMENT NETWORK
@@ -1032,6 +1037,12 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$name[k] <- NA}
 }
 
+
+# DEfine the SPINGLASS COMMUNITY STRUCTURE
+sp <- spinglass.community(graph = av,
+                          weights = E(av)$weights,
+                          spins = 20)
+
 # PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
 plot(sp,
      av,
@@ -1067,16 +1078,78 @@ plot(sp,
      main = "Weighted Agency Aid Network Spinglass Communities")
 
 
+# SPINGLASS COMMUNITIES AND FILTER AT CUTOFF = 90%
+cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.90)
+av_f <- filter(cutoff = cut90,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+
+# DEFINE THE SPINGLASS COMMUNITY STRUCTURE
+sp_f_c <- spinglass.community(graph = av_f_c,
+                            weights = E(av_f_c)$weights,
+                            spins = 20)
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(sp_f_c,
+     av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av_f_c)),
+     vertex.color = sp_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Spinglass Communities")
 
 
+# TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
 
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
 
+# SET UP THE VERTEX NAMES, SIZES, COORDINATES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- all[k]}
+}
 
+koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
 
-
-
-
-
+# PLOT THE SPINGLASS COMMUNITIES FOR THE GEO-NETWORK
+plot(sp_f_c,
+     av_f_c,
+     layout = koords2_f_c,
+     vertex.color = sp_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Spinglass Communities")
 
 # SOME BASIC SPINGLASS COMMUNITY STATS
 plot(sort(sp$membership), 
@@ -1096,6 +1169,174 @@ histP1(sp$membership,
 
 
 
+
+#
+#
+#
+# WALKTRAP COMMUNITY DETECTION
+#
+#
+# This is an approach based on random walks. The general idea is that if you perform random walks on the graph, 
+# then the walks are more likely to stay within the same community because there are only a few edges that lead 
+# outside a given community. Walktrap runs short random walks of 3-4-5 steps (depending on one of its parameters) 
+# and uses the results of these random walks to merge separate communities in a bottom-up manner like fastgreedy.community. 
+# Again, you can use the modularity score to select where to cut the dendrogram. It is a bit slower than the fast greedy 
+# approach but also a bit more accurate (according to the original publication).
+#
+#
+#
+
+
+# DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+# SET UP THE VERTEX SIZES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
+
+
+# DEFINE THE WALKTRAP COMMUNITY STRUCTURE
+wk <- walktrap.community(graph = av,
+                           membership = TRUE,
+                           weights = E(av)$weights)
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(wk,
+     av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = wk,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Fastgreedy Communities")
+
+# PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
+plot(wk,
+     av,
+     layout = koords2,
+     vertex.color = wk,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+# edit
+
+
+
+# WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 80%
+cut80 <- quantile(as.vector(aid_m[aid_m>0]),0.80)
+av_f <- filter(cutoff = cut80,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+
+# DEFINE THE WALKTRAP COMMUNITY STRUCTURE
+wk_f_c <- walktrap.community(graph = av_f_c,
+                              weights = E(av_f_c)$weights)
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av_f_c)),
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+# SET UP THE VERTEX NAMES, SIZES, COORDINATES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- all[k]}
+}
+
+koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
+
+# PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
+plot(sp_f_c,
+     av_f_c,
+     layout = koords2_f_c,
+     vertex.color = sp_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+# SOME BASIC WALKTRAP COMMUNITY STATS
+plot(sort(wk$membership), 
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index in the Network", 
+     ylab = "Walktrap Community Values", 
+     main = "Sorted Walktrap Community Values for Nepal Agency Aid Network", 
+     pch = 19)
+
+histP1(wk$membership,
+       breaks = 60,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Walktrap Community Values",
+       main = "Walktrap Community Distribution for Nepal Displacement Network")
 
 
 
@@ -1136,104 +1377,3 @@ plot(mc,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Multilevel Communities")
-
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
-plot(mc,
-     av,
-     layout = av_coords,
-     vertex.color = strongclusters,
-     vertex.size = 4,
-     vertex.label = NA, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.75, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Geo-Network Multilevel Communities")
-
-
-# SOME BASIC MULTILEVEL COMMUNITY STATS
-plot(sort(mc$membership), 
-     col = adjustcolor(rgb(1,0,1,1)), 
-     xlab = "Node Index (VDC) in the Network", 
-     ylab = "Multilevel Community Values", 
-     main = "Sorted Multilevel Community Values for Nepal Displacement Network", 
-     pch = 19)
-histP1(mc$membership,
-       breaks = 60,
-       col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Multilevel Community Values",
-       main = "Multilevel Community Distribution for Nepal Displacement Network")
-
-
-av <- graph.adjacency(dtm,
-                      mode = "directed",
-                      weighted = TRUE)
-V(av)$color <- rep("SkyBlue2",length(vdc))
-for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc == vdc[k]))
-  d_count <- length(which(dt_data$vdc == vdc[k]))
-  if(o_count>d_count){
-    V(av)$color[k] <- "green"
-  } 
-}
-V(av)$name <- vdc
-av <- drop_isolated(graph = av,
-                    vertex_colors = V(av)$color,
-                    vertex_names = V(av)$name)
-av <- drop_loops(graph = av,
-                 vertex_colors = V(av)$color,
-                 vertex_names = V(av)$name)
-av_coords <- koords[which(vdc %in% V(av)$name),]
-av <- as.undirected(av)
-wc <- walktrap.community(graph = av,
-                         weights = E(av)$weights)
-plot(wc,
-     av,
-     layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
-     vertex.color = mc,
-     vertex.size = 9,
-     vertex.label = V(av)$name, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
-
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
-plot(wc,
-     av,
-     layout = av_coords,
-     vertex.color = strongclusters,
-     vertex.size = 4,
-     vertex.label = NA, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.75, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Geo-Network Walktrap Communities")
-
-
-# SOME BASIC WALKTRAP STATS
-plot(sort(wc$membership), 
-     col = adjustcolor(rgb(1,0,1,1)), 
-     xlab = "Node Index (VDC) in the Network", 
-     ylab = "Walktrap Community Values", 
-     main = "Sorted Walktrap Community Values for Nepal Displacement Network", 
-     pch = 19)
-histP1(wc$membership,
-       breaks = 60,
-       col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Walktrap Community Values",
-       main = "Walktrap Community Distribution for Nepal Displacement Network")
