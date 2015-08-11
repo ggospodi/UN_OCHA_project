@@ -1,6 +1,6 @@
 # Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "Augist 5, 2015"
+# date: "Augist 11, 2015"
 # 
 # Data Sources:
 #
@@ -207,7 +207,7 @@ aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
 #
 #
 #
-# AGENCY RELIEF NETWORK AT VDC LEVEL BELOW:
+# Agency-VDC Aid NETWORK AT VDC LEVEL
 #
 #
 #
@@ -228,7 +228,6 @@ for (k in 1:dim(aid_data)[1]){
 
 # SINCE aid_data$hlcit AND aid_data$vdc HAVE 239 ROWS OF SIMULTANEOUS NAs,
 # WE DROP THESE ROWS
-
 aid_data <- aid_data[!is.na(aid_data$hlcit),]
 
 
@@ -253,7 +252,7 @@ ya <- 80+12*runif(length(ag))
 koords1 <-cbind(xa,ya)
 koords2<- rbind(koords1,koords)
 
-# DEFINE THE AGENCY-VDC RELIEF AID NETWORK ADJACENCY MATRIX
+# DEFINE THE AGENCY-VDC AID NETWORK ADJACENCY MATRIX
 aid_m <- matrix(0,nrow=length(all),ncol=length(all))
 for (i in 1:length(ag)){
   for (j in 1:length(vd)){
@@ -262,7 +261,7 @@ for (i in 1:length(ag)){
   }
 }
 
-# BUILD THE AGENCY-VDC RELIEF EFFORT AID NETWORK
+# BUILD THE AGENCY-VDC AID NETWORK
 av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
@@ -274,21 +273,19 @@ for (k in 1:length(all)){
 }
 
 # PLOT THE AGENCY-VDC AID NETWORK
-
-
 V(av)$color<-rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
+    V(av)$color[k] <- "SkyBlue2"
   }  
 }
 
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 
@@ -306,9 +303,13 @@ plot(av,
      edge.width = 0.2*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
-
-
+     edge.color = gray.colors(1),
+     main = "Weighted Agency-VDC Aid Abstract Network (VDC Level)")
+legend("topleft",
+       c("Relief Aid Agency","VDC Aid Target"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+     
 # PLOT THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
@@ -331,7 +332,7 @@ plot(av,
      edge.arrow.size=0.2,
      edge.curved=TRUE,
      edge.color=gray.colors(1),
-     main="Nepal Agency Aid Relief Geo-Network")
+     main="Nepal Agency-VDC Aid Relief Geo-Network")
 legend("topright",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
 
 
@@ -403,7 +404,7 @@ av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
                      vertex_names = V(av_f)$name)
 
-# PLOT THE WEIGHTED DISPLACEMENT GRAPH
+# DISPLAY THE EDGE-FILTERED GRAPH AGAIN
 plot(av_f_c,
      layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
      vertex.color=V(av_f_c)$color,
@@ -463,25 +464,6 @@ plot(av_f_c,
 
 
 
-
-
-
-
-
-
-
-
-
-# EDIT
-
-
-
-
-
-
-
-
-
 #
 #
 #
@@ -489,7 +471,7 @@ plot(av_f_c,
 #
 #
 #
-# ANALYSIS OF THE AGENCY-VDC NETWORK ITSELF
+# ANALYSIS OF THE AGENCY-VDC AID NETWORK ITSELF
 #
 #
 #
@@ -499,7 +481,7 @@ plot(av_f_c,
 #
 
 
-# DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+# DEFINE THE AGENCY-VDC AID GRAPH
 av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
@@ -511,7 +493,6 @@ for (k in 1:length(all)){
 }
 
 # PLOT THE AGENCY-VDC AID NETWORK
-
 V(av)$color<-rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
@@ -542,7 +523,7 @@ summary(degree(av,mode = "in"))
 summary(degree(av,mode = "out"))
 
 
-# THIS IS THE WEIGHTED NUMBER OF THE ABOVE vdcENCIES, SO THE NUMBER OF SHARED VDC
+# THIS IS THE WEIGHTED NUMBER OF THE ABOVE AGENCIES, SO THE NUMBER OF SHARED VDC
 # TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF vdcENCIES
 
 # AGAIN, THE INWARD WEIGHTED DEGREE
@@ -568,7 +549,7 @@ plot(sort(degree(av,mode = "out")),
      ylab = "Number of VDC Transitions",
      main = "Number of VDC Transitions To and From a Given VDC (Sorted)")
 legend("topleft",
-       c("Agency Aid Degree Distribution", "VDC Aid Degree Distribution"),
+       c("Agency-VDC Aid Degree Distribution", "VDC Aid Degree Distribution"),
        fill = c("green","SkyBlue2"),
        cex = 1.8,
        bty = "n")
@@ -741,13 +722,13 @@ plot(av,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
 legend("topleft",
        c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
        fill = c("red","White"),
        bty = "n")
 
-# PLOT THE HEAT MAP OF THE AGENCY AID NETWORK
+# PLOT THE HEAT MAP OF THE Agency-VDC Aid NETWORK
 plot(av,
      layout = av_coords,
      vertex.color = V(av)$color,
@@ -760,7 +741,7 @@ plot(av,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
 legend("topright",
        c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
        fill = c("red","White"),
@@ -833,13 +814,13 @@ plot(av,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
 legend("topleft",
        c("Highest Authority Score","Lowest Authority Score"),
        fill = c("red","White"),
        bty = "n")
 
-# PLOT THE HEAT MAP OF THE AGENCY AID NETWORK
+# PLOT THE HEAT MAP OF THE Agency-VDC Aid NETWORK
 plot(av,
      layout = av_coords,
      vertex.color = V(av)$color,
@@ -852,7 +833,7 @@ plot(av,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
 legend("topright",
        c("Highest Authority Score","Lowest Authority Score"),
        fill = c("red","White"),
@@ -878,7 +859,7 @@ legend("topright",
 #      edge.arrow.size = 0.5,
 #      edge.curved = TRUE,
 #      edge.color = gray.colors(1),
-#      main = "Weighted Agency Aid Network Flow (VDC Level)")
+#      main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
 # legend("topleft",
 #        c("Highest Hub Score","Lowest Hub Score"),
 #        fill = c("red","White"),
@@ -895,7 +876,7 @@ legend("topright",
 #      edge.arrow.size = 0.5,
 #      edge.curved = TRUE,
 #      edge.color = gray.colors(1),
-#      main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+#      main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
 # legend("topright",
 #        c("Highest Hub Score","Lowest Hub Score"),
 #        fill = c("red","White"),
@@ -969,13 +950,13 @@ plot(av,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
 legend("topleft",
        c("Highest Hub Score","Lowest Hub Score"),
        fill = c("red","White"),
        bty = "n")
 
-# PLOT THE HUB SCORES OF THE AGENCY AID NETWORK
+# PLOT THE HUB SCORES OF THE Agency-VDC Aid NETWORK
 plot(av,
      layout = av_coords,
      vertex.color = V(av)$color,
@@ -988,7 +969,7 @@ plot(av,
      edge.arrow.size = 0.5,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Geo-Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
 legend("topright",
        c("Highest Hub Score","Lowest Hub Score"),
        fill = c("red","White"),
@@ -1043,7 +1024,7 @@ sp <- spinglass.community(graph = av,
                           weights = E(av)$weights,
                           spins = 20)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(sp,
      av,
      layout = layout.fruchterman.reingold(av, 
@@ -1059,7 +1040,7 @@ plot(sp,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Spinglass Communities")
+     main = "Weighted Agency-VDC Aid Network Spinglass Communities")
 
 # PLOT THE SPINGLASS COMMUNITIES FOR THE GEO-NETWORK
 plot(sp,
@@ -1075,7 +1056,7 @@ plot(sp,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Spinglass Communities")
+     main = "Weighted Agency-VDC Aid Network Spinglass Communities")
 
 
 # SPINGLASS COMMUNITIES AND FILTER AT CUTOFF = 90%
@@ -1093,7 +1074,7 @@ sp_f_c <- spinglass.community(graph = av_f_c,
                             weights = E(av_f_c)$weights,
                             spins = 20)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(sp_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
@@ -1109,7 +1090,7 @@ plot(sp_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Spinglass Communities")
+     main = "Weighted Agency-VDC Aid Network Spinglass Communities")
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -1149,14 +1130,14 @@ plot(sp_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Spinglass Communities")
+     main = "Weighted Agency-VDC Aid Network Spinglass Communities")
 
 # SOME BASIC SPINGLASS COMMUNITY STATS
 plot(sort(sp$membership), 
      col = adjustcolor(rgb(1,0,1,1)), 
      xlab = "Node Index in the Network", 
      ylab = "Spinglass Community Values", 
-     main = "Sorted Spinglass Community Values for Nepal Agency Aid Network", 
+     main = "Sorted Spinglass Community Values for Nepal Agency-VDC Aid Network", 
      pch = 19)
 
 histP1(sp$membership,
@@ -1164,9 +1145,6 @@ histP1(sp$membership,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Spinglass Community Values",
        main = "Spinglass Community Distribution for Nepal Displacement Network")
-
-
-
 
 
 
@@ -1214,7 +1192,7 @@ wk <- walktrap.community(graph = av,
                            membership = TRUE,
                            weights = E(av)$weights)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(wk,
      av,
      layout = layout.fruchterman.reingold(av, 
@@ -1230,7 +1208,7 @@ plot(wk,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Fastgreedy Communities")
+     main = "Weighted Agency-VDC Aid Network Fastgreedy Communities")
 
 # PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
 plot(wk,
@@ -1246,7 +1224,7 @@ plot(wk,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 70%
@@ -1263,7 +1241,7 @@ av_f_c <- giant_comp(graph = av_f,
 wk_f_c <- walktrap.community(graph = av_f_c,
                               weights = E(av_f_c)$weights)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
@@ -1279,7 +1257,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -1319,7 +1297,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 80%
@@ -1336,7 +1314,7 @@ av_f_c <- giant_comp(graph = av_f,
 wk_f_c <- walktrap.community(graph = av_f_c,
                              weights = E(av_f_c)$weights)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
@@ -1352,7 +1330,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -1392,7 +1370,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 90%
@@ -1409,7 +1387,7 @@ av_f_c <- giant_comp(graph = av_f,
 wk_f_c <- walktrap.community(graph = av_f_c,
                              weights = E(av_f_c)$weights)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
@@ -1425,7 +1403,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -1465,7 +1443,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 93%
@@ -1482,7 +1460,7 @@ av_f_c <- giant_comp(graph = av_f,
 wk_f_c <- walktrap.community(graph = av_f_c,
                              weights = E(av_f_c)$weights)
 
-# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
@@ -1498,7 +1476,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
@@ -1538,7 +1516,7 @@ plot(wk_f_c,
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Walktrap Communities")
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
 # SOME BASIC WALKTRAP COMMUNITY STATS
@@ -1546,55 +1524,11 @@ plot(sort(wk$membership),
      col = adjustcolor(rgb(1,0,1,1)), 
      xlab = "Node Index in the Network", 
      ylab = "Walktrap Community Values", 
-     main = "Sorted Walktrap Community Values for Nepal Agency Aid Network", 
+     main = "Sorted Walktrap Community Values for Nepal Agency-VDC Aid Network", 
      pch = 19)
 
 histP1(wk$membership,
        breaks = 60,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Walktrap Community Values",
-       main = "Walktrap Community Size Distribution for Nepal Agency Aid Network")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# LEAVE FOR NOW
-
-av <- drop_isolated(graph = av,
-                    vertex_colors = V(av)$color,
-                    vertex_names = V(av)$name)
-av <- drop_loops(graph = av,
-                 vertex_colors = V(av)$color,
-                 vertex_names = V(av)$name)
-av_coords <- koords[which(vdc %in% V(av)$name),]
-av <- as.undirected(av)
-mc <- multilevel.community(graph = av,
-                           weights = E(av)$weights)
-plot(mc,
-     av,
-     layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
-     vertex.color = mc,
-     vertex.size = 9,
-     vertex.label = V(av)$name, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency Aid Network Multilevel Communities")
+       main = "Walktrap Community Size Distribution for Nepal Agency-VDC Aid Network")
