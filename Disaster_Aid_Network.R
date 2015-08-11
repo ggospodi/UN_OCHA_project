@@ -1056,7 +1056,7 @@ plot(sp,
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Spinglass Communities")
@@ -1072,7 +1072,7 @@ plot(sp,
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Spinglass Communities")
@@ -1106,7 +1106,7 @@ plot(sp_f_c,
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Spinglass Communities")
@@ -1146,7 +1146,7 @@ plot(sp_f_c,
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Spinglass Communities")
@@ -1221,13 +1221,13 @@ plot(wk,
                                           niter = 200, 
                                           area = 2000*vcount(av)),
      vertex.color = wk,
-     vertex.size = 2,
+     vertex.size = V(av)$size,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Fastgreedy Communities")
@@ -1237,24 +1237,21 @@ plot(wk,
      av,
      layout = koords2,
      vertex.color = wk,
-     vertex.size = 2,
+     vertex.size = V(av)$size,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Walktrap Communities")
 
-# edit
 
-
-
-# WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 80%
-cut80 <- quantile(as.vector(aid_m[aid_m>0]),0.80)
-av_f <- filter(cutoff = cut80,
+# WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 70%
+cut70 <- quantile(as.vector(aid_m[aid_m>0]),0.70)
+av_f <- filter(cutoff = cut70,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
                vertex_names = all)
@@ -1279,7 +1276,7 @@ plot(wk_f_c,
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Walktrap Communities")
@@ -1309,20 +1306,240 @@ for (k in 1:dim(aid_m)[1]){
 koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
 
 # PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
-plot(sp_f_c,
+plot(wk_f_c,
      av_f_c,
      layout = koords2_f_c,
-     vertex.color = sp_f_c,
+     vertex.color = wk_f_c,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 80%
+cut80 <- quantile(as.vector(aid_m[aid_m>0]),0.80)
+av_f <- filter(cutoff = cut80,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+
+# DEFINE THE WALKTRAP COMMUNITY STRUCTURE
+wk_f_c <- walktrap.community(graph = av_f_c,
+                             weights = E(av_f_c)$weights)
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av_f_c)),
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+# SET UP THE VERTEX NAMES, SIZES, COORDINATES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- all[k]}
+}
+
+koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
+
+# PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = koords2_f_c,
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 90%
+cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.90)
+av_f <- filter(cutoff = cut90,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+
+# DEFINE THE WALKTRAP COMMUNITY STRUCTURE
+wk_f_c <- walktrap.community(graph = av_f_c,
+                             weights = E(av_f_c)$weights)
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av_f_c)),
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+# SET UP THE VERTEX NAMES, SIZES, COORDINATES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- all[k]}
+}
+
+koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
+
+# PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = koords2_f_c,
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 93%
+cut93 <- quantile(as.vector(aid_m[aid_m>0]),0.93)
+av_f <- filter(cutoff = cut93,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = all)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name)
+
+# DEFINE THE WALKTRAP COMMUNITY STRUCTURE
+wk_f_c <- walktrap.community(graph = av_f_c,
+                             weights = E(av_f_c)$weights)
+
+# PLOT THE COMMUNITIES OF THE AGENCY AID NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av_f_c)),
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
+
+# TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
+av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color<-rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k]<-"SkyBlue2"
+  }  
+}
+
+# SET UP THE VERTEX NAMES, SIZES, COORDINATES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <-3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- all[k]}
+}
+
+koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
+
+# PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
+plot(wk_f_c,
+     av_f_c,
+     layout = koords2_f_c,
+     vertex.color = wk_f_c,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency Aid Network Walktrap Communities")
+
 
 # SOME BASIC WALKTRAP COMMUNITY STATS
 plot(sort(wk$membership), 
@@ -1336,7 +1553,7 @@ histP1(wk$membership,
        breaks = 60,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Walktrap Community Values",
-       main = "Walktrap Community Distribution for Nepal Displacement Network")
+       main = "Walktrap Community Size Distribution for Nepal Agency Aid Network")
 
 
 
@@ -1350,6 +1567,10 @@ histP1(wk$membership,
 
 
 
+
+
+
+# LEAVE FOR NOW
 
 av <- drop_isolated(graph = av,
                     vertex_colors = V(av)$color,
