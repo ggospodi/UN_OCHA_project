@@ -109,7 +109,7 @@ drop_loops <- function(graph, vertex_colors, vertex_names){
 
 
 # DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
-filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
+filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names, vertex_size) {
   
   # get the definitions
   cut <- cutoff
@@ -126,6 +126,7 @@ filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- vertex_colors[v_g_f]
+  V(g_f)$size <- vertex_size[v_g_f]
   
   return(g_f)
 }
@@ -160,13 +161,14 @@ filter_deg <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   # color the filtered graph with sources and endpoints for the directed edges
   V(g_f)$color <- V(g)$colors[v_g_f]
   
+  
   return(g_f)
 }
 
 # DEFINE WEIGHTED DEGREE FILTRATION USING graph.strength
 
 # DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
-giant_comp <- function(graph, vertex_colors, vertex_names){
+giant_comp <- function(graph, vertex_colors, vertex_names, vertex_size){
   
   # get the definitions
   g <- graph
@@ -184,6 +186,7 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   
   # color the filtered graph with sources and endpoints for the directed edges
   V(g_f)$color <- vertex_colors[v_g_f]
+  V(g_f)$size <- vertex_size[v_g_f]
   
   return(g_f)
 }
@@ -262,18 +265,12 @@ for (i in 1:length(ag)){
 }
 
 # BUILD THE AGENCY-VDC AID NETWORK
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
-for (k in 1:length(all)){
-  if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
-  }  
-}
-
-# PLOT THE AGENCY-VDC AID NETWORK
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
     V(av)$color[k] <- "SkyBlue2"
@@ -306,117 +303,429 @@ plot(av,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Abstract Network (VDC Level)")
 legend("topleft",
-       c("Relief Aid Agency","VDC Aid Target"),
+       c("Implementing Aid Agency","Aid Target VDC"),
        fill = c("green","SkyBlue2"),
        bty = "n")
      
 # PLOT THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-1
+    V(av)$size[k] <- 1
     V(av)$name[k] <- NA}
 }
 
 plot(av,
-     layout=koords2,
-     vertex.color=V(av)$color,
-     vertex.size=V(av)$size,
-     vertex.label=V(av)$name, 
-     vertex.label.color="darkgreen", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.75, 
-     edge.width=0.05*sqrt(E(av)$weight),
-     edge.arrow.size=0.2,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1),
-     main="Nepal Agency-VDC Aid Relief Geo-Network")
-legend("topright",c("Implementing Aid Agency ","VDC with Geo-Coords"),fill=c("green","SkyBlue2"),bty="n")
+     layout = koords2,
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
 
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% percentile
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% PERCENTILE
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 1
+    V(av)$name[k] <- NA}
+}
 cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
 av_f <- filter(cutoff = cut25,
              edge_matrix = aid_m,
              vertex_colors = V(av)$color,
-             vertex_names = all)
+             vertex_names = V(av)$name,
+             vertex_size = V(av)$size)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
-     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,
-     vertex.size=4,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.7*sqrt(E(av_f)$weight),
-     edge.arrow.size=0.5,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(av_f,
+                                          niter = 200,
+                                          area = 2000*vcount(av_f)),
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = NA, 
+     vertex.label.color = "black", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.7, 
+     edge.width = 0.7*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Abstract Network")
+legend("topright",
+       c("Implementing Aid Agency","Aid Target VDC"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% percentile
+# PLOT THE AGENCY-VDC AID GEO-NETWORK
+koords2_f <- koords2[which(V(av)$name %in% V(av_f)$name),]
+plot(av_f,
+     layout = koords2_f,
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 50% PERCENTILE
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- NA}
+}
 cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
 av_f <- filter(cutoff = cut50,
              edge_matrix = aid_m,
              vertex_colors = V(av)$color,
-             vertex_names = all)
+             vertex_names = V(av)$name,
+             vertex_size = V(av)$size)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
-     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,
-     vertex.size=3,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.3*(E(av_f)$weight),
-     edge.arrow.size=0.5,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(av_f,
+                                          niter = 200,
+                                          area = 2000*vcount(av_f)),
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "black", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.7, 
+     edge.width = 0.3*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Abstract Network")
+legend("topright",
+       c("Implementing Aid Agency","Aid Target VDC"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
-# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% percentile
+# PLOT THE AGENCY-VDC AID GEO-NETWORK
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 1
+    V(av)$name[k] <- all[k]}
+}
+cut50 <- quantile(as.vector(aid_m[aid_m>0]),0.5)
+av_f <- filter(cutoff = cut50,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+koords2_f <- koords2[which(V(av)$name %in% V(av_f)$name),]
+V(av_f)$name[which(all %in% V(av_f)$name)>length(ag)] <- NA
+plot(av_f,
+     layout = koords2_f,
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% PERCENTILE
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
 cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
 av_f <- filter(cutoff = cut75,
              edge_matrix = aid_m,
              vertex_colors = V(av)$color,
-             vertex_names = all)
+             vertex_names = all,
+             vertex_size = V(av)$size)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
-     layout=layout.fruchterman.reingold(av_f, niter=200, area=2000*vcount(av_f)),
-     vertex.color=V(av_f)$color,
-     vertex.size=3,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=0.7, 
-     edge.width=0.3*(E(av_f)$weight),
-     edge.arrow.size=0.6,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(av_f,
+                                          niter = 200,
+                                          area = 2000*vcount(av_f)),
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = NA, 
+     vertex.label.color = "black", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.7, 
+     edge.width = 0.7*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Abstract Network")
+legend("topright",
+       c("Implementing Aid Agency","Aid Target VDC"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
 
-# DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT):
+# PLOT THE AGENCY-VDC AID GEO-NETWORK
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 1
+    V(av)$name[k] <- all[k]}
+}
+cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
+av_f <- filter(cutoff = cut75,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+koords2_f <- koords2[which(V(av)$name %in% V(av_f)$name),]
+V(av_f)$name[which(all %in% V(av_f)$name)>length(ag)] <- NA
+plot(av_f,
+     layout = koords2_f,
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+
+# EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 85% PERCENTILE
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 4
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <-2
+    V(av)$name[k] <- NA}
+}
+cut85 <- quantile(as.vector(aid_m[aid_m>0]),0.85)
+av_f <- filter(cutoff = cut85,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+
+# DISPLAY THE EDGE-FILTERED GRAPH
+plot(av_f,
+     layout = layout.fruchterman.reingold(av_f,
+                                          niter = 200,
+                                          area = 2000*vcount(av_f)),
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "black", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.7, 
+     edge.width = 0.7*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Abstract Network")
+legend("topright",
+       c("Implementing Aid Agency","Aid Target VDC"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+# PLOT THE AGENCY-VDC AID GEO-NETWORK
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 4
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 1
+    V(av)$name[k] <- all[k]}
+}
+cut85 <- quantile(as.vector(aid_m[aid_m>0]),0.85)
+av_f <- filter(cutoff = cut85,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+koords2_f <- koords2[which(V(av)$name %in% V(av_f)$name),]
+V(av_f)$name[which(all %in% V(av_f)$name)>length(ag)] <- NA
+plot(av_f,
+     layout = koords2_f,
+     vertex.color = V(av_f)$color,
+     vertex.size = V(av_f)$size,
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 2, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.1*sqrt(E(av_f)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Filtered Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+
+# DISPLAY THE LARGEST CLUSTER (GIANT COMPONENT) FOR THE
+# FILTERED AGENCY-VDC AID NETWORK WITH 
+# FILTER THRESHOLD = 75% PERCENTILE
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- all[k]}
+}
+cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
+av_f <- filter(cutoff = cut75,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+koords2_f <- koords2[which(V(av)$name %in% V(av_f)$name),]
+
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
-
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av_f)$size)
+koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
+V(av_f_c)$name[which(all %in% V(av_f_c)$name)>length(ag)] <- NA
 # DISPLAY THE EDGE-FILTERED GRAPH AGAIN
 plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,
-     vertex.size=4,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=1, 
-     edge.width=sqrt(E(av_f_c)$weight),
-     edge.arrow.size=0.6,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(av_f_c,
+                                          niter = 200,
+                                          area = 2000*vcount(av_f_c)),
+     vertex.color = V(av_f_c)$color,
+     vertex.size = V(av_f_c)$size,
+     vertex.label = V(av_f_c)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.3*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Giant Component for Filtered Nepal Agency-VDC Aid Relief Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+# DISPLAY THE GEO-NETWORK GIANT COMPONENT
+plot(av_f_c,
+     layout = koords2_f_c,
+     vertex.color = V(av_f_c)$color,
+     vertex.size = V(av_f_c)$size,
+     vertex.label = V(av_f_c)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.1*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.3,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Giant Component for Filtered Nepal Agency-VDC Aid Relief Network")
+legend("topright",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+
 
 # FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
 cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
