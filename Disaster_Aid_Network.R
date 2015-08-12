@@ -727,52 +727,6 @@ legend("topright",
 
 
 
-# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 90% quantile
-cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.9)
-av_f <- filter(cutoff = cut90,
-               edge_matrix = aid_m,
-               vertex_colors = V(av)$color,
-               vertex_names = all)
-av_f_c <- giant_comp(graph = av_f,
-                     vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
-plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,
-     vertex.size=6,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=2, 
-     vertex.label.cex=1, 
-     edge.width=sqrt(E(av_f_c)$weight),
-     edge.arrow.size=0.6,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-# FILTRATION PLUS GIANT CONNECTED COMPONENT, CUTOFF = 95% quantile
-cut95 <- quantile(as.vector(aid_m[aid_m>0]),0.95)
-av_f<-filter(cutoff = cut95,
-             edge_matrix = aid_m,
-             vertex_colors = V(av)$color,
-             vertex_names = all)
-av_f_c<-giant_comp(graph = av_f,
-                   vertex_colors = V(av_f)$color,
-                   vertex_names = V(av_f)$name)
-plot(av_f_c,
-     layout=layout.fruchterman.reingold(av_f_c, niter=200, area=2000*vcount(av_f_c)),
-     vertex.color=V(av_f_c)$color,
-     vertex.size=12,
-     vertex.label=V(av_f_c)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1.2, 
-     edge.width=0.5*(E(av_f_c)$weight),
-     edge.arrow.size=0.8,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
-
-
-
 #
 #
 #
@@ -790,11 +744,30 @@ plot(av_f_c,
 #
 
 
+
+
+
+
+
+
+# EDIT LABELS
+
+
+
+
+
+
+
+
+
+
 # DEFINE THE AGENCY-VDC AID GRAPH
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
     V(av)$color[k]<-"SkyBlue2"
@@ -802,19 +775,19 @@ for (k in 1:length(all)){
 }
 
 # PLOT THE AGENCY-VDC AID NETWORK
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
+    V(av)$color[k] <- "SkyBlue2"
   }  
 }
 
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 
