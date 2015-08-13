@@ -1021,13 +1021,14 @@ for (k in 1:dim(aid_m)[1]){
 }
 hb <- hub.score(graph = av,
                       weights = E(av)$weight)$vector
-hb <- 100*sqrt(hb)
-plot(sort(hb, decreasing = TRUE),
+hb <- 100*(hb)^(1/3)
+plot(sort(hb),
      col = adjustcolor(rgb(1,0,1,1)), 
      xlab = "Node Index", 
      ylab = "Hub Score", 
      main = "Sorted Agency-VDC Aid Network Hub Score Values", 
      pch = 19)
+
 histP1(hb,
        breaks = 50,
        col = adjustcolor(rgb(1,0,1,1)),
@@ -1050,11 +1051,11 @@ plot(av,
                                           area = 2000*vcount(av)),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
-     vertex.label = NA, 
+     vertex.label = V(av)$name, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.2*sqrt(E(av)$weight),
+     vertex.label.cex = 0.5, 
+     edge.width = 0.1*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
@@ -1076,7 +1077,7 @@ for (k in 1:dim(aid_m)[1]){
 hb_coords <- koords2[which(all %in% V(av)$name),]
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <- 5
+    V(av)$size[k] <- 6
     V(av)$name[k] <- ag[k]
   } else {
     V(av)$size[k] <- 1
@@ -1089,7 +1090,7 @@ plot(av,
      vertex.label = V(av)$name, 
      vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
-     vertex.label.cex = 0.75, 
+     vertex.label.cex = 0.5, 
      edge.width = 0.05*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
