@@ -935,7 +935,7 @@ histP1(au,
 for (k in 1:length(au)){
   V(av)$color[k] <- rev(heat.colors(1+max(as.integer(au))))[1+as.integer(au[k])]
 }
-av_coords <- koords[which(vdc %in% V(av)$name),]
+
 plot(av,
      layout = layout.fruchterman.reingold(av, 
                                           niter = 200, 
@@ -957,20 +957,27 @@ legend("topleft",
        bty = "n")
 
 
-
-
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- all[k]}
+}
+av_coords <- koords2[which(all %in% V(av)$name),]
 
 # PLOT THE HEAT MAP OF THE Agency-VDC Aid NETWORK
 plot(av,
      layout = av_coords,
      vertex.color = V(av)$color,
-     vertex.size = 4,
+     vertex.size = V(av)$size,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.75, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
+     edge.width = 0.1*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
