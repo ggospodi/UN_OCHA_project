@@ -756,14 +756,6 @@ for (k in 1:length(all)){
   }  
 }
 
-# PLOT THE AGENCY-VDC AID NETWORK
-V(av)$color <- rep("green",length(all))
-for (k in 1:length(all)){
-  if(is.element(all[k],vd)){
-    V(av)$color[k] <- "SkyBlue2"
-  }  
-}
-
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
     V(av)$size[k] <- 3
@@ -906,44 +898,42 @@ legend("topright",
 #
 #
 #
-
-av <- graph.adjacency(dtm,
+av <- graph.adjacency(aid_m,
                       mode = "directed",
                       weighted = TRUE)
-V(av)$color <- rep("SkyBlue2",length(vdc))
-for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc == vdc[k]))
-  d_count <- length(which(dt_data$vdc == vdc[k]))
-  if(o_count>d_count){
-    V(av)$color[k] <- "green"
-  } 
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
 }
-V(av)$name <- vdc
-av <- drop_isolated(graph = av,
-                    vertex_colors = V(av)$color,
-                    vertex_names = V(av)$name)
-av <- drop_loops(graph = av,
-                 vertex_colors = V(av)$color,
-                 vertex_names = V(av)$name)
-au <- authority.score(av)$vector
-au <- 100*au
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- NA}
+}
+au <- authority.score(graph = av,
+                      weights = E(av)$weight)$vector
+au <- 100*sqrt(au)
 plot(sort(au, decreasing = TRUE),
      col = adjustcolor(rgb(1,0,1,1)), 
      xlab = "Node Index", 
-     ylab = "Eigenvector Centrality", 
-     main = "Sorted VDC Network Authority Score Values", 
+     ylab = "Authority Score", 
+     main = "Sorted Agency-VDC Aid Network Authority Score Values", 
      pch = 19)
-histP2(au,
+histP1(au,
        breaks = 50,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Authority Score Values",
-       main = "VDC Network Authority Score Distribution")
+       main = "Agency-VDC Aid Network Authority Score Distribution")
 
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
 for (k in 1:length(au)){
-  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(au))))[as.integer(au[k])+1]
+  V(av)$color[k] <- rev(heat.colors(1+max(as.integer(au))))[1+as.integer(au[k])]
 }
 av_coords <- koords[which(vdc %in% V(av)$name),]
 plot(av,
@@ -951,13 +941,13 @@ plot(av,
                                           niter = 200, 
                                           area = 2000*vcount(av)),
      vertex.color = V(av)$color,
-     vertex.size = 9,
-     vertex.label = V(av)$name, 
+     vertex.size = V(av)$size,
+     vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
@@ -965,6 +955,10 @@ legend("topleft",
        c("Highest Authority Score","Lowest Authority Score"),
        fill = c("red","White"),
        bty = "n")
+
+
+
+
 
 # PLOT THE HEAT MAP OF THE Agency-VDC Aid NETWORK
 plot(av,
