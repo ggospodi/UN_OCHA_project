@@ -792,31 +792,22 @@ for (k in 1:dim(aid_m)[1]){
 }
 
 
-
-# THIS IS THE NUMBER OF EDGES FROM EACH NODE
-# IGNORING DIRECTION (TOTAL DEGREE)
-
-
-# THIS IS THE IN DEGREE SUMMARY
+# THIS IS THE NUMBER OF AGENCIES PER VDC
 summary(degree(av,mode = "in"))
 
-
-# THIS IS THE OUT DEGREE SUMMARY
+# THIS IS THE NUMBER OF VDCs PER AGENCY
 summary(degree(av,mode = "out"))
 
-
-# THIS IS THE WEIGHTED NUMBER OF THE ABOVE AGENCIES, SO THE NUMBER OF SHARED VDC
-# TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF vdcENCIES
-
-# AGAIN, THE INWARD WEIGHTED DEGREE
+# THIS IS THE WEIGHTED NUMBER OF AGENCIES,
+# WEIGHED BY NUMBER OF AID ACTIONS PER VDC
 summary(graph.strength(av,mode = "in"))
 
 
-# AGAIN, THE OUTWARD WEIGHTED DEGREE
+# THIS IS THE WEIGHTED NUMBER OF VDCs PER AGENCY
+# WEIGHED BY THE NUMBER OF AID ACTIONS
 summary(graph.strength(av,mode = "out"))
 
-
-# PLOT THE AGENCY ADN VDC DEGREE DISTRIBUTIONS 
+# PLOT THE AGENCY AND VDC DEGREE DISTRIBUTIONS 
 plot(sort(degree(av,mode = "in")),
      col = "green",
      pch = 19,
@@ -827,11 +818,11 @@ par(new=T)
 plot(sort(degree(av,mode = "out")),
      col = "SkyBlue2",
      pch = 19,
-     xlab = "VDC Index",
-     ylab = "Number of VDC Transitions",
-     main = "Number of VDC Transitions To and From a Given VDC (Sorted)")
+     xlab = "Agency/VDC Index",
+     ylab = "Agency/VDC Degree",
+     main = "Agency/VDC Degree (Sorted)")
 legend("topleft",
-       c("Agency-VDC Aid Degree Distribution", "VDC Aid Degree Distribution"),
+       c("Number of VDCs per Agency", "Number of Agencies per VDC"),
        fill = c("green","SkyBlue2"),
        cex = 1.8,
        bty = "n")
