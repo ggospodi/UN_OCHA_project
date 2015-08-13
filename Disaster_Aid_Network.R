@@ -933,7 +933,11 @@ histP1(au,
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
 for (k in 1:length(au)){
-  V(av)$color[k] <- rev(heat.colors(1+max(as.integer(au))))[1+as.integer(au[k])]
+  if (k>length(ag)){
+    V(av)$color[k] <- rev(heat.colors(1+max(as.integer(au))))[1+as.integer(au[k])]
+  } else {
+    V(av)$color[k] <- "green"
+  }
 }
 
 plot(av,
@@ -950,13 +954,13 @@ plot(av,
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Network Authority Score")
 legend("topleft",
        c("Highest Authority Score","Lowest Authority Score"),
        fill = c("red","White"),
        bty = "n")
 
-
+# PLOT THE AUTHORITY SCORE HEAT MAP OF THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
     V(av)$size[k] <- 3
@@ -967,7 +971,6 @@ for (k in 1:dim(aid_m)[1]){
 }
 av_coords <- koords2[which(all %in% V(av)$name),]
 
-# PLOT THE HEAT MAP OF THE Agency-VDC Aid NETWORK
 plot(av,
      layout = av_coords,
      vertex.color = V(av)$color,
@@ -980,57 +983,11 @@ plot(av,
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
+     main = "Weighted Agency-VDC Aid Geo-Network Authority Scores")
 legend("topright",
        c("Highest Authority Score","Lowest Authority Score"),
        fill = c("red","White"),
        bty = "n")
-
-
-# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
-# for (k in 1:length(hb)){
-#   V(av)$color[k] <- rev(heat.colors(1+as.integer(max(hb))))[as.integer(hb[k])+1]
-# }
-# av_coords <- koords[which(vdc %in% V(av)$name),]
-# plot(av,
-#      layout = layout.fruchterman.reingold(av, 
-#                                           niter = 200, 
-#                                           area = 2000*vcount(av)),
-#      vertex.color = V(av)$color,
-#      vertex.size = 9,
-#      vertex.label = V(av)$name, 
-#      vertex.label.color = "black",
-#      vertex.label.font = 1, 
-#      vertex.label.cex = 0.85, 
-#      edge.width = 0.2*sqrt(E(av)$weight),
-#      edge.arrow.size = 0.5,
-#      edge.curved = TRUE,
-#      edge.color = gray.colors(1),
-#      main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
-# legend("topleft",
-#        c("Highest Hub Score","Lowest Hub Score"),
-#        fill = c("red","White"),
-#        bty = "n")
-# plot(av,
-#      layout = av_coords,
-#      vertex.color = V(av)$color,
-#      vertex.size = 4,
-#      vertex.label = NA, 
-#      vertex.label.color = "black",
-#      vertex.label.font = 1, 
-#      vertex.label.cex = 0.75, 
-#      edge.width = 0.2*sqrt(E(av)$weight),
-#      edge.arrow.size = 0.5,
-#      edge.curved = TRUE,
-#      edge.color = gray.colors(1),
-#      main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
-# legend("topright",
-#        c("Highest Hub Score","Lowest Hub Score"),
-#        fill = c("red","White"),
-#        bty = "n")
-#
-#
-
 
 
 #
@@ -1043,6 +1000,133 @@ legend("topright",
 # BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
 #
 #
+#
+
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 4
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- NA}
+}
+hb <- hub.score(graph = av,
+                      weights = E(av)$weight)$vector
+hb <- 100*sqrt(hb)
+plot(sort(hb, decreasing = TRUE),
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index", 
+     ylab = "Hub Score", 
+     main = "Sorted Agency-VDC Aid Network Hub Score Values", 
+     pch = 19)
+histP1(hb,
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Hub Score Values",
+       main = "Agency-VDC Aid Network Hub Score Distribution")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
+for (k in 1:length(hb)){
+  if (k<length(ag)+1){
+    V(av)$color[k] <- rev(heat.colors(1+max(as.integer(hb))))[1+as.integer(hb[k])]
+  } else {
+    V(av)$color[k] <- "SkyBlue2"
+  }
+}
+
+plot(av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency-VDC Aid Network Hub Score")
+legend("topleft",
+       c("Highest Hub Score","Lowest Hub Score"),
+       fill = c("red","White"),
+       bty = "n")
+
+# PLOT THE HUB SCORE HEAT MAP OF THE AGENCY-VDC AID NETWORK
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 5
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- all[k]}
+}
+hb_coords <- koords2[which(all %in% V(av)$name),]
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 5
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 1
+    V(av)$name[k] <- NA}
+}
+plot(av,
+     layout = hb_coords,
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "darkgreen",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency-VDC Aid Geo-Network Hub Scores")
+legend("topright",
+       c("Highest Hub Score","Lowest Hub Score"),
+       fill = c("red","White"),
+       bty = "n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 av <- graph.adjacency(dtm,
                       mode = "directed",
@@ -1121,6 +1205,27 @@ legend("topright",
        c("Highest Hub Score","Lowest Hub Score"),
        fill = c("red","White"),
        bty = "n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #
