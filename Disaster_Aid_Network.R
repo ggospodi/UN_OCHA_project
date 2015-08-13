@@ -743,25 +743,7 @@ legend("topright",
 #
 #
 
-
-
-
-
-
-
-
-# EDIT LABELS
-
-
-
-
-
-
-
-
-
-
-# DEFINE THE AGENCY-VDC AID GRAPH
+# DEFINE THE AGENCY-VDC AID NETWORK
 av <- graph.adjacency(aid_m,
                       mode = "directed",
                       weighted = TRUE)
@@ -838,7 +820,7 @@ text(300,150, paste("   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
      font = 2)
 
 
-# THE DEGREE DISTRIBUTION (VDC-VDC CONNECTIONS)
+# THE DEGREE DISTRIBUTION (AGENCY-VDC CONNECTIONS)
 deg1 <- hist(degree(av,mode = "in"), breaks = 20)$counts
 deg1n <- 100*deg1/sum(deg1)
 deg2 <- hist(degree(av,mode = "out"), breaks = 20)$counts
@@ -849,9 +831,9 @@ d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
 ddata <- cbind(d1,d2)
 barplot(t(ddata), 
         beside = T, 
-        xlab = "Number of VDC-VDC Connection", 
-        ylab = "Relative VDC-VDC Conneciton %", 
-        main = "Distribution of VDC Transitions To and From a Given VDC",
+        xlab = "Number of Agency/VDC Connections for a VDC/Agency", 
+        ylab = "Relative Agency/VDC Connection Percentages", 
+        main = "Distribution of Relative Agency/VDC Connections",
         col = c("green","SkyBlue2"))
 axis(1, 
      at = 4*(1:maxn)-2,
@@ -859,13 +841,13 @@ axis(1,
      cex.axis = 1,
      las = 1)
 legend("topright",
-       legend = c("VDC In-Transitions", "VDC Out-Transitions"),
+       legend = c("Number of VDCs per Agency", "Number of Agencies per VDC"),
        col = c("green","SkyBlue2"), 
        bty = "n",pch = 15, 
        cex = 1.5)
 
 
-# PLOT THE WEIGHTED NUMBER OF DISTINCT VDC-VDC CONNECTIONS
+# THE WEIGHTED DEGREE DISTRIBUTION (AGENCY-VDC CONNECTIONS)
 plot(sort(graph.strength(av,mode = "in")),
      col = "green",
      pch = 19,
@@ -876,11 +858,11 @@ par(new=T)
 plot(sort(graph.strength(av,mode = "out")),
      col = "SkyBlue2",
      pch = 19,
-     xlab = "VDC Index",
-     ylab = "Weighted Number of VDC Transitions",
-     main = "Weighted Number of VDC Transitions To and From a Given VDC (Sorted)")
+     xlab = "Weighted Agency/VDC Index",
+     ylab = "Weighted Agency/VDC Degree",
+     main = "Weighted Number of Agency/VDC Connections (Sorted)")
 legend("topleft",
-       c("Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       c("Weighted Number of VDCs per Agency", "Weighted Number of Agencies per VDC"),
        fill = c("green","SkyBlue2"),
        bty = "n")
 
@@ -896,9 +878,9 @@ d2 <- append(deg2n,rep(0,maxn-length(deg2n)))
 wddata <- cbind(d1,d2)
 barplot(t(wddata), 
         beside = T, 
-        xlab = "Weighted Number of VDC-VDC Connection", 
-        ylab = "Weighted Relative VDC-VDC Conneciton %", 
-        main = "Distribution of Weighted VDC Transitions To and From a Given VDC",
+        xlab = "Weighted Number of Agency/VDC Connections for a VDC/Agency",
+        ylab = "Weighted Relative Agency/VDC Connection Percentages",
+        main = "Distribution of Weighted Relative Agency/VDC Connections",
         col = c("green","SkyBlue2"))
 axis(1, 
      at = 4*(1:maxn)-2,
@@ -906,119 +888,10 @@ axis(1,
      cex.axis = 1,
      las = 1)
 legend("topright",
-       legend = c("Weighted VDC In-Transitions", "Weighted VDC Out-Transitions"),
+       legend = c("Weighted Number of VDCs per Agency", "Weighted Number of Agencies per VDC"),
        col = c("green","SkyBlue2"), 
        bty = "n",pch = 15, 
        cex = 1.5)
-
-
-#
-#
-#
-#
-#
-#
-#
-# CENTRALITY ANALYSIS OF THE NETWORK
-#
-#
-#
-#
-#
-#
-#
-
-#
-#
-#
-# EIGENVECTOR CENTRALITY: THIS IS A MEASURE OF THE INFLUENCE OF A NODE IN A NETWORK.
-# IT ASSIGNS RELATIVE SCORES TO ALL NODES BASED ON THE CONCEPT THAT CONNECTIONS
-# TO HIGH-SCORING NODES CONTRIBUTE MORE TO THE SCORE OF A GIVEN NODE THAN CONNECTIONS
-# TO LOW-SCORING NODES. A VARIANT OF EIGNEVECTOR CENTRALITY IS GOOGLE'S PAGERANK.
-#
-#
-# NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
-# BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
-#
-#
-
-av <- graph.adjacency(dtm,
-                      mode = "directed",
-                      weighted = TRUE)
-V(av)$color <- rep("SkyBlue2",length(vdc))
-for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc == vdc[k]))
-  d_count <- length(which(dt_data$vdc == vdc[k]))
-  if(o_count>d_count){
-    V(av)$color[k] <- "green"
-  } 
-}
-V(av)$name <- vdc
-av <- drop_isolated(graph = av,
-                    vertex_colors = V(av)$color,
-                    vertex_names = V(av)$name)
-av <- drop_loops(graph = av,
-                 vertex_colors = V(av)$color,
-                 vertex_names = V(av)$name)
-ec <- evcent(av)$vector
-ec <- 10*ec
-plot(sort(ec, decreasing = TRUE),
-     col = adjustcolor(rgb(1,0,1,1)), 
-     xlab = "Node Index", 
-     ylab = "Eigenvector Centrality", 
-     main = "Sorted VDC Network Eigenvector Centrality Values", 
-     pch = 19)
-histP2(ec,
-       breaks = 50,
-       col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Eigenvector Centrality Values",
-       main = "VDC Network Eigenvector Centrality Distribution")
-
-
-# PLOT HEAT MAP ON VERTICES ACCORDING TO EIGENVECTOR CENTRALITY
-for (k in 1:length(ec)){
-  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(ec))))[as.integer(ec[k])+1]
-}
-av_coords <- koords[which(vdc %in% V(av)$name),]
-plot(av,
-     layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
-     vertex.color = V(av)$color,
-     vertex.size = 9,
-     vertex.label = V(av)$name, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
-legend("topleft",
-       c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
-       fill = c("red","White"),
-       bty = "n")
-
-# PLOT THE HEAT MAP OF THE Agency-VDC Aid NETWORK
-plot(av,
-     layout = av_coords,
-     vertex.color = V(av)$color,
-     vertex.size = 4,
-     vertex.label = NA, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.75, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
-legend("topright",
-       c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
-       fill = c("red","White"),
-       bty = "n")
 
 #
 #

@@ -3642,145 +3642,122 @@ lines(abline(coef=coef(fitn), col="red"),xlim=range(0:length(dn)),ylim=range(0:m
 
 
 
+# TO USE HERE FOR EACH PROJECTION:
 
 
-SECTION 2: Nepal Displacement Tracking Network Analytics Examples.
-library("igraph")
-library("stats")
-# We define all the graphs that we will be using in this research.
-g100<-graph.adjacency(edgem[1:100,1:100],mode="undirected",weighted=TRUE)
-g200<-graph.adjacency(edgem[1:200,1:200],mode="undirected",weighted=TRUE)
-g201<-graph.adjacency(edges[1:200,1:200],mode="undirected")
-g400<-graph.adjacency(edgem[1:400,1:400],mode="undirected",weighted=TRUE)
-g401<-graph.adjacency(edges[1:400,1:400],mode="undirected")
-g1000<-graph.adjacency(edgem[1:1000,1:1000],mode="undirected",weighted=TRUE)
-g1001<-graph.adjacency(edges[1:1000,1:1000],mode="undirected")
-g2000<-graph.adjacency(edgem[1:2000,1:2000],mode="undirected",weighted=TRUE)
-g2001<-graph.adjacency(edges[1:2000,1:2000],mode="undirected")
-g<-graph.adjacency(edgem,mode="undirected",weighted=TRUE)
-g1<-graph.adjacency(edges,mode="undirected")
-#We next plot the examples of store networks for stores 1-100 and 1-200. Note that since many stores are not presented, there are many edges missing.")
-plot(g100, layout=layout.fruchterman.reingold,vertex.size=8, edge.color="black", edge.width=E(g100)$weight,vertex.label.cex=0.8,main="Store Network for g100",vertex.label=ids[1:100])
-plot(g200, layout=layout.fruchterman.reingold,vertex.size=5, edge.color="black", edge.width=E(g200)$weight,vertex.label.cex=0.3,main="Store Network for g200",vertex.label=ids[1:200])
 
 
-SECTION 3: Nepal Displacement Tracking Network Analytics for the Complete Store Network
 
-#Now we will show a few basic properties of the Wal Mart Store Trade Area network. We will use various sub-networks (g200, g400, g1000, g2000) to visualize some of the results.")
-plot(g, layout=layout.fruchterman.reingold,vertex.label=NA,vertex.size=2,main="Wal Mart Store Network",vertex.label=ids)
 
-NUMBER OF NODES: This is the number of stores (nodes) in this network.
+#
+#
+#
+#
+#
+#
+#
+# CENTRALITY ANALYSIS OF THE NETWORK
+#
+#
+#
+#
+#
+#
+#
 
-length(V(g))
-NUMBER OF EDGES: This is the number of store-to-store connections in this network. Each connection between stores indicates shared trade areas between the stores.
-length(E(g))
+#
+#
+#
+# EIGENVECTOR CENTRALITY: THIS IS A MEASURE OF THE INFLUENCE OF A NODE IN A NETWORK.
+# IT ASSIGNS RELATIVE SCORES TO ALL NODES BASED ON THE CONCEPT THAT CONNECTIONS
+# TO HIGH-SCORING NODES CONTRIBUTE MORE TO THE SCORE OF A GIVEN NODE THAN CONNECTIONS
+# TO LOW-SCORING NODES. A VARIANT OF EIGNEVECTOR CENTRALITY IS GOOGLE'S PAGERANK.
+#
+#
+# NOTE: THIS IS LIKELY NOT THE RIGHT TOOL TO APPLY HERE aT THE VDC LEVEL
+# BUT IF WE OBTAIN MORE GRANUALR DATA, WE WILL BE ABLE TO USE IT
+#
+#
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- all[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- all[k]}
+}
+av <- drop_isolated(graph = av,
+                    vertex_colors = V(av)$color,
+                    vertex_names = V(av)$name)
+av <- drop_loops(graph = av,
+                 vertex_colors = V(av)$color,
+                 vertex_names = V(av)$name)
+ec <- evcent(av,
+             directed = TRUE,
+             weights = E(av)$weight)$vector
+ec <- 10*ec
+plot(sort(ec, decreasing = TRUE),
+     col = adjustcolor(rgb(1,0,1,1)), 
+     xlab = "Node Index", 
+     ylab = "Eigenvector Centrality", 
+     main = "Sorted VDC Network Eigenvector Centrality Values", 
+     pch = 19)
+histP2(ec,
+       breaks = 50,
+       col = adjustcolor(rgb(1,0,1,1)),
+       xlab = "Eigenvector Centrality Values",
+       main = "VDC Network Eigenvector Centrality Distribution")
 
-GRAPH DENSITY: This is a measure of the density of edges on the graph (Number of edges/Number of possible edges) in this network.
-graph.density(g)
 
-DEGREE OF A NODE: This shows the number of connections to the node. That is, the number of different stores that a store shares trade areas with. In further analysis, we will take into account the different stores' percent sales that come from a shared trade area. 
-summary(degree(g))
-NUMBER OF CONNECTED COMPONENTS: The number of connected components or "islands" or "clusters"
-clusters(g)$no
-sort(clusters(g)$csize,decreasing=TRUE)[1:80]
-GIANT CONNECTED COMPONENT: The largest cluster or island in the network.
-#Notice the giant connected component (cluster) of about 3500 stores. This is subject of investigation: when did it arise, what is the store demographic distribution within it, how are stores clustered within it (clique anlaysis).") 
-sort(clusters(g)$csize, decreasing=TRUE)[1]
-#The giant connected component as a percentage:")
-(sort(clusters(g)$csize, decreasing=TRUE)[1])/vcount(g)
-NUMBER OF ISOLATED NODES:
-sum(degree(g)==0)
-#Number of isolated nodes as a percentage:")
-(sum(degree(g)==0))/vcount(g)
-GLOBAL CLUSTERING COEFFICIENT: This is a measure of the clustering of the network (Number of of triangles of closed triplets/ Number of total triples (both open and closed)), it is also called the transitivity measure. For weighted networks like ours, there are more than four refinements of this measure, and we will choose each depending on the question we are looking to answer in subsequent reports. For now, we compute the generic one (ignoring weights):
-transitivity(g)
-#For comparison, transitivity of a random graph of the same size:")
-ge<-erdos.renyi.game(vcount(g),ecount(g),type="gnm")
-transitivity(ge)
-EXAMPLES OF CLUSTERING: g200, g400, g2000
-sort(clusters(g201)$csize,decreasing=TRUE)
-strongclusters<-clusters(g200)$membership
-plot(g200,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=4, edge.color="black", edge.width=E(g200)$weight,vertex.label=NA,main="Clustering for Store Network g200")
-sort(clusters(g400)$csize,decreasing=TRUE)
-strongclusters<-clusters(g400)$membership
-plot(g400,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=2, edge.color="black", edge.width=E(g400)$weight,vertex.label=NA,main="Clustering for Store Network g400")
-sort(clusters(g2001)$csize, decreasing=TRUE)[1:90]
-strongclusters<-clusters(g2001)$membership
-plot(g2001,vertex.color=strongclusters, layout=layout.fruchterman.reingold,vertex.size=2, vertex.label=NA, edge.color="black",main="Clustering for Store Network g2000")
-EDGE-CONNECTIVITY: This is a measure of whether the network is connected or not. Here, the value is 0 since the network is disconnected.
-edge.connectivity(g)
-DIAMETER OF THE NETWORK: The longest path (among all connected components). We will use the unweighted graph first so that we can count the longest unweighted path in an intuitive way. For the weighted graph, we will consider a path as the weighted sum of paths. For the definition of a weigthed path, we take the sum of the weights of each of the edges along the path. We illustrate the diameters of g400 and g2000 as examples.
-#We compute the diameter of the complete network first.")
-diameter(g1)
-#Now we illustrate the examples for g400 and g200.")
-d<-get.diameter(g401)
-E(g401)$color<-"black"
-E(g401)$width<-1
-E(g401,path=d)$color<-"red"
-E(g401,path=d)$width<-2
-V(g401)$label.color<-"blue"
-V(g401)$color<-"SkyBlue2"
-V(g401)[d]$label.color<-"black"
-V(g401)[d]$color<-"red"
-plot(g401,layout=layout.fruchterman.reingold,vertex.label.dist=0,vertex.size=5,vertex.label.cex=0.4, main="Diameter for the Largest Connected Component of g400 (unweighted)",vertex.label=ids[1:400])
-d<-get.diameter(g2001)
-E(g2001)$color<-"black"
-E(g2001,path=d)$color<-"red"
-E(g2001,path=d)$width<-2
-V(g2001)$color<-"SkyBlue2"
-V(g2001)[d]$color<-"red"
-plot(g2001,layout=layout.fruchterman.reingold,vertex.label=NA,vertex.size=2, main="Diameter for the Largest Connected Component of g2000")
-DEGREE DISTRIBUTION: This studies the distribution of node connections across the network.The functionality in igraph has a degree distribution function which gives cumulative normalized degree distribution, but we will use the absolute degree distribution frequence definition (count how many times a certain node degree occurs.) 
-degree.distribution(g)
-# We illustrate the degree distribution of the subgraphs of g200 and g400 for comparison.
-par(mfrow=c(1,2))
-hist(degree(g201), breaks=60, col=adjustcolor(rgb(1,0,1,1)), xlab="Node Degree", main="Node Degree Distribution Histogram for g200")
-# Just for comparison, we will compute the degree distribution of g400.
-hist(degree(g401), breaks=100, col=adjustcolor(rgb(1,0,1,1)), xlab="Node Degree", main="Node Degree Distribution Histogram for g400")
-#Note that the plots are rescaled, so in g400, we have more than twice as many nodes with degree 1 or 2, for example. The main point to note is the similar shape of the degree distribution. This is a property of networks (real-life networks) which is known as scale-free, that is, we notice similar network structure at different scales.")
-#Typically, the degree distributions are compared in a semi-log graph, because resutls from complex network science show certian networks have exponential degree distribution (and ours is one of them).")
-d21<-hist(degree(g201))$counts
-d22<-d21[which(!d21==0)]
-d200<-cbind.data.frame(as.vector(1:length(d22)),log(d22))
-colnames(d200)<-c("x","y")
-fit2<-lm(y~x, data=d200)
-d41<-hist(degree(g401))$counts
-d42<-d41[which(!d41==0)]
-d400<-cbind.data.frame(as.vector(1:length(d42)),log(d42))
-colnames(d400)<-c("x","y")
-fit4<-lm(y~x, data=d400)
-#Notice that the slopes (the exponent of the degree distribution) are very close in value (compare with the slope of the degree distribution of the whole network below).")
-par(mfrow=c(1,2))
-plot(d200$x,d200$y,xlab="Degree", ylab="Log[Degree Frequency]", pch=16, main="Semi-Log Degree Distribution with a Linear Fit for g200")
-lines(abline(coef=coef(fit2), col="red"),xlim=range(0:length(d22)),ylim=range(0:max(log(d22))))
-legend(5.5,4.25,legend=rbind(c("Intercept:","Slope:"),coef(fit2)))
-plot(d400$x,d400$y,xlab="Degree", ylab="Log[Degree Frequency]", pch=16, main="Semi-Log Degree Distribution with a Linear Fit for g400")
-lines(abline(coef=coef(fit4), col="red"),xlim=range(0:length(d42)),ylim=range(0:max(log(d42))))
-legend(6,4.5,legend=rbind(c("Intercept:","Slope:"),coef(fit4)))
-#For the degree distribution analysis of the complete network, we use the unweighted version, for simplicity. When the weights are taken into consideration, degree is a weighted sum of all connections, each one weighted by its, well, weight. In some cases, we normalize all weights, and that makes some of the figures difficult to interpret. That is why, for simplicity, we will just cound the connections, and use that as the definition of a degree.")
-d1<-hist(degree(g1))$counts
-d2<-d1[which(!d1==0)]
-dg<-cbind.data.frame(1:length(d2),log(d2))
-colnames(dg)<-c("x","y")
-fit<-lm(y~x, data=dg)
-par(mfrow=c(1,2))
-hist(degree(g), breaks=400, col=adjustcolor(rgb(1,0,1,1)), xlab="Node Degree", main="Node Degree Distribution for the Unweighted Store Network")
-plot(dg$x,dg$y,xlab="Degree", ylab="Log[Degree Frequency]", pch=16, main="Degree Distribution for g")
-lines(abline(coef=coef(fit), col="red"),xlim=range(0:length(d2)),ylim=range(0:max(log(d2))))
-legend(8,7.5,legend=rbind(c("Intercept:","Slope:"),coef(fit)))
-MINIMUM WEIGHT SPANNING TREE: This is the minimum number of edges that we can keep so that connected components are preserved, vertices are preserved, and the weight is minimized. This can be useful in order to show us the most essential shared trade areas and their adjacent stores. We observe that most of the edges are needed in order to preserve the connectivity of the graph. The real power of this tool comes in when we have higher connectivity and essential features (the "spine of the graph") need to be detected. We will use g400 and g1000 to illustrate the concept.
-E(g401)$id<-seq_len(ecount(g401))
-mst<-minimum.spanning.tree(g401)
-E(g401)$color<-"black"
-E(g401)$width<-1
-E(g401)$color[E(mst)$id]<-"red"
-E(g401)$width[E(mst)$id]<-1
-V(g401)$color<-"SkyBlue2"
-plot(g401,layout=layout.fruchterman.reingold,vertex.label=NA,vertex.size=2,main="Minimum Spanning Tree for the Largest Connected Component of g400")
-#We compute the minimum weight spanning tree for g1000.")
-E(g1001)$id<-seq_len(ecount(g1001))
-mst<-minimum.spanning.tree(g1001)
-E(g1001)$color<-"black"
-E(g1001)$color[E(mst)$id]<-"red"
-V(g1001)$color<-"SkyBlue2"
-plot(g1001,layout=layout.fruchterman.reingold,vertex.label=NA,vertex.size=2,main="Minimum Spanning Tree for the Largest Connected Component of the Network g1000")
+# PLOT HEAT MAP ON VERTICES ACCORDING TO EIGENVECTOR CENTRALITY
+for (k in 1:length(ec)){
+  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(ec))))[as.integer(ec[k])+1]
+}
+av_coords <- koords[which(vd %in% V(av)$name),]
+plot(av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200, 
+                                          area = 2000*vcount(av)),
+     vertex.color = V(av)$color,
+     vertex.size = 9,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
+legend("topleft",
+       c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
+       fill = c("red","White"),
+       bty = "n")
+
+# PLOT THE HEAT MAP OF THE AGENCY-VDC AID NETWORK
+plot(av,
+     layout = av_coords,
+     vertex.color = V(av)$color,
+     vertex.size = 4,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.5,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
+legend("topright",
+       c("Highest Eigenvector Centrality","Lowest Eigenvector Centrality"),
+       fill = c("red","White"),
+       bty = "n")
