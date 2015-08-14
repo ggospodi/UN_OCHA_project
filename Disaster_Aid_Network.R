@@ -1036,7 +1036,7 @@ histP1(hb,
        main = "Agency-VDC Aid Network Hub Score Distribution")
 
 
-# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
+# PLOT HEAT MAP ON VERTICES ACCORDING TO HUB SCORE
 for (k in 1:length(hb)){
   if (k<length(ag)+1){
     V(av)$color[k] <- rev(heat.colors(1+max(as.integer(hb))))[1+as.integer(hb[k])]
@@ -1103,135 +1103,9 @@ legend("topright",
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-av <- graph.adjacency(dtm,
-                      mode = "directed",
-                      weighted = TRUE)
-V(av)$color <- rep("SkyBlue2",length(vdc))
-for (k in 1:length(vdc)){
-  o_count <- length(which(dt_data$idp_origin_vdc == vdc[k]))+
-    length(which(dt_data$idp2_origin_vdc == vdc[k]))
-  d_count <- length(which(dt_data$vdc == vdc[k]))
-  if(o_count>d_count){
-    V(av)$color[k] <- "green"
-  } 
-}
-V(av)$name <- vdc
-av <- drop_isolated(graph = av,
-                    vertex_colors = V(av)$color,
-                    vertex_names = V(av)$name)
-av <- drop_loops(graph = av,
-                 vertex_colors = V(av)$color,
-                 vertex_names = V(av)$name)
-hb <- hub.score(av)$vector
-hb <- 100*hb
-plot(sort(hb, decreasing = TRUE),
-     col = adjustcolor(rgb(1,0,1,1)), 
-     xlab = "Node Index", 
-     ylab = "Eigenvector Centrality", 
-     main = "Sorted VDC Network Hub Score Values", 
-     pch = 19)
-histP2(hb,
-       breaks = 50,
-       col = adjustcolor(rgb(1,0,1,1)),
-       xlab = "Hub Score Values",
-       main = "VDC Network Hub Score Distribution")
-
-
-# PLOT HEAT MAP ON VERTICES ACCORDING TO AUTHORITY SCORE
-for (k in 1:length(hb)){
-  V(av)$color[k] <- rev(heat.colors(1+as.integer(max(hb))))[as.integer(hb[k])+1]
-}
-av_coords <- koords[which(vdc %in% V(av)$name),]
-plot(av,
-     layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
-     vertex.color = V(av)$color,
-     vertex.size = 9,
-     vertex.label = V(av)$name, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Network Flow (VDC Level)")
-legend("topleft",
-       c("Highest Hub Score","Lowest Hub Score"),
-       fill = c("red","White"),
-       bty = "n")
-
-# PLOT THE HUB SCORES OF THE Agency-VDC Aid NETWORK
-plot(av,
-     layout = av_coords,
-     vertex.color = V(av)$color,
-     vertex.size = 4,
-     vertex.label = NA, 
-     vertex.label.color = "black",
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.75, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.5,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Geo-Network Flow (VDC Level)")
-legend("topright",
-       c("Highest Hub Score","Lowest Hub Score"),
-       fill = c("red","White"),
-       bty = "n")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #
 #
-# COMMUNITY STRUCTURES FOR THE DISPLACEMENT NETWORK
+# COMMUNITY STRUCTURES FOR THE AGENCY-VDC AID NETWORK
 #
 #
 
@@ -1317,10 +1191,12 @@ cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.90)
 av_f <- filter(cutoff = cut90,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all)
+               vertex_names = all,
+               vertex_size = V(av)$size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av)$size)
 
 # DEFINE THE SPINGLASS COMMUNITY STRUCTURE
 sp_f_c <- spinglass.community(graph = av_f_c,
