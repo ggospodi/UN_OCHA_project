@@ -1,40 +1,36 @@
 # Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
 # author: Georgi D. Gospodinov
-# date: "July 21, 2015"
+# date: "Augist 14, 2015"
 # 
 # Data Sources:
 #
-# Tables: CCCM_Nepal_DTM_R2.csv
-# agency_relief.csv
-# centroids.csv
+# https://data.hdx.rwlabs.org/dataset/scnepal-agency-data
+# master_hlcit.csv
 # 
-# This report contains the initial displacement tracking network model construction and some analytics.
+# Relevant materials and data can be found at:
 # 
-# 1. NEPAL DISPLACEMENT TRACKING NETWORK CONSTRUCTION AND ANALYSIS
-# 2. Nepal Disaster Relief Distribution Network Construction and Analysis
-# 3. Nepal Disaster Agency Network Construction and Analysis
-# 4. Severity Index Correlation With Disaster Agency NEtwork. 
-# 
-# 
-# Definition of the Nepal Displacement Tracking Network: 
-#   
-# NOTE: This report is intended to only demonstrate the construction of the networks and some of the analytical tools. 
-# In subsequent reports, we will develop the analytics further and address the actionable advances that this apporach offers.
+# https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
 #
+# in the folder /Displacement Network Model/
 #
+# 
 #
 # LOAD PACKAGES
 library(plyr)
 library(dplyr)
 library(igraph)
 library(RColorBrewer)
-
+#
+#
+#
 # SET FILE SOURCE PATH
 DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
-
+#
+#
 # DEFINE FUNCTIONS
-
-
+#
+#
+#
 # FUNCTION TO DISPLAY RELATIVE PERCENTAGES FOR HSITOGRAM COLUMNS
 histP <- function(x,breaks, ...) {
   H <- hist(x, plot = FALSE, breaks=breaks)
@@ -77,7 +73,9 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 # FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF A VARIABLE
 rm_space <- function(df,col_name){
   level_names <- unique(levels(df[,which(names(df) %in% col_name)]))
-  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], from=level_names,to=gsub("[[:space:]]","",level_names))
+  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], 
+                                                   from = level_names,
+                                                   to = gsub("[[:space:]]","",level_names))
   return(df)
 }
 
@@ -111,7 +109,7 @@ drop_loops <- function(graph, vertex_colors, vertex_names){
 
 
 # DEFINE EDGE-FILTRATION FUNCTION FOR THE NETWORKS
-filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
+filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names, vertex_size) {
   
   # get the definitions
   cut <- cutoff
@@ -128,6 +126,7 @@ filter <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   v_g_f <- setdiff(V(g),V(g)[degree(g)==0])
   V(g_f)$name <- vertex_names[v_g_f]
   V(g_f)$color <- vertex_colors[v_g_f]
+  V(g_f)$size <- vertex_size[v_g_f]
   
   return(g_f)
 }
@@ -162,13 +161,14 @@ filter_deg <- function(cutoff,edge_matrix,vertex_colors,vertex_names) {
   # color the filtered graph with sources and endpoints for the directed edges
   V(g_f)$color <- V(g)$colors[v_g_f]
   
+  
   return(g_f)
 }
 
 # DEFINE WEIGHTED DEGREE FILTRATION USING graph.strength
 
 # DEFINE A FILTRATION OF GRAPH TO DISPLAY LARGEST CLUSTER (GIANT COMPONENT)
-giant_comp <- function(graph, vertex_colors, vertex_names){
+giant_comp <- function(graph, vertex_colors, vertex_names, vertex_size){
   
   # get the definitions
   g <- graph
@@ -186,13 +186,15 @@ giant_comp <- function(graph, vertex_colors, vertex_names){
   
   # color the filtered graph with sources and endpoints for the directed edges
   V(g_f)$color <- vertex_colors[v_g_f]
+  V(g_f)$size <- vertex_size[v_g_f]
   
   return(g_f)
 }
 
-# LOAD HLCIT CODES
-hlcit <- read.csv(paste0(DIR,"hlcit_codes.csv"))
-colnames(hlcit) <- c("vname","hlcit_code","vdc_name")
+
+# LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
+hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
+colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
 hlcit$hlcit_code <- as.factor(hlcit$hlcit_code)
 hlcit$vname <- as.character(hlcit$vname)
 hlcit$vdc_name <- as.character(hlcit$vdc_name)
@@ -200,18 +202,8 @@ hlcit <- rm_space(hlcit,"hlcit_code")
 hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
 
 
-# LOAD LAT/LON COORDINATES (OF CENTROIDS FOR AGENCY RELIEF) 
-# AND LHCIT CODES 
-
-coords_all <- read.csv(paste0(DIR,"agency_relief_vdc_coords.csv"))
-coords <- coords_all[,c("X","Y","VDC_NAME", "HLCIT_CODE","Implementi","Sourcing.A")]
-colnames(coords) <- c("lon","lat","vdc","hlcit","impl_agency","src_agency")
-coords$vdc <- as.character(coords$vdc)
-coords <- rm_space(coords,"hlcit")
-coords$hlcit <- as.numeric(levels(coords$hlcit))[coords$hlcit]
-
-
-
+# COLUMN NAMES FOR agency_relief.csv ARE:
+aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
 
 
 

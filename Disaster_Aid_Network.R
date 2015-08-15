@@ -1,4 +1,4 @@
-# Nepal Disaster Relief Distribution and Displacement Tracking Network Analysis
+# Nepal Disaster Aid Distribution Network Analysis
 # author: Georgi D. Gospodinov
 # date: "Augist 11, 2015"
 # 
