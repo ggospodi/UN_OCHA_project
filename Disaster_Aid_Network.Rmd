@@ -1,19 +1,24 @@
-# Nepal Disaster Aid Distribution Network Analysis
-# author: Georgi D. Gospodinov
-# date: "Augist 15, 2015"
-# 
-# Data Sources:
-#
-# https://data.hdx.rwlabs.org/dataset/scnepal-agency-data
-# master_hlcit.csv
-# 
-# Relevant materials and data can be found at:
-# 
-# https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
-#
-# in the folder /Displacement Network Model/
-#
-# 
+---
+title: "Disaster_Aid_Network"
+author: "Georgi D. Gospodinov"
+date: "August 16, 2015"
+output: html_document
+---
+
+Data Sources:
+
+https://data.hdx.rwlabs.org/dataset/scnepal-agency-data
+master_hlcit.csv
+ 
+Relevant materials and data can be found at:
+ 
+https://www.dropbox.com/sh/tb9854hzcof7x23/AACEDTGk8EmYQ6r4ukSFLBspa?dl = 0
+
+in the folder /Displacement Network Model/
+
+
+```{r,echo=TRUE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=10, dpi=100,out.width='1200px',out.height='1000px'}
+
 #
 # LOAD PACKAGES
 library(plyr)
@@ -1368,7 +1373,7 @@ av_f <- filter(cutoff = cut70,
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
                      vertex_names = V(av_f)$name,
-                     vertex_size = V(av_f)$size)
+                     vertex_size = vertex_size = V(av_f)$size)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1438,12 +1443,10 @@ cut80 <- quantile(as.vector(aid_m[aid_m>0]),0.80)
 av_f <- filter(cutoff = cut80,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all,
-               vertex_size = V(av)$size)
+               vertex_names = all)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name,
-                     vertex_size = V(av_f)$size)
+                     vertex_names = V(av_f)$name)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1514,11 +1517,10 @@ av_f <- filter(cutoff = cut90,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
                vertex_names = all,
-               vertex_size = V(av)$size)
+               vetex_size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name,
-                     vertex_size = V(av_f)$size)
+                     vertex_names = V(av_f)$name)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1588,12 +1590,10 @@ cut93 <- quantile(as.vector(aid_m[aid_m>0]),0.93)
 av_f <- filter(cutoff = cut93,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all,
-               vertex_size = V(av)$size)
+               vertex_names = all)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name,
-                     vertex_size = V(av_f)$size)
+                     vertex_names = V(av_f)$name)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1671,3 +1671,6 @@ histP1(wk$membership,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "Walktrap Community Values",
        main = "Walktrap Community Size Distribution for Nepal Agency-VDC Aid Network")
+
+
+```
