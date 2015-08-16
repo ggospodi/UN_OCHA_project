@@ -493,7 +493,7 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
@@ -575,7 +575,7 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$size[k] <- 4
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 cut85 <- quantile(as.vector(aid_m[aid_m>0]),0.85)
@@ -1139,10 +1139,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX SIZES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 
@@ -1237,10 +1237,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX NAMES, SIZES, COORDINATES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- all[k]}
 }
 
@@ -1310,10 +1310,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX SIZES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 
@@ -1407,10 +1407,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX NAMES, SIZES, COORDINATES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- all[k]}
 }
 
@@ -1482,10 +1482,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX NAMES, SIZES, COORDINATES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- all[k]}
 }
 
@@ -1557,10 +1557,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX NAMES, SIZES, COORDINATES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- all[k]}
 }
 
@@ -1632,10 +1632,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX NAMES, SIZES, COORDINATES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- all[k]}
 }
 
