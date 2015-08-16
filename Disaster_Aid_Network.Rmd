@@ -1144,10 +1144,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX SIZES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 
@@ -1202,7 +1202,7 @@ av_f <- filter(cutoff = cut90,
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
                      vertex_names = V(av_f)$name,
-                     vertex_size = V(av)$size)
+                     vertex_size = V(av_f)$size)
 
 # DEFINE THE SPINGLASS COMMUNITY STRUCTURE
 sp_f_c <- spinglass.community(graph = av_f_c,
@@ -1373,7 +1373,7 @@ av_f <- filter(cutoff = cut70,
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
                      vertex_names = V(av_f)$name,
-                     vertex_size = vertex_size = V(av_f)$size)
+                     vertex_size = V(av_f)$size)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1443,10 +1443,12 @@ cut80 <- quantile(as.vector(aid_m[aid_m>0]),0.80)
 av_f <- filter(cutoff = cut80,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all)
+               vertex_names = all,
+               vertex_size = V(av)$size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av_f)$size)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1485,10 +1487,10 @@ for (k in 1:length(all)){
 # SET UP THE VERTEX NAMES, SIZES, COORDINATES
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <-3
+    V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <-2
+    V(av)$size[k] <- 2
     V(av)$name[k] <- all[k]}
 }
 
@@ -1512,15 +1514,16 @@ plot(wk_f_c,
 
 
 # WALKTRAP COMMUNITIES AND FILTER AT CUTOFF = 90%
-cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.90)
+cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.8)
 av_f <- filter(cutoff = cut90,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all,
-               vetex_size)
+               vertex_names = all, 
+               vertex_size = V(av)$size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av_f)$size)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
@@ -1590,10 +1593,12 @@ cut93 <- quantile(as.vector(aid_m[aid_m>0]),0.93)
 av_f <- filter(cutoff = cut93,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all)
+               vertex_names = all,
+               vertex_size = V(av)$size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
-                     vertex_names = V(av_f)$name)
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av_f)$size)
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
