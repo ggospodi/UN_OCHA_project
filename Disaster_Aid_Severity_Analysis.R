@@ -210,7 +210,7 @@ aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
 #
 #
 #
-# Agency-VDC Aid NETWORK AT VDC LEVEL
+# AGENCY-VDC AID NETWORK
 #
 #
 #
@@ -734,7 +734,7 @@ legend("topright",
 #
 #
 #
-# ANALYSIS OF THE AGENCY-VDC AID NETWORK ITSELF
+# ANALYSIS OF THE AGENCY-VDC AID NETWORK
 #
 #
 #
@@ -898,6 +898,7 @@ legend("topright",
 #
 #
 #
+
 av <- graph.adjacency(aid_m,
                       mode = "directed",
                       weighted = TRUE)
@@ -1283,11 +1284,12 @@ histP1(sp$membership,
 # WALKTRAP COMMUNITY DETECTION
 #
 #
-# This is an approach based on random walks. The general idea is that if you perform random walks on the graph, 
-# then the walks are more likely to stay within the same community because there are only a few edges that lead 
-# outside a given community. Walktrap runs short random walks of 3-4-5 steps (depending on one of its parameters) 
-# and uses the results of these random walks to merge separate communities in a bottom-up manner like fastgreedy.community. 
-# Again, you can use the modularity score to select where to cut the dendrogram. It is a bit slower than the fast greedy 
+# This is an approach based on random walks. The general idea is that if you perform random walks 
+# on the graph,vthen the walks are more likely to stay within the same community because there are 
+# only a few edges that lead outside a given community. Walktrap runs short random walks of 3-4-5 
+# steps (depending on one of its parameters) and uses the results of these random walks to merge 
+# separate communities in a bottom-up manner like fastgreedy.community. Again, you can use the 
+# modularity score to select where to cut the dendrogram. It is a bit slower than the fast greedy 
 # approach but also a bit more accurate (according to the original publication).
 #
 #
@@ -1666,33 +1668,19 @@ histP1(wk$membership,
 
 
 
+#
+#
+#
+#
+# SEVERITY ANALYSIS ON THE VDC PROJECTION OF THE AGENCY-VDC AID NETWORK
+# 
+#
+#
+#
+#
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# INCORPORATE SEVERITY
+# INCORPORATE SEVERITY SCORES
 
 sev <- read.csv(paste0(DIR,"severity.csv"))
 sev$vdc <- as.character(sev$vdc)
