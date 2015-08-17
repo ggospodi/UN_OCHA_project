@@ -1691,7 +1691,68 @@ histP1(wk$membership,
 sev <- read.csv(paste0(DIR,"severity.csv"))
 sev$vdc <- as.character(sev$vdc)
 sev$vdc <- mapvalues(sev$vdc,
-                     from = c("Agara","Baruneshwor","Betini","BhaktapurN.P.","BhimesworN.P.",
+                     from = c("Akhikarichaur","AmargadhiN.P.","Andheri (Narayansthan)","Arbabijaya",
+                              "Arjun Chaupari","Arthar Dadakharka","Awal Parajul","Baad Bhanjyang",
+                              "Bada Khola","Badabhairab","Badagama","Badaka Diyale","BageswariTitrona",
+                              "BaglungN.P.","Bahadurgunj","Baikunthe","Baklauri","BanepaN. P.",
+                              "Banskhaur","Bekhsimle","BeriyaBirta","BeriyaBirta(Wa. Pu.)",
+                              "Bhadauretamagi","BhadgaunSinawari","BhadrapurN.P.","BharatpurN. P.",
+                              "Bhinggithe","Bicharichautara","BidurN.P.","Bijayshwari(Chaurjahari)",
+                              "Bhusedanda",
+                              "Binun",
+                              "Chande",
+                              "Dahafatgaun",
+                              "Dhaibung",
+                              "Khadang",
+                              "Bindyabasini",
+                              "BiratnagarN.P.",
+                              "BirendranagarN.P.",
+                              "BirgunjN. P.",
+                              "Bodebarsain","BodhaPokharathok",
+                              "Bungadovan","ButawalN.P.","Byas N. P.",
+                              "Chaphamandaun","Chhatedhunga","Chimadi","Chok chisapani",
+                              "DamakN.P.",
+                              "Danda Bazar","DandaParajul","DasharathchandaN.P.","Dewaldibyapur",
+                              "Dhamia","DhangadhiN.P.","DhankutaN.P.","DhapukSimalBhanjyan",
+                              "Dhar(Institutional)",
+                              "Dharampaniya","DharanN. P.","Dhikurpokhari","Dholagohe","DhulikhelN. P.",
+                              "DhullaJaidi",
+                              "DipayalSilgadhiN.P.","Drabesh","Duhilamati","Dulegauda","Durling",
+                              "Falametar","GairiBisouna Deupur","Gamhariya Parwaha","GaurN.P.",
+                              "Ghanghalgau",
+                              "Ghasikuwa","Gobargadha","GulariyaN.P.","Guthi Prasauni","Hadiryapaltuwa",
+                              "Harpatgunj","Hemja","IlamN.P.","InaruwaN .P.",
+                              "InarwaFulbariya",
+                              "ItahariN. P.",
+                              "Jaiamangalapur","Jaira","JaleshworN.P.","JanakpurN.P.","Jhouwaguthi",
+                              "KalaiyaN.P.",
+                              "Kalati Bhumidanda","KamalamiN.P.","Kanhu","Kanhushivapur","Kaphalkot",
+                              "Kapilbastu N. P.","KauwabanKataiya","KavreNitya Chandeswor",
+                              "KhandbariN.P.",
+                              "Khaptad National Par","Kheen","Khilungdeurali","Khokhsarparbaha",
+                              "KholegaunKhanigau","Khukhani","Kinhu","Ko. Madhepura","Koshi Tappu Wildlife",
+                              "Kotbhairab","Kushma","Kusmi","LahanN.P.","Lalapatti","Lalutantikot","Laphagaun",
+                              "Lekhnath N. P.","Lumbini Development","Machapuchre","MagaPauwa","Maharajgunj",
+                              "MahendranagarN.P.","Mainamaini","MalangawaN.P.","Malhaniya Gamharia",
+                              "MalhaniyaKhori","Malikabota","Malkot(Institutional)","Malm","Mashtabandali",
+                              "Mashtamandaun",
+                              "Matsyapokhari","MechinagarN.P.","Mumrakot","Nachnechaur",
+                              "NarayanN.P.","NasikasthanSangha","NawamiDanda","NepalgunjN.P.","Nyawal",
+                              "Paiyunnyap","Palungmainadi","PanautiN. P.","Panchawati","Paschimkusaha",
+                              "Patlepani","Patto","Phoi Mahadev","PiparpatiJabdi","Pokhara N. P.","Prajvunpata",
+                              "PrithbinarayanN.P.","Purbakusaha","Purtimkanda","PutalibazarN.P.",
+                              "PyuthanKhalanga","RajbirajN. P.","RakhuPiple","RamgramN. P.","RamgunjBelgachhi",
+                              "Ramjadeurali","Ranipokhari (Resing)","RatnanagarN.P.","Rayalebhir",
+                              "Royal Bardiya Nation","Royal Chitawan Natio","Royal Shuklaphanta",
+                              "Rumale(Khaumale)","Sabhapokhari","Sahebgunj","Salmechakala","Saraswar",
+                              "SarasyunKhark","ShankarSaraiya","ShankhupatiChour","Shibaratha","Shyamgha",
+                              "SiddharthNagarN.P.","Sinwang","SirahaN.P.","SisaKhani","SiswaBelhi","Siuna",
+                              "Sreesiya(Nau.Ta.Ja)",
+                              "Sukitaya",
+                              "Sunaulabazar","Sundhara (Ghiring)","Sunhoo",
+                              "Tanahusur","TansenN.P.","Thulolumpek","TikapurN.P.","TribhuwanNagarN. P.",
+                              "TriyugaN. P.","TulsipurN. P.","WalingN.P.",
+                              "Agara","Aabukhaireni","Baruneshwor","Betini","BhaktapurN.P.","BhimesworN.P.",
                               "ChandeniMandan","Chhatara","GunsiBhadaure","HetaudaN.P.","JaisithokMandan",
                               "JhangajholiRalmata","Jhyaku","JyamdiMandan","KakurThakur","KathmanduN.P.",
                               "LalitpurN.P.","Sangu","KirtipurN.P.","TokhaChandeswori","Thulogoun",
@@ -1699,7 +1760,68 @@ sev$vdc <- mapvalues(sev$vdc,
                               "Pukhulachhi","NaikapPuranoBhanjya","Mankha","Mahankal","MadhyapurThimiN.P.",
                               "Lamidada","Laharepouwa","Daxinkali","Bajrayogini","Budanilkantha","Fulpingkatti",
                               "Orang"),
-                     to = c("Agra","Barudeshwor","Beteni","Bhaktapur Municipality","Bhimeswor Municipality",
+                     to = c("Adhikarichaur","Amargadhi Municipality","Narayansthan","Arba Bijaypur",
+                            "Arjunchaupari","Arthar Dandakharka","Awalparajul","Badbhanjyang",
+                            "Badakhola","Badabhairav","Badgama","Baadkadiyale","Bageshwari Titarauna",
+                            "Baglung Municipality","Bahadurganj","Baikhunthe","Bakloura","Banepa Municipality",
+                            "Banskhor","Bekhsimle Ghartigaon","Bairiyabirta (Nau.Ta.Ja.)","Bairiyanbirta (Wa.Pu.)",
+                            "Bhadauretamago","Bhadgaun Sinuwari","Bhadrapur Municipality","Bharatpur Municipality",
+                            "Bhingithe","Bichari Chautara","Bidur Municipality",
+                            "Chourjahari",
+                            "Bhasedawa",
+                            "Binauna",
+                            "Change",
+                            "Daha Phalgaun",
+                            "Darbung",
+                            "Kharang",
+                            "Bindhyabasini",
+                            "Biratnagar Sub Metropolitan",
+                            "Birendranagar Municipality",
+                            "Birgunj Sub Metropolitan",
+                            "Barashine (Bode)","Bodha Pokhara Thok",
+                            "Bungadobhan","Butawal Municipality","Byas Municipality",
+                            "Chaphamadaun","Chatedhunga","Chimdi","Chokchisapani",
+                            "Damak Municipality",
+                            "Dadhabazaar","Dandaparajul","Dasharath Chanda Municipality","Dewaldebhyapur",
+                            "Dhamja","Dhangadhi Municipality","Dhankuta Municipality","Dhapuk Simalbhanjyang",
+                            "Dhari",
+                            "Dharmapaniya","Dharan Municipality","Dhikur Pokhari","Dholagoha","Dhulikhel Municipality",
+                            "Jaidi","Dipayal Silgadhi Municipality","Darbesa","Dudilabhati","Dulegaunda","Durlung",
+                            "Phalametar","Gairi Bisauna Deupur","Gamariya Parawaha","Gaur Municipality",
+                            "Khagalgaun",
+                            "Ghansikuwa","Gobargada","Gulariya Municipality","Guthiparsauni","Hardiyapaltuwa",
+                            "Harpatganj","Hyangja","Ilam Municipality","Inarwa Municipality",
+                            "Inarwaphulwariya",
+                            "Itahari Municipality",
+                            "Jayamangalapur","Jair","Jaleshwor Municipality","Janakpur Municipality","Jhauwaguthi",
+                            "Kalaiya Municipality",
+                            "Kapali Bhumaedanda","Kamalami Municipality","Kanku","Kahunshivapur","Kaphal Kot",
+                            "Kapilbastu Municipality","Kauwaban Kataiya","Kabhrenitya Chandeshwari",
+                            "Khandbari Municipality",
+                            "Khaptad National Park","Khin","Khilu Deurali","Khoksarparwaha",
+                            "Khanigaun","Kakani","Kihun","Komadhepura","Koshi Tappu Wildlife Reserve",
+                            "Kotbhairav","Kusma","Kusma","Lahan Municipality","Lalapatthi","Lalu","Lafagaun",
+                            "Lekhnath Municipality","Lumbini Development Area","Machhapuchchhre","Magapauwa","Maharajganj",
+                            "Mahendranagar Municipality","Mainamaine","Malangawa Municipality","Malahaniya Gamariya",
+                            "Malhaniya Khori","Malikabota (Hatsinja)","Malkot","Malma","Masyawandali","Mashtamadaun",
+                            "Matshyapokhari","Mechinagar Municipality","Mumra","Kristi Nachnechaur",
+                            "Narayan Municipality","Nasikasthan Sanga","Nawamidanda","Nepalgunj Municipality",
+                            "Nwali",
+                            "Paiyunthanthap","Palung Mainadi","Panauti Municipality","Panchabatti","Kusahapaschim",
+                            "Patelepani","Pato","Phoimahadev","Khutawa Jabdi","Pokhara Sub Metropolitan","Paiyunpata",
+                            "Prithbinarayan Municipality","Purba Kusahha","Purtimdanda","Putalibazar Municipality",
+                            "Khalanga","Rajbiraj Municipality","Piple","Ramgram Municipality","Ramgunjbelgachhiya",
+                            "Ramja Deurali","Resing Ranipokhari","Ratnanagar Municipality","Rayal",
+                            "Royal Bardiya National Park","Royal chitwan National Park","Royal Shukla Phanta National Park",
+                            "Khamale","Shavapokhari","Shahebgunj",
+                            "Salme","Sarashwor","Sarsyunkharka","Shankarsaraiya","Sangkhupatichaur","Shiba","Syamgha",
+                            "Siddhartha Nagar Municipality","Sunwal","Siraha Municipality","Sisakhani","Shishwa","Syuna",
+                            "Sirsiya",
+                            "Sukatinya",
+                            "Sunaulabajar","Sundhara (Thiring )","Sangkhu","Tanahunsur","Tansen Municipality",
+                            "Thulo Lumpek","Tikapur Municipality","Tribhuwan Nagar Municipality","Triyuga Municipality",
+                            "Tulsipur Municipality","Waling Municipality",
+                            "Agra","Anbukhaireni","Barudeshwor","Beteni","Bhaktapur Municipality","Bhimeswor Municipality",
                             "Chandeni Mandan","Chautara","Gunsi","Hetauda Municipality","Jaisithok Mandan",
                             "Jhangajholi Ratmata","Jhyanku","Jyamdi Mandan","Kakur Thakur","Kathmandu Metropolitan",
                             "Lalitpur Sub Metropolitan","Sangkhu","Kirtipur Municipality","Tokhachandeshwari",
@@ -1711,53 +1833,27 @@ sev$vdc <- mapvalues(sev$vdc,
 sev$vdc[218] <- "Betini"
 sev$vdc[624] <-"Lamidada"
 
+# MERGE WITH AGENCY-VDC AID TABLE
+for (k in 1:dim(sev)[1]){
+  if (sev$vdc[k] %in% hlcit$vname){
+    sev$hlcit[k] <- hlcit[which(hlcit$vname==sev$vdc[k])[1],]$hlcit
+  } else {
+    sev$hlcit[k] <- NA
+  }
+}
 
+# RESOLVE REMAINING VDC NAMES AND HLCIT CODES
+resolve_vdc <- sev[is.na(sev$hlcit),]$vdc
+resolve_which <- which(is.na(sev$hlcit))
+for (k in 1: length(resolve_vdc)){
+  if (sev$vdc[resolve_which[k]] %in% hlcit$vdc_name){
+    sev$hlcit[resolve_which[k]] <- hlcit[which(hlcit$vdc_name==sev$vdc[resolve_which[k]])[1],]$hlcit
+  } else {
+    sev$hlcit[resolve_which[k]] <- NA
+  }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# NOW WE MERGE WITH THE SEVERITY INDEX DATA
 
 
 
