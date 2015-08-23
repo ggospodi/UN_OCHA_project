@@ -1689,19 +1689,6 @@ histP1(wk$membership,
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # PROJECT EACH GRAPH COMPONENT WITH APPROPRIATE CONNECTIONS
 
 
@@ -1714,8 +1701,8 @@ ag_m <- matrix(0,nrow=length(ag),ncol=length(ag))
 for (i in 1:length(ag)){
   for (j in 1:length(ag)){
     common <- aid_m[c(i,j),(length(ag)+1):dim(aid_m)[1]]
-    common[common>0] <-1
-    ag_m[[i,j]]<-sum(t(common[1,])*t(common[2,]))
+    common[common>0] <- 1
+    ag_m[[i,j]] <- sum(t(common[1,])*t(common[2,]))
   }
 }
 
@@ -1725,62 +1712,140 @@ for (k in 1:dim(ag_m)[1]){ag_m[[k,k]] <- 0}
 # DEFINE AGENCY GRAPH
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 
-# SET THE GRAPH COLOR
+# SET THE GRAPH COLOR, LABELS, AND NODE SIZE
 V(agg)$color <- rep("green",length(ag))
 V(agg)$name <- ag
+V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
-     layout=layout.fruchterman.reingold(agg, niter=2000, area=20000*vcount(agg)),
-     vertex.color="green",
-     vertex.size=6,
-     vertex.label=ag, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=0.75, 
-     edge.width=0.5*E(agg)$weight,
-     edge.curved=TRUE,
-     edge.color=gray.colors(1),
-     main="Aid Agency Association Network")
+     layout = layout.fruchterman.reingold(agg, 
+                                        niter = 200,
+                                        area = 2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = V(agg)$size,
+     vertex.label = V(agg)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.25*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Aid Agency Association Network (Node Size = Sqrt(Degree)
+(Node Degree = number of agencies with shared VDC aid targets)")
+
+
+# CHANGE THE NODE SIZE TO REFLECT NUBER OF SHARED VDCs USING SQRT
+V(agg)$size <- sqrt(graph.strength(agg)-min(graph.strength(agg)))
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, 
+                                          niter = 200,
+                                          area = 2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = V(agg)$size,
+     vertex.label = V(agg)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.25*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Aid Agency Association Network (Node Size = Sqrt(Weighted Degree)
+(Node Weighted Degree = number of agencies with shared VDC aid targets, 
+     weighted by the number of VDCs per agency)")
+
+# CHANGE THE NODE SIZE TO REFLECT NUBER OF SHARED VDCs USING LOG
+V(agg)$size <- log(graph.strength(agg))
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(agg,
+     layout = layout.fruchterman.reingold(agg, 
+                                          niter = 200,
+                                          area = 2000*vcount(agg)),
+     vertex.color = V(agg)$color,
+     vertex.size = V(agg)$size,
+     vertex.label = V(agg)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.25*E(agg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Aid Agency Association Network (Node Size = Log(Weighted Degree)
+(Node Weighted Degree = number of agencies with shared VDC aid targets, 
+     weighted by the number of VDCs per agency)")
+
+
+
 
 # BEFORE WE FILTER, MULTILEVEL COMMUNITY DETECTION:
-mc<-multilevel.community(agg)
+mc <- multilevel.community(agg)
 plot(mc,
      agg, 
-     vertex.size=5,
-     edge.width=0.15*E(agg)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=0.8,
-     vertex.label=V(agg)$name)
+     vertex.size = 5,
+     edge.width = 0.15*E(agg)$weight,
+     main = "Example: ML Community DEtection for Aid Agency Association Network",
+     vertex.label.cex = 0.8,
+     vertex.label = V(agg)$name)
+
+# MULTILEVEL COMMUNITIES BREAKDOWN
+as.data.frame(sort(membership(mc)))
+
 
 # FILTRATION, CUTOFF = 75% quantile
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
 agg_f<-filter(cutoff = cut75,
               edge_matrix = ag_m,
               vertex_colors = V(agg)$color,
-              vertex_names = ag)
+              vertex_names = V(agg)$name,
+              vertex_size = V(agg)$size)
 
 plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",
-     vertex.size=10,
-     vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=(E(agg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(agg_f,
+                                          niter = 200,
+                                          area = 2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = V(agg_f)$size,
+     vertex.label = V(agg_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.25*(E(agg_f)$weight),
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "75% Level Filttration of the Aid Agency Association Network (Node Size = Log(Weighted Degree))")
+
+
 
 # MULTILEVEL COMMUNITY DETECTION WITH FILTRATIONS:
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
-     vertex.size=10,
-     edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.size = V(agg_f)$size,
+     edge.width = 0.25*E(agg_f)$weight,
+     vertex.label.cex = 1,
+     vertex.label = V(agg_f)$name,
+     edge.curved = TRUE,
+     main = "Example: ML Communities")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
 agg_f<-filter(cutoff = cut85,
