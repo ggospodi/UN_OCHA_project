@@ -1824,10 +1824,10 @@ mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
      vertex.size = V(agg_f)$size,
-     edge.width = 0.25*E(agg_f)$weight,
+     edge.width = 0.15*E(agg_f)$weight,
      vertex.label.cex = 1,
      vertex.label = V(agg_f)$name,
-     edge.curved = TRUE,
+     edge.curved = FALSE,
      main = "Example: ML Communities")
 
 
