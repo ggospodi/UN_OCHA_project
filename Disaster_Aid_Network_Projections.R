@@ -1780,21 +1780,21 @@ plot(agg,
 
 
 
-# BEFORE WE FILTER, MULTILEVEL COMMUNITY DETECTION:
+# BEFORE WE FILTER, MULTILEVEL COMMUNITY DETECTION
 mc <- multilevel.community(agg)
 plot(mc,
      agg, 
-     vertex.size = 5,
+     vertex.size = V(agg)$size,
      edge.width = 0.15*E(agg)$weight,
-     main = "Example: ML Community DEtection for Aid Agency Association Network",
      vertex.label.cex = 0.8,
-     vertex.label = V(agg)$name)
+     vertex.label = V(agg)$name,
+     main = "ML Community Detection for Aid Agency Association Network")
 
 # MULTILEVEL COMMUNITIES BREAKDOWN
 as.data.frame(sort(membership(mc)))
 
 
-# FILTRATION, CUTOFF = 75% quantile
+# MULTILEVEL COMMUNITY DETECTION WITH 75% FILTRATION
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
 agg_f<-filter(cutoff = cut75,
               edge_matrix = ag_m,
@@ -1815,11 +1815,8 @@ plot(as.undirected(agg_f),
      edge.width = 0.25*(E(agg_f)$weight),
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "75% Level Filttration of the Aid Agency Association Network (Node Size = Log(Weighted Degree))")
+     main = "75% Level Filtration of the Aid Agency Association Network (Node Size = Log(Weighted Degree))")
 
-
-
-# MULTILEVEL COMMUNITY DETECTION WITH FILTRATIONS:
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
@@ -1828,179 +1825,192 @@ plot(mc_f,
      vertex.label.cex = 1,
      vertex.label = V(agg_f)$name,
      edge.curved = FALSE,
-     main = "Example: ML Communities")
+     main = "ML Communities for the Aid Agency Association Network (75% Filtration)")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# MULTILEVEL COMMUNITY DETECTION WITH 85% FILTRATION
 cut85 <- quantile(as.vector(ag_m[ag_m>0]),0.85)
-agg_f<-filter(cutoff = cut85,
-              edge_matrix = ag_m,
-              vertex_colors = V(agg)$color,
-              vertex_names = ag)
+agg_f <- filter(cutoff = cut85,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name,
+                vertex_size = V(agg)$size)
 
 plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",
-     vertex.size=10,
-     vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=(E(agg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(agg_f,
+                                          niter = 200,
+                                          area = 2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = V(agg_f)$size,
+     vertex.label = V(agg_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.25*(E(agg_f)$weight),
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "ML Communities for the Aid Agency Association Network (85% Filtration)")
 
-c_f <- multilevel.community(as.undirected(agg_f))
+
+mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
-     vertex.size=10,
-     edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.size = V(agg_f)$size,
+     edge.width = 0.15*E(agg_f)$weight,
+     vertex.label.cex = 1,
+     vertex.label = V(agg_f)$name,
+     edge.curved = FALSE,
+     main = "ML Communities for the Aid Agency Association Network (85% Filtration)")
 
+
+# MULTILEVEL COMMUNITY DETECTION WITH 90% FILTRATION
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
-agg_f<-filter(cut90,
-              edge_matrix = ag_m,
-              vertex_colors = V(agg)$color,
-              vertex_names = ag)
+agg_f <- filter(cutoff = cut90,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name,
+                vertex_size = V(agg)$size)
 
 plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",
-     vertex.size=10,
-     vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(agg_f,
+                                          niter = 200,
+                                          area = 2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = V(agg_f)$size,
+     vertex.label = V(agg_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.15*(E(agg_f)$weight),
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "ML Communities for the Aid Agency Association Network (90% Filtration)")
+
 
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
-     vertex.size=10,
-     edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.size = V(agg_f)$size,
+     edge.width = 0.15*E(agg_f)$weight,
+     vertex.label.cex = 1,
+     vertex.label = V(agg_f)$name,
+     edge.curved = FALSE,
+     main = "ML Communities for the Aid Agency Association Network (90% Filtration)")
 
+
+# MULTILEVEL COMMUNITY DETECTION WITH 95% FILTRATION
 cut95 <- quantile(as.vector(ag_m[ag_m>0]),0.95)
-agg_f<-filter(cut95,
-              edge_matrix = ag_m,
-              vertex_colors = V(agg)$color,
-              vertex_names = ag)
+agg_f <- filter(cutoff = cut95,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name,
+                vertex_size = V(agg)$size)
 
 plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",
-     vertex.size=10,
-     vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(agg_f,
+                                          niter = 200,
+                                          area = 2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = V(agg_f)$size,
+     vertex.label = V(agg_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.15*(E(agg_f)$weight),
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "ML Communities for the Aid Agency Association Network (95% Filtration)")
+
 
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
-     vertex.size=10,
-     edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.size = V(agg_f)$size,
+     edge.width = 0.15*E(agg_f)$weight,
+     vertex.label.cex = 1,
+     vertex.label = V(agg_f)$name,
+     edge.curved = FALSE,
+     main = "ML Communities for the Aid Agency Association Network (95% Filtration)")
 
+# MULTILEVEL COMMUNITY DETECTION WITH 97% FILTRATION
 cut97 <- quantile(as.vector(ag_m[ag_m>0]),0.97)
-agg_f<-filter(cut97,
-              edge_matrix = ag_m,
-              vertex_colors = V(agg)$color,
-              vertex_names = ag)
+agg_f <- filter(cutoff = cut97,
+                edge_matrix = ag_m,
+                vertex_colors = V(agg)$color,
+                vertex_names = V(agg)$name,
+                vertex_size = V(agg)$size)
 
 plot(as.undirected(agg_f),
-     layout=layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
-     vertex.color="green",
-     vertex.size=10,
-     vertex.label=V(agg_f)$name, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.5*(E(agg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     layout = layout.fruchterman.reingold(agg_f,
+                                          niter = 200,
+                                          area = 2000*vcount(agg_f)),
+     vertex.color = V(agg_f)$color,
+     vertex.size = V(agg_f)$size,
+     vertex.label = V(agg_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.15*(E(agg_f)$weight),
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "ML Communities for the Aid Agency Association Network (97% Filtration)")
+
 
 mc_f <- multilevel.community(as.undirected(agg_f))
 plot(mc_f,
      as.undirected(agg_f), 
-     vertex.size=10,
-     edge.width=0.5*E(agg_f)$weight,
-     main="Example: ML Communities",
-     vertex.label.cex=1,
-     vertex.label=V(agg_f)$name)
+     vertex.size = V(agg_f)$size,
+     edge.width = 0.15*E(agg_f)$weight,
+     vertex.label.cex = 1,
+     vertex.label = V(agg_f)$name,
+     edge.curved = FALSE,
+     main = "ML Communities for the Aid Agency Association Network (97% Filtration)")
 
-# CHECKING THE GIANT CONNECTED COMPONENT WE SEE IT IS CONNECTED VERY WELL
-# agg_c <- as.undirected(giant_comp(agg,V(agg)$name))
-# 
-# plot(agg_c,
-#      layout=layout.fruchterman.reingold(agg_c, niter=200, area=2000*vcount(agg_c)),
-#      vertex.color="green",vertex.size=10,vertex.label=V(agg_c)$name, 
-#      vertex.label.color="black", vertex.label.font=1, vertex.label.cex=1, 
-#      edge.width=0.5*(E(agg_c)$weight),edge.curved=TRUE,edge.color=gray.colors(1))
-
-
-
-
-
-# ANALYSIS OF AGENCY NETWORK: 
-
-
-
+#
+#
+#
+#
+#
+#
+#
+# ANALYSIS OF THE AID AGENCY NETWORK
+#
+#
+#
+#
+#
+#
+#
+#
 
 # RANGE OF NUMBER OF DISTINCT AID INSTANCES FOR EACH AGENCY
-summary(as.data.frame(table(aid_data$impl_agency))[,2])
+summary(as.data.frame(table(aid_data$impl_ag))[,2])
 
 # NOTE: THIS IS NOT THE SAME AS
 # summary(graph.strength(av))
 # SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
 
 # RANGE OF NUMBER OF DISTINCT VDCs OF AID FOR EACH AGENCY
-unique_aid <- unique(cbind.data.frame(aid_data$impl_agency,aid_data$vdc))
-colnames(unique_aid) <- c("impl_agency","vdc")
-summary(as.data.frame(table(unique_aid$impl_agency))[,2])
+unique_aid <- unique(cbind.data.frame(aid_data$impl_ag,aid_data$vdc))
+colnames(unique_aid) <- c("impl_ag","vdc")
+summary(as.data.frame(table(unique_aid$impl_ag))[,2])
 
 # NOTE: THIS IS NOT THE SAME AS
 # summary(degree(av))
 # SINCE BOTH AGENCIES AND VDCs ARE INCLUDED IN THIS
 
 # PLOT RELIEF AGENCY WEIGHTED DEGREE DISTRIBUTION (DISTINCT TYPES OF AID)
-plot(sort(as.data.frame(table(aid_data$impl_agency))[,2]),
+plot(sort(as.data.frame(table(aid_data$impl_ag))[,2]),
      col = adjustcolor(rgb(1,0,1,1)),
      pch = 19,
      xlab = "Agency index",
      ylab = "Numer of Distinct Aid Activities",
      main = "Sorted Agencies by Number of Distinct Aid Activities")
 par(new = T)
-lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_agency))[,2]),2), col ="black", lwd=4)
-text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_agency))[,2])),col="black",cex=2.5)
+lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_ag))[,2]),2), col ="black", lwd=4)
+text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_ag))[,2])),col="black",cex=2.5)
 
-histP1(as.data.frame(table(aid_data$impl_agency))[,2],
+histP1(as.data.frame(table(aid_data$impl_ag))[,2],
        breaks=100,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab="Agency Network Aid Action Numbers", 
@@ -2008,14 +2018,14 @@ histP1(as.data.frame(table(aid_data$impl_agency))[,2],
   (VDC Overlap Counts Dsitribution)")
 
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
-plot(sort(as.data.frame(table(unique_aid$impl_agency))[,2]),
+plot(sort(as.data.frame(table(unique_aid$impl_ag))[,2]),
      col = adjustcolor(rgb(1,0,1,1)),
      pch = 19,
      xlab = "Agency index",
      ylab = "Numer of Distinct Aid Activities",
      main = "Sorted Agencies by Number of Distinct VDC")
 
-hist(as.data.frame(table(unique_aid$impl_agency))[,2], breaks=100,
+hist(as.data.frame(table(unique_aid$impl_ag))[,2], breaks=100,
        col=adjustcolor(rgb(1,0,1,1)),
        xlab="Agency Network Aid Action Numbers", 
        main="Agency Network Number of Targeted VDCs Distribution
