@@ -1673,24 +1673,35 @@ histP1(wk$membership,
        main = "Walktrap Community Size Distribution for Nepal Agency-VDC Aid Network")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 # PROJECT EACH GRAPH COMPONENT WITH APPROPRIATE CONNECTIONS
-
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 
 
 # NOTE FOR THE AGENCY NETWORK PROJECTION, WE ARE COUNTING THE NUMBER OF
