@@ -289,13 +289,12 @@ for (k in 1:dim(aid_m)[1]){
 # PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200,
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = NA, 
      vertex.label.color = "black", 
-     vertex.label.font = 2, 
+     vertex.label.font = 1, 
      vertex.label.cex = 0.2, 
      edge.width = 0.2*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
@@ -306,6 +305,7 @@ legend("topleft",
        c("Implementing Aid Agency","Aid Target VDC"),
        fill = c("green","SkyBlue2"),
        bty = "n")
+
 
 # PLOT THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
@@ -323,7 +323,7 @@ plot(av,
      vertex.size = V(av)$size,
      vertex.label = V(av)$name, 
      vertex.label.color = "darkgreen", 
-     vertex.label.font = 2, 
+     vertex.label.font = 1, 
      vertex.label.cex = 0.75, 
      edge.width = 0.05*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
@@ -342,7 +342,7 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <- 1
+    V(av)$size[k] <- 2
     V(av)$name[k] <- NA}
 }
 cut25 <- quantile(as.vector(aid_m[aid_m>0]),0.25)
@@ -355,15 +355,14 @@ av_f <- filter(cutoff = cut25,
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout = layout.fruchterman.reingold(av_f,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f)),
+                                          niter = 200),
      vertex.color = V(av_f)$color,
      vertex.size = V(av_f)$size,
      vertex.label = NA, 
      vertex.label.color = "black", 
-     vertex.label.font = 2, 
+     vertex.label.font = 1, 
      vertex.label.cex = 0.7, 
-     edge.width = 0.7*sqrt(E(av_f)$weight),
+     edge.width = 0.2*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
@@ -381,8 +380,8 @@ plot(av_f,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
      vertex.label.color = "darkgreen", 
-     vertex.label.font = 2, 
-     vertex.label.cex = 0.75, 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
      edge.width = 0.05*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
@@ -424,14 +423,13 @@ av_f <- filter(cutoff = cut50,
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout = layout.fruchterman.reingold(av_f,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f)),
+                                          niter = 200),
      vertex.color = V(av_f)$color,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
-     vertex.label.color = "black", 
-     vertex.label.font = 2, 
-     vertex.label.cex = 0.7, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.8, 
      edge.width = 0.3*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
@@ -474,8 +472,8 @@ plot(av_f,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
      vertex.label.color = "darkgreen", 
-     vertex.label.font = 2, 
-     vertex.label.cex = 0.75, 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
      edge.width = 0.05*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
@@ -490,7 +488,7 @@ legend("topright",
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 75% PERCENTILE
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
-    V(av)$size[k] <- 3
+    V(av)$size[k] <- 4
     V(av)$name[k] <- ag[k]
   } else {
     V(av)$size[k] <- 2
@@ -500,21 +498,20 @@ cut75 <- quantile(as.vector(aid_m[aid_m>0]),0.75)
 av_f <- filter(cutoff = cut75,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all,
+               vertex_names = V(av)$name,
                vertex_size = V(av)$size)
 
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout = layout.fruchterman.reingold(av_f,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f)),
+                                          niter = 200),
      vertex.color = V(av_f)$color,
      vertex.size = V(av_f)$size,
-     vertex.label = NA, 
-     vertex.label.color = "black", 
-     vertex.label.font = 2, 
-     vertex.label.cex = 0.7, 
-     edge.width = 0.7*sqrt(E(av_f)$weight),
+     vertex.label = V(av_f)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.9, 
+     edge.width = 0.3*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
@@ -556,8 +553,8 @@ plot(av_f,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
      vertex.label.color = "darkgreen", 
-     vertex.label.font = 2, 
-     vertex.label.cex = 0.75, 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
      edge.width = 0.05*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
@@ -588,15 +585,14 @@ av_f <- filter(cutoff = cut85,
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout = layout.fruchterman.reingold(av_f,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f)),
+                                          niter = 200),
      vertex.color = V(av_f)$color,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
      vertex.label.color = "black", 
-     vertex.label.font = 2, 
-     vertex.label.cex = 0.7, 
-     edge.width = 0.7*sqrt(E(av_f)$weight),
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.8, 
+     edge.width = 0.3*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
@@ -638,7 +634,7 @@ plot(av_f,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
      vertex.label.color = "darkgreen", 
-     vertex.label.font = 2, 
+     vertex.label.font = 1, 
      vertex.label.cex = 0.75, 
      edge.width = 0.1*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
@@ -688,14 +684,13 @@ V(av_f_c)$name[which(all %in% V(av_f_c)$name)>length(ag)] <- NA
 # DISPLAY THE EDGE-FILTERED GRAPH AGAIN
 plot(av_f_c,
      layout = layout.fruchterman.reingold(av_f_c,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = V(av_f_c)$color,
      vertex.size = V(av_f_c)$size,
      vertex.label = V(av_f_c)$name, 
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
-     vertex.label.cex = 1, 
+     vertex.label.cex = 0.9, 
      edge.width = 0.3*sqrt(E(av_f_c)$weight),
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
@@ -714,7 +709,7 @@ plot(av_f_c,
      vertex.label = V(av_f_c)$name, 
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
-     vertex.label.cex = 1, 
+     vertex.label.cex = 0.9, 
      edge.width = 0.1*sqrt(E(av_f_c)$weight),
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
@@ -943,8 +938,7 @@ for (k in 1:length(au)){
 
 plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = NA, 
@@ -967,7 +961,7 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$size[k] <- 3
     V(av)$name[k] <- all[k]
   } else {
-    V(av)$size[k] <- 2
+    V(av)$size[k] <- 1
     V(av)$name[k] <- all[k]}
 }
 av_coords <- koords2[which(all %in% V(av)$name),]
@@ -1048,14 +1042,13 @@ for (k in 1:length(hb)){
 
 plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = V(av)$name, 
-     vertex.label.color = "black",
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
-     vertex.label.cex = 0.5, 
+     vertex.label.cex = 0.75, 
      edge.width = 0.1*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
@@ -1065,6 +1058,7 @@ legend("topleft",
        c("Highest Hub Score","Lowest Hub Score"),
        fill = c("red","White"),
        bty = "n")
+
 
 # PLOT THE HUB SCORE HEAT MAP OF THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
@@ -1091,7 +1085,7 @@ plot(av,
      vertex.label = V(av)$name, 
      vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
-     vertex.label.cex = 0.5, 
+     vertex.label.cex = 0.75, 
      edge.width = 0.05*sqrt(E(av)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
@@ -1126,13 +1120,15 @@ legend("topright",
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
+    V(av)$color[k] <- "SkyBlue2"
   }  
 }
 
@@ -1147,90 +1143,117 @@ for (k in 1:dim(aid_m)[1]){
 }
 
 
-# DEfine the SPINGLASS COMMUNITY STRUCTURE
+# DEFINE THE SPINGLASS COMMUNITY STRUCTURE
 sp <- spinglass.community(graph = av,
-                          weights = E(av)$weights,
+                          weights = E(av)$weight,
                           spins = 20)
 
 # PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
-plot(sp,
-     av,
+plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
-     vertex.color = sp,
-     vertex.size = 2,
+                                          niter = 200),
+     vertex.color = sp$membership,
+     vertex.size = V(av)$size,
      vertex.label = NA, 
-     vertex.label.color = "black",
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.3,
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
+     mark.groups = by(seq_along(sp$membership), sp$membership, invisible),
      main = "Weighted Agency-VDC Aid Network Spinglass Communities")
+
 
 # PLOT THE SPINGLASS COMMUNITIES FOR THE GEO-NETWORK
-plot(sp,
-     av,
+plot(av,
      layout = koords2,
-     vertex.color = sp,
-     vertex.size = 2,
-     vertex.label = NA, 
-     vertex.label.color = "black",
+     vertex.color = sp$membership,
+     vertex.size = V(av)$size,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.3,
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
+     mark.groups = by(seq_along(sp$membership), sp$membership, invisible),
      main = "Weighted Agency-VDC Aid Network Spinglass Communities")
 
+
+# SET UP THE VERTEX SIZES
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 5
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 2
+    V(av)$name[k] <- NA}
+}
 
 # SPINGLASS COMMUNITIES AND FILTER AT CUTOFF = 90%
 cut90 <- quantile(as.vector(aid_m[aid_m>0]),0.90)
 av_f <- filter(cutoff = cut90,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all,
+               vertex_names = V(av)$name,
                vertex_size = V(av)$size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
                      vertex_names = V(av_f)$name,
-                     vertex_size = V(av)$size)
+                     vertex_size = V(av_f)$size)
 
 # DEFINE THE SPINGLASS COMMUNITY STRUCTURE
 sp_f_c <- spinglass.community(graph = av_f_c,
-                              weights = E(av_f_c)$weights,
+                              weights = E(av_f_c)$weight,
                               spins = 20)
 
-# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
-plot(sp_f_c,
-     av_f_c,
+# PLOT THE COMMUNITIES OF THE AGENCY-VDC AID NETWORK
+plot(av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
-     vertex.color = sp_f_c,
-     vertex.size = 2,
-     vertex.label = NA, 
-     vertex.label.color = "black",
+                                          niter = 200),
+     vertex.color = sp_f_c$membership,
+     vertex.size = V(av_f_c)$size,
+     vertex.label = V(av_f_c)$sname, 
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.3,
+     edge.width = 0.2*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     mark.groups = by(seq_along(sp_f_c$membership), sp_f_c$membership,invisible),
+     main = "Weighted Agency-VDC Aid Network Spinglass Communities")
+
+# JUST COLORING THE VERTICES
+plot(av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200),
+     vertex.color = sp_f_c$membership,
+     vertex.size = V(av_f_c)$size,
+     vertex.label = V(av_f_c)$sname, 
+     vertex.label.color = "darkgreen",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Network Spinglass Communities")
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
+    V(av)$color[k] <- "SkyBlue2"
   }  
 }
 
@@ -1244,23 +1267,52 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$name[k] <- all[k]}
 }
 
+av_f <- filter(cutoff = cut90,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av_f)$size)
 koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
 
+# DEFINE THE SPINGLASS COMMUNITY STRUCTURE
+sp_f_c <- spinglass.community(graph = av_f_c,
+                              weights = E(av_f_c)$weight,
+                              spins = 20)
 # PLOT THE SPINGLASS COMMUNITIES FOR THE GEO-NETWORK
-plot(sp_f_c,
-     av_f_c,
+plot(av_f_c,
      layout = koords2_f_c,
-     vertex.color = sp_f_c,
-     vertex.size = 2,
+     vertex.color = sp_f_c$membership,
+     vertex.size = V(av_f_c)$size,
      vertex.label = NA, 
-     vertex.label.color = "black",
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
-     vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.3,
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     mark.groups = by(seq_along(sp_f_c$membership), sp_f_c$membership, invisible),
+     main = "Weighted Agency-VDC Aid Network Spinglass Communities")
+
+# JUST COLORING THE VERTICES
+plot(av_f_c,
+     layout = koords2_f_c,
+     vertex.color = sp_f_c$membership,
+     vertex.size = V(av_f_c)$size,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.2*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Network Spinglass Communities")
+
 
 # SOME BASIC SPINGLASS COMMUNITY STATS
 plot(sort(sp$membership), 
@@ -1297,13 +1349,15 @@ histP1(sp$membership,
 
 
 # DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
+    V(av)$color[k] <- "SkyBlue2"
   }  
 }
 
@@ -1321,38 +1375,69 @@ for (k in 1:dim(aid_m)[1]){
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk <- walktrap.community(graph = av,
                          membership = TRUE,
-                         weights = E(av)$weights)
+                         weights = E(av)$weight)
 
 # PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
-plot(wk,
-     av,
+plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
-     vertex.color = wk,
+                                          niter = 200),
+     vertex.color = wk$membership,
      vertex.size = V(av)$size,
      vertex.label = NA, 
-     vertex.label.color = "black",
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.3,
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     mark.groups = by(seq_along(wk$membership), wk$membership, invisible),
+     main = "Weighted Agency-VDC Aid Network Fastgreedy Communities")
+
+# JUST COLOR THE VERTICES
+plot(av,
+     layout = layout.fruchterman.reingold(av, 
+                                          niter = 200),
+     vertex.color = wk$membership,
+     vertex.size = V(av)$size,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.3*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Network Fastgreedy Communities")
 
+
 # PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
-plot(wk,
-     av,
+plot(av,
      layout = koords2,
-     vertex.color = wk,
+     vertex.color = wk$membership,
      vertex.size = V(av)$size,
      vertex.label = NA, 
-     vertex.label.color = "black",
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av)$weight),
-     edge.arrow.size = 0.3,
+     edge.width = 0.2*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     mark.groups = by(seq_along(wk$membership), wk$membership, invisible),
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
+
+# JUST COLOR THE VERTICES
+plot(av,
+     layout = koords2,
+     vertex.color = wk$membership,
+     vertex.size = V(av)$size,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.1*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Network Walktrap Communities")
@@ -1363,7 +1448,7 @@ cut70 <- quantile(as.vector(aid_m[aid_m>0]),0.70)
 av_f <- filter(cutoff = cut70,
                edge_matrix = aid_m,
                vertex_colors = V(av)$color,
-               vertex_names = all,
+               vertex_names = V(av)$name,
                vertex_size = V(av)$size)
 av_f_c <- giant_comp(graph = av_f,
                      vertex_colors = V(av_f)$color,
@@ -1372,25 +1457,62 @@ av_f_c <- giant_comp(graph = av_f,
 
 # DEFINE THE WALKTRAP COMMUNITY STRUCTURE
 wk_f_c <- walktrap.community(graph = av_f_c,
-                             weights = E(av_f_c)$weights)
+                             weights = E(av_f_c)$weight)
 
 # PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
-plot(wk_f_c,
-     av_f_c,
+plot(av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
-     vertex.color = wk_f_c,
-     vertex.size = 2,
+                                          niter = 200),
+     vertex.color = wk_f_c$membership,
+     vertex.size = V(av_f_c)$size,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
-     edge.width = 0.3*sqrt(E(av_f_c)$weight),
-     edge.arrow.size = 0.3,
+     edge.width = 0.2*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     mark.groups = by(seq_along(wk_f_c$membership), wk_f_c$membership, invisible),
+     main = "Weighted Agency-VDC Aid Network Walktrap Communities")
+
+# JUST COLOR THE VERTICES
+plot(av_f_c,
+     layout = layout.fruchterman.reingold(av_f_c, 
+                                          niter = 200),
+     vertex.color = wk_f_c$membership,
+     vertex.size = V(av_f_c)$size,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.85, 
+     edge.width = 0.2*sqrt(E(av_f_c)$weight),
+     edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Weighted Agency-VDC Aid Network Walktrap Communities")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
