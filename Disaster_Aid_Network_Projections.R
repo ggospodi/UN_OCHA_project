@@ -318,7 +318,74 @@ for (k in 1:dim(aid_m)[1]){
 }
 
 plot(av,
-     layout = koords2,
+     layout = koords21,
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topleft",
+       c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","SkyBlue2"),
+       bty = "n")
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+# HEAT MAP FOR VDCs ACCORDING TO DEGREE
+#
+#
+#
+#
+#
+
+xa1 <- 20+5*runif(length(ag))
+ya1 <- 80+12*runif(length(ag))
+koords11 <-cbind(xa1,ya1)
+koords21<- rbind(koords11,koords)
+
+# BUILD THE AGENCY-VDC AID NETWORK
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+
+
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- rev(heat.colors(1+as.integer(max(degree(vgg)))))[as.integer(degree(vgg)[which(vd %in% all[k])])+1]
+  }  
+}
+
+# PLOT THE AGENCY-VDC AID NETWORK
+for (k in 1:dim(aid_m)[1]){
+  if(k-1<length(ag)){
+    V(av)$size[k] <- 3
+    V(av)$name[k] <- ag[k]
+  } else {
+    V(av)$size[k] <- 1
+    V(av)$name[k] <- NA}
+}
+
+plot(av,
+     layout = koords21,
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = V(av)$name, 
@@ -332,8 +399,99 @@ plot(av,
      main = "Nepal Agency-VDC Aid Relief Geo-Network")
 legend("topright",
        c("Implementing Aid Agency","VDC With Geo-Coordinates"),
+       fill = c("green","darkorange"),
+       bty = "n")
+
+
+
+xa1 <- 20+5*runif(length(ag))
+ya1 <- 82+10*runif(length(ag))
+koords11 <-cbind(xa1,ya1)
+koords21<- rbind(koords11,koords)
+plot(av,
+     layout = koords21,
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topleft",
+       c("Implementing Aid Agencies","VDCs With Geo-Coordinates"),
+       fill = c("green","darkorange"),
+       bty = "n")
+
+
+
+
+
+
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(all)){
+  if(is.element(all[k],vd)){
+    V(av)$color[k] <- "SkyBlue2"
+  }  
+}
+
+
+plot(av,
+     layout = koords21,
+     vertex.color = V(av)$color,
+     vertex.size = V(av)$size,
+     vertex.label = V(av)$name, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75, 
+     edge.width = 0.05*sqrt(E(av)$weight),
+     edge.arrow.size = 0.2,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "Nepal Agency-VDC Aid Relief Geo-Network")
+legend("topleft",
+       c("Implementing Aid Agencies","VDCs With Geo-Coordinates"),
        fill = c("green","SkyBlue2"),
        bty = "n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+# BACK TO THE ANALYSIS
+#
+#
+#
+#
+#
+#
+#
+
+
 
 
 # EDGE-FILTRATION BY EDGE WEIGHT OF THE AGENCY-VDC AID NETWORK: CUT-OFF = 25% PERCENTILE
@@ -3333,7 +3491,7 @@ hist(paths,
 #
 
 
-# PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
+# PLOT HEAT MAP ON VERTICES ACCORDING TO DeGHREE DISTRIBUTION
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
@@ -3342,9 +3500,8 @@ vgg <- giant_comp(graph = vgg,
                   vertex_color = V(vgg)$color,
                   vertex_names = V(vgg)$name,
                   vertex_size = V(vgg)$size)
-bc_int <- as.integer(round(bc,0))
-for (k in 1:length(bc_int)){
-  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+for (k in 1:length(degree(vgg))){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(degree(vgg)))))[as.integer(degree(vgg)[k])+1]
 }
 
 # PLOT AGENCY GRAPH AND FILTER
@@ -3360,8 +3517,119 @@ plot(vgg,
      edge.width = 0.04*E(vgg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main = "VDC Aid Association Network Giant Component BC Heat Map
+     main = "VDC Aid Association Network Giant Component
+ Heat Map According to Node Degree
      (node degree = number of VDCs with same aid agency)")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO DEGREE DISTRIBUTION
+# WITH GEOGRAPHIC LOCATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
+vgg_c <- giant_comp(graph = vgg,
+                  vertex_color = V(vgg)$color,
+                  vertex_names = V(vgg)$name,
+                  vertex_size = V(vgg)$size)
+koordsf <- koords[which(V(vgg)$name %in% V(vgg_c)$name),]
+
+for (k in 1:length(degree(vgg_c))){
+  V(vgg_c)$color[k] <- rev(heat.colors(1+2*(max(degree(vgg_c)))))[as.integer(2*degree(vgg_c)[k])+1]
+}
+
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg_c,
+     layout = koordsf,
+     vertex.color = V(vgg_c)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.003*E(vgg_c)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network Giant Component
+ Heat Map According to Node Degree
+     (node degree = number of VDCs with same aid agency)")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO WEIGHTED DEGREE DISTRIBUTION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
+vgg_c <- giant_comp(graph = vgg,
+                  vertex_color = V(vgg)$color,
+                  vertex_names = V(vgg)$name,
+                  vertex_size = V(vgg)$size)
+
+for (k in 1:length(degree(vgg_c))){
+  V(vgg_c)$color[k] <- rev(heat.colors(1+as.integer(max(graph.strength(vgg_c)))))[as.integer(graph.strength(vgg_c)[k])+1]
+}
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg_c,
+     layout = layout.fruchterman.reingold(vgg_c,
+                                          niter = 200),
+     vertex.color = V(vgg_c)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.02*E(vgg_c)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network Giant Component
+ Heat Map According to Weighted Node Degree
+     (same aid agency VDCs, weighted by the number of agencies)")
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO WEIGHTED DEGREE DISTRIBUTION
+# WITH GEOGRAPHIC LOCATION
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
+vgg_c <- giant_comp(graph = vgg,
+                    vertex_color = V(vgg)$color,
+                    vertex_names = V(vgg)$name,
+                    vertex_size = V(vgg)$size)
+koordsf <- koords[which(V(vgg)$name %in% V(vgg_c)$name),]
+
+for (k in 1:length(degree(vgg_c))){
+  V(vgg_c)$color[k] <- rev(heat.colors(1+as.integer(max(graph.strength(vgg_c)))))[as.integer(graph.strength(vgg_c)[k])+1]
+}
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg_c,
+     layout = koordsf,
+     vertex.color = V(vgg_c)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.005*E(vgg_c)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network Giant Component
+ Heat Map According to Weighted Node Degree
+     (same aid agency VDCs, weighted by the number of agencies)")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
