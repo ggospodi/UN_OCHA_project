@@ -1,6 +1,6 @@
 # Nepal Disaster Aid Distribution Network Analysis and Projections
 # author: Georgi D. Gospodinov
-# date: "Augist 15, 2015"
+# date: "Augist 18, 2015"
 # 
 # Data Sources:
 #
@@ -2249,6 +2249,13 @@ hist(paths,
 
 
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+
+# SET THE GRAPH COLOR, LABELS, AND NODE SIZE
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
+
 bc <- betweenness(agg,
                   v = V(agg),
                   directed = FALSE)
@@ -3016,31 +3023,29 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 # VDC AID TARGET NETWORK:
-
+#
+#
+#
+#
+#
+#
+# FIX FIX FIX FIX FIX PLOT LABELS!!!!!!!!!!!!!!
+#
+#
+#
+#
 
 # ANALYSIS OF THE VDC AID TARGET NETWORK
 u_vdc <- as.character(unique(aid_data$vdc))
@@ -3050,8 +3055,8 @@ aid_vdc <- matrix(0, nrow = length(u_vdc), ncol = length(u_vdc))
 for (i in 1:length(u_vdc)){
   for (j in 1:length(u_vdc)){
     common <- aid_m[1:length(ag),c(i,j)]
-    common[common>0] <-1
-    aid_vdc[i,j]<-sum((common[,1])*(common[,2]))
+    common[common>0] <- 1
+    aid_vdc[i,j] <- sum((common[,1])*(common[,2]))
   }
 }
 
@@ -3060,11 +3065,13 @@ for (i in 1:length(u_vdc)){
 for (k in 1:dim(aid_vdc)[1]){aid_vdc[[k,k]] <- 0}
 
 # DEFINE AGENCY GRAPH
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+vgg <- as.undirected(graph.adjacency(aid_vdc,
+                                     weighted = TRUE))
 
-# SET THE GRAPH COLOR
+# SET THE GRAPH PROPERTIES
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
+V(vgg)$size <- log(exp(1)+degree(vgg)/max(degree(vgg)))
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(vgg,
@@ -3076,9 +3083,11 @@ plot(vgg,
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.5, 
-     edge.width = 0.5*E(vgg)$weight,
+     edge.width = 0.05*E(vgg)$weight,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network
+     (node degree = number of VDCs with same aid agency)")
 
 # REMOVE ISOLATED
 vgg <- drop_isolated(graph = vgg,
@@ -3086,7 +3095,7 @@ vgg <- drop_isolated(graph = vgg,
                      vertex_names = V(vgg)$name)
 
 # GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
-vgg <- giant_comp(graph = vgg,
+vgg <- giant_comp(graph = vgg, 
                   vertex_colors = V(vgg)$color,
                   vertex_names = V(vgg)$name,
                   vertex_size = V(vgg)$size)
@@ -3100,10 +3109,11 @@ plot(vgg,
      vertex.label.color = "black",
      vertex.label.font = 1, 
      vertex.label.cex = 0.5, 
-     edge.width = 0.1*E(vgg)$weight,
+     edge.width = 0.03*E(vgg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
-     main="VDC Aid Association Network")
+     main = "VDC Aid Association Network Giant Component
+     (node degree = number of VDCs with same aid agency)")
 
 
 # FILTER BY EDGE WEIGHT LEVELS, NOTE THAT LOWER CUTOFF VALUES
@@ -3113,7 +3123,7 @@ plot(vgg,
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
-transitivity(vgg)
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
 cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
 vgg_f <- filter(cutoff = cut85,
                 edge_matrix = aid_vdc,
@@ -3129,21 +3139,22 @@ plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f,
                                         niter = 200),
      vertex.color = V(vgg_f)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.05*(E(vgg_f)$weight),
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network With 85% Threshold Filtration
+     (node degree = number of VDCs with same aid agency)")
 
 # THE NEXT CUT IS TOO BIG OF A JUMP, WHICH WILL BE EVIDENT IN THE DEGREE DISTRIBUTION
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
-transitivity(vgg)
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
 cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
 vgg_f <- filter(cutoff = cut95,
                 edge_matrix = aid_vdc,
@@ -3159,43 +3170,53 @@ plot(as.undirected(vgg_f),
      layout=layout.fruchterman.reingold(vgg_f,
                                         niter = 200),
      vertex.color = V(vgg_f)$color,
-     vertex.size=2,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=0.25*(E(vgg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 1, 
+     edge.width = 0.05*(E(vgg_f)$weight),
+     edge.curved = TRUE,
+     edge.color=gray.colors(1),
+     main = "VDC Aid Association Network With 95% Threshold Filtration
+     (node degree = number of VDCs with same aid agency)")
 
 # FURTHER FILTRATION
-vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
-V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
-V(vgg)$name <- u_vdc
-transitivity(vgg)
-cut99.5 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.995)
-vgg_f <- filter(cutoff = cut99.5,
-                edge_matrix = aid_vdc,
-                vertex_colors = V(vgg)$color,
-                vertex_names = V(vgg)$name)
-vgg_f <- as.undirected(vgg_f)
-vgg_f <- giant_comp(graph = vgg_f,
-                    vertex_colors = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
-plot(as.undirected(vgg_f),
-     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
-     vertex.color = V(vgg_f)$color,
-     vertex.size=4,
-     vertex.label=NA, 
-     vertex.label.color="black", 
-     vertex.label.font=1, 
-     vertex.label.cex=1, 
-     edge.width=sqrt(E(vgg_f)$weight),
-     edge.curved=TRUE,
-     edge.color=gray.colors(1))
+# vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+# V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+# V(vgg)$name <- u_vdc
+# V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
+# cut99.5 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.995)
+# vgg_f <- filter(cutoff = cut99.5,
+#                 edge_matrix = aid_vdc,
+#                 vertex_colors = V(vgg)$color,
+#                 vertex_names = V(vgg)$name)
+# vgg_f <- as.undirected(vgg_f)
+# vgg_f <- giant_comp(graph = vgg_f,
+#                     vertex_colors = V(vgg_f)$color,
+#                     vertex_names = V(vgg_f)$name)
+# plot(as.undirected(vgg_f),
+#      layout=layout.fruchterman.reingold(vgg_f,
+#                                         niter = 200),
+#      vertex.color = V(vgg_f)$color,
+#      vertex.size = 4,
+#      vertex.label = NA, 
+#      vertex.label.color = "black", 
+#      vertex.label.font = 1, 
+#      vertex.label.cex = 1, 
+#      edge.width = sqrt(E(vgg_f)$weight),
+#      edge.curved = TRUE,
+#      edge.color = gray.colors(1),
+#      main = "VDC Aid Association Network (Node Size = Log(1+Degree)
+#      (Node Degree = number of agencies with shared VDC aid targets)")
 
 
 # ANALYSIS OF THE TARGET VDC NETWORK ITSELF:
+vgg <- as.undirected(graph.adjacency(aid_vdc,
+                                     weighted = TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
 
 # THIS IS THE NUMBER OF VDCS A GIVEN VDC HAS AN AGENCY IN COMMON
 summary(degree(vgg))
@@ -3238,19 +3259,6 @@ histP2(graph.strength(vgg),
   (Weighted VDC Overlap Counts Distribution)")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # GRAPH DENSITY IS THE RATIO OF THE NUMBER OF EDGES AND THE NUMBER OF POSSIBLE EDGES
 # TYPICALLY ON THE ORDER OF 1-10%
 100*graph.density(vgg)
@@ -3267,12 +3275,13 @@ sort(clusters(vgg)$csize,decreasing=TRUE)
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
-transitivity(vgg)
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
 cut75 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.75)
 vgg_f <- filter(cutoff = cut75,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
-                vertex_names = V(vgg)$name)
+                vertex_names = V(vgg)$name,
+                vertex_size = V(vgg)$size)
 vgg_f <- as.undirected(vgg_f)
 transitivity(vgg_f)
 
@@ -3286,9 +3295,11 @@ sum(degree(vgg)==0)/vcount(vgg)
 vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
 vgg <- giant_comp(graph = vgg,
                   vertex_color = V(vgg)$color,
-                  vertex_names = V(vgg)$name)
+                  vertex_names = V(vgg)$name,
+                  vertex_size = V(vgg)$size)
 sh<-shortest.paths(vgg)
 is.na(sh)<-sapply(sh,is.infinite)
 sh[1:5,1:5]
@@ -3303,13 +3314,71 @@ plot(sort(paths),
      col=adjustcolor(rgb(1,0,1/2,1)))
 hist(paths,
      breaks=15,
-     col=adjustcolor(rgb(1,0,1/2,1)),
+     col=adjustcolor(rgb(1,0,1,1)),
      xlab="Path Length Values",
      main="Path Length Distribution for g")
 
 
 
-# BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
+#
+#
+#
+#
+# HEAT MAPS ACCORDING TO DEGREE DISTRIBUTION
+# AND WEIGHTED DEGREE DISTRIBUTION
+#
+#
+#
+#
+#
+
+
+# PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
+vgg <- giant_comp(graph = vgg,
+                  vertex_color = V(vgg)$color,
+                  vertex_names = V(vgg)$name,
+                  vertex_size = V(vgg)$size)
+bc_int <- as.integer(round(bc,0))
+for (k in 1:length(bc_int)){
+  V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
+}
+
+# PLOT AGENCY GRAPH AND FILTER
+plot(vgg,
+     layout = layout.fruchterman.reingold(vgg,
+                                          niter = 200),
+     vertex.color = V(vgg)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "black",
+     vertex.label.font = 1.5, 
+     vertex.label.cex = 1, 
+     edge.width = 0.04*E(vgg)$weight,
+     edge.curved = TRUE,
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network Giant Component BC Heat Map
+     (node degree = number of VDCs with same aid agency)")
+
+
+
+
+#
+#
+#
+#
+#
+# BETWEENNESS CENTRALITY: 
+# THE NUMBER OF GEODESICS GOING THROUGH A NODE
+#
+#
+#
+#
+#
+
 bc <- betweenness(vgg,v=V(vgg), directed=FALSE)
 plot(sort(bc, decreasing=TRUE),
      col=adjustcolor(rgb(1/2,0,0,1/2)), 
@@ -3324,6 +3393,14 @@ histP2(bc,
        main="Relief Agency Betweenness Centrality Distribution")
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
+vgg <- as.undirected(graph.adjacency(aid_vdc,weighted=TRUE))
+V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
+V(vgg)$name <- u_vdc
+V(vgg)$size <- log(3+degree(vgg)/max(degree(vgg)))
+vgg <- giant_comp(graph = vgg,
+                  vertex_color = V(vgg)$color,
+                  vertex_names = V(vgg)$name,
+                  vertex_size = V(vgg)$size)
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
   V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
@@ -3331,16 +3408,19 @@ for (k in 1:length(bc_int)){
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     layout = layout.fruchterman.reingold(vgg,
+                                          niter = 200),
      vertex.color = V(vgg)$color,
-     vertex.size = 4,
+     vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
      vertex.label.font = 1.5, 
      vertex.label.cex = 1, 
-     edge.width = 0.5*E(vgg)$weight,
+     edge.width = 0.04*E(vgg)$weight,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
+     edge.color = gray.colors(1),
+     main = "VDC Aid Association Network Giant Component BC Heat Map
+     (node degree = number of VDCs with same aid agency)")
 
 # FIND THE TOP 10% BETWEENNES NODES
 top_bc <- bc[which(bc > quantile(bc,0.9))]
@@ -3368,7 +3448,8 @@ for (k in 1:length(bc_int)){
   V(vgg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
 plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=2000, area=20000*vcount(vgg)),
+     layout = layout.fruchterman.reingold(vgg,
+                                          niter = 2000),
      vertex.color = V(vgg)$color,
      vertex.size = 3,
      vertex.label = NA, 
@@ -4912,8 +4993,7 @@ plot(wc_f,
 
 
 
-CLIQUE ANALYSIS:
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE,fig.width=12,fig.height=6, dpi=200,out.width='1200px',out.height='600px'}
+# CLIQUE ANALYSIS:
 # Largest clique
 largest.cliques(g1)[1]
 # Maximal clique
@@ -4921,9 +5001,9 @@ mc<-maximal.cliques(g1)
 mc[length(mc)] 
 maximal.cliques.count(g1)
 clique.number(g1)
-````
-SMALL-WORLD ANALYSIS:
-```{r, echo=FALSE,results='markup',warning=FALSE,message=FALSE}
+
+#SMALL-WORLD ANALYSIS:
+
 cat("We compute the giant component.")
 cl<-clusters(g1)
 gg1<-induced.subgraph(g1, which(cl$membership == which.max(cl$csize)))
@@ -4950,52 +5030,6 @@ clustering_coef_er<-transitivity(er, type="global")
 sindex<-(clustering_coef/clustering_coef_er) / (avdistg/avdist_er)
 cat("We compute the small-world index of the store network. We will take a closer look at this and other properties in subsequent sections.")
 sindex
-```
-library(plyr)
-#We next compare the dept-level multi-basket (more than one dept) size distribution for renewal versus nonrenewal members after the first year. Since the distributions are exponential and hard to compare, we use the slope of the linear fit to the semi-log distribution to better see the difference. 
-dy2<-as.data.frame(unique(cbind(dy1$visit_nbr,dy1$dept_nbr)))
-dn2<-as.data.frame(unique(cbind(dn1$visit_nbr,dn1$dept_nbr)))
-colnames(dy2)<-c("visit_nbr","dept_nbr")
-colnames(dn2)<-c("visit_nbr","dept_nbr")
-bsizey<-length(unique(dy2$visit_nbr))
-bsizen<-length(unique(dn2$visit_nbr))
-yvisits<-unique(dy2$visit_nbr)
-nvisits<-unique(dn2$visit_nbr)
-dy2$visit_num<-mapvalues(dy2$visit_nbr, from=yvisits,to=1:length(yvisits))
-dn2$visit_num<-mapvalues(dn2$visit_nbr, from=nvisits,to=1:length(nvisits))
-baskety<-vector()
-basketn<-vector()
-ty<-table(dy2$visit_num)
-tn<-table(dn2$visit_num)
-for (k in 1:bsizey){
-  baskety[k]<-ty[k][[1]] 
-}
-for (k in 1:bsizen){
-  basketn[k]<-tn[k][[1]] 
-}
-tby<-vector()
-tbn<-vector()
-for (k in 1:length(table(baskety))){
-  tby[k]<-table(baskety)[k][[1]] 
-}
-for (k in 1:length(table(basketn))){
-  tbn[k]<-table(basketn)[k][[1]] 
-}
-dy<-cbind.data.frame(as.vector(1:length(tby)),log(tby))
-colnames(dy)<-c("x","y")
-dn<-cbind.data.frame(as.vector(1:length(tbn)),log(tbn))
-colnames(dn)<-c("x","y")
-fity<-lm(y~x, data=dy)
-fitn<-lm(y~x, data=dn)
-par(mfrow=c(1,2))
-hist(baskety[baskety>1], breaks=90,col=adjustcolor(rgb(1,0,1,1)),xlab="Sams Renewal Dept Index", main="Reneweal Multi-Basket Sizes at Dept Level",labels=ifelse(as.numeric(as.vector(hist(baskety[baskety>1],breaks=90,plot=FALSE)$counts))<1,"",hist(baskety[baskety>1],breaks=90,plot=FALSE)$counts))
-hist(basketn[basketn>1], breaks=80,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Sams Non-Renewal Dept Index", main="Non-Reneweal Multi-Basket Sizes at Dept Level",labels=ifelse(as.numeric(as.vector(hist(basketn[basketn>1],breaks=80,plot=FALSE)$counts))<1,"",hist(basketn[basketn>1],breaks=80,plot=FALSE)$counts))
-par(mfrow=c(1,2))
-plot(dy$x,dy$y,xlab="Sams Renewal Dept Index", ylab="Log[Basket Size Frequency]", pch=16, main="Linear Fit for Semi-Log Renewal Multi-Baskets")
-lines(abline(coef=coef(fity), col="red"),xlim=range(0:length(dy)),ylim=range(0:max(log(dy))))
-legend(15,7.5,legend=rbind(c("Intercept:","Slope:"),round(coef(fity),5)))
-plot(dn$x,dn$y,xlab="Sams Non-Renewal Dept Index", ylab="Log[Basket Size Frequency]", pch=16, main="Linear Fit for Semi-Log Non-Renewal Multi-Baskets")
-lines(abline(coef=coef(fitn), col="red"),xlim=range(0:length(dn)),ylim=range(0:max(log(dn))))
 
 
 
