@@ -1,6 +1,6 @@
 # Severity of Nepal Disaster Aid Distribution Network Analysis
 # author: Georgi D. Gospodinov
-# date: "Augist 15, 2015"
+# date: "September 18, 2015"
 # 
 # Data Sources:
 #
@@ -289,8 +289,7 @@ for (k in 1:dim(aid_m)[1]){
 # PLOT THE AGENCY-VDC AID NETWORK
 plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200,
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = NA, 
@@ -355,15 +354,14 @@ av_f <- filter(cutoff = cut25,
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout = layout.fruchterman.reingold(av_f,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f)),
+                                          niter = 200),
      vertex.color = V(av_f)$color,
      vertex.size = V(av_f)$size,
      vertex.label = NA, 
      vertex.label.color = "black", 
      vertex.label.font = 2, 
      vertex.label.cex = 0.7, 
-     edge.width = 0.7*sqrt(E(av_f)$weight),
+     edge.width = 0.15*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
@@ -424,13 +422,12 @@ av_f <- filter(cutoff = cut50,
 # DISPLAY THE EDGE-FILTERED GRAPH
 plot(av_f,
      layout = layout.fruchterman.reingold(av_f,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f)),
+                                          niter = 200),
      vertex.color = V(av_f)$color,
      vertex.size = V(av_f)$size,
      vertex.label = V(av_f)$name, 
      vertex.label.color = "black", 
-     vertex.label.font = 2, 
+     vertex.label.font = 1, 
      vertex.label.cex = 0.7, 
      edge.width = 0.3*sqrt(E(av_f)$weight),
      edge.arrow.size = 0.2,
@@ -688,8 +685,7 @@ V(av_f_c)$name[which(all %in% V(av_f_c)$name)>length(ag)] <- NA
 # DISPLAY THE EDGE-FILTERED GRAPH AGAIN
 plot(av_f_c,
      layout = layout.fruchterman.reingold(av_f_c,
-                                          niter = 200,
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = V(av_f_c)$color,
      vertex.size = V(av_f_c)$size,
      vertex.label = V(av_f_c)$name, 
@@ -943,8 +939,7 @@ for (k in 1:length(au)){
 
 plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = NA, 
@@ -1048,8 +1043,7 @@ for (k in 1:length(hb)){
 
 plot(av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = V(av)$name, 
@@ -1147,7 +1141,7 @@ for (k in 1:dim(aid_m)[1]){
 }
 
 
-# DEfine the SPINGLASS COMMUNITY STRUCTURE
+# DEFINE THE SPINGLASS COMMUNITY STRUCTURE
 sp <- spinglass.community(graph = av,
                           weights = E(av)$weights,
                           spins = 20)
@@ -1156,8 +1150,7 @@ sp <- spinglass.community(graph = av,
 plot(sp,
      av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = sp,
      vertex.size = 2,
      vertex.label = NA, 
@@ -1208,8 +1201,7 @@ sp_f_c <- spinglass.community(graph = av_f_c,
 plot(sp_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = sp_f_c,
      vertex.size = 2,
      vertex.label = NA, 
@@ -1327,8 +1319,7 @@ wk <- walktrap.community(graph = av,
 plot(wk,
      av,
      layout = layout.fruchterman.reingold(av, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av)),
+                                          niter = 200),
      vertex.color = wk,
      vertex.size = V(av)$size,
      vertex.label = NA, 
@@ -1378,8 +1369,7 @@ wk_f_c <- walktrap.community(graph = av_f_c,
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = wk_f_c,
      vertex.size = 2,
      vertex.label = NA, 
@@ -1453,8 +1443,7 @@ wk_f_c <- walktrap.community(graph = av_f_c,
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = wk_f_c,
      vertex.size = 2,
      vertex.label = NA, 
@@ -1528,8 +1517,7 @@ wk_f_c <- walktrap.community(graph = av_f_c,
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = wk_f_c,
      vertex.size = 2,
      vertex.label = NA, 
@@ -1603,8 +1591,7 @@ wk_f_c <- walktrap.community(graph = av_f_c,
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
+                                          niter = 200),
      vertex.color = wk_f_c,
      vertex.size = 2,
      vertex.label = NA, 
@@ -1854,6 +1841,18 @@ for (k in 1: length(resolve_vdc)){
 }
 
 # NOW WE MERGE WITH THE SEVERITY INDEX DATA
+# GET UNIQUE HLCIT FROM AID DATA
+aid_sev <-aid_data
+for (k in 1:dim(aid_data)[1]){
+  aid_sev$hazard[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$hazard)
+  aid_sev$exposure[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$exposure)
+  aid_sev$housing[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$housing)
+  aid_sev$poverty[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$poverty)
+  aid_sev$vulnerability[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$vulnerability)
+  aid_sev$severity[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$severity)
+}
 
+# EXPORT THE DATA
+write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
 
 

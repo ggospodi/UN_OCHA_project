@@ -1493,36 +1493,16 @@ plot(av_f_c,
      main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # TO PLOT THE FILTERED GEO-NETWORK, RE-DEFINE THE WEIGHTED DISPLACEMENT GRAPH
-av <- graph.adjacency(aid_m,mode="directed",weighted=TRUE)
+av <- graph.adjacency(aid_m,
+                      mode = "directed",
+                      weighted = TRUE)
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color<-rep("green",length(all))
+V(av)$color <- rep("green",length(all))
 for (k in 1:length(all)){
   if(is.element(all[k],vd)){
-    V(av)$color[k]<-"SkyBlue2"
+    V(av)$color[k] <- "SkyBlue2"
   }  
 }
 
@@ -1536,22 +1516,35 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$name[k] <- all[k]}
 }
 
+cut70 <- quantile(as.vector(aid_m[aid_m>0]),0.70)
+av_f <- filter(cutoff = cut70,
+               edge_matrix = aid_m,
+               vertex_colors = V(av)$color,
+               vertex_names = V(av)$name,
+               vertex_size = V(av)$size)
+av_f_c <- giant_comp(graph = av_f,
+                     vertex_colors = V(av_f)$color,
+                     vertex_names = V(av_f)$name,
+                     vertex_size = V(av_f)$size)
 koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
+wk_f_c <- walktrap.community(graph = av_f_c,
+                             weights = E(av_f_c)$weight)
+
 
 # PLOT THE WALKTRAP COMMUNITIES FOR THE GEO-NETWORK
-plot(wk_f_c,
-     av_f_c,
+plot(av_f_c,
      layout = koords2_f_c,
-     vertex.color = wk_f_c,
-     vertex.size = 2,
+     vertex.color = wk_f_c$membership,
+     vertex.size = V(av_f_c)$size,
      vertex.label = NA, 
-     vertex.label.color = "black",
+     vertex.label.color = "darkgreen",
      vertex.label.font = 1, 
      vertex.label.cex = 0.85, 
      edge.width = 0.3*sqrt(E(av_f_c)$weight),
      edge.arrow.size = 0.3,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
+     mark.groups = by(seq_along(wk_f_c$membership), wk_f_c$membership, invisible),
      main = "Weighted Agency-VDC Aid Network Walktrap Communities")
 
 
@@ -1571,13 +1564,12 @@ av_f_c <- giant_comp(graph = av_f,
 wk_f_c <- walktrap.community(graph = av_f_c,
                              weights = E(av_f_c)$weights)
 
-# PLOT THE COMMUNITIES OF THE Agency-VDC Aid NETWORK
+# PLOT THE COMMUNITIES OF THE AGENCY-VDC AID NETWORK
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
-     vertex.color = wk_f_c,
+                                          niter = 200),
+     vertex.color = wk_f_c$membership,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
@@ -1617,7 +1609,7 @@ koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
 plot(wk_f_c,
      av_f_c,
      layout = koords2_f_c,
-     vertex.color = wk_f_c,
+     vertex.color = wk_f_c$membership,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
@@ -1650,9 +1642,8 @@ wk_f_c <- walktrap.community(graph = av_f_c,
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
-     vertex.color = wk_f_c,
+                                          niter = 200),
+     vertex.color = wk_f_c$membership,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
@@ -1692,7 +1683,7 @@ koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
 plot(wk_f_c,
      av_f_c,
      layout = koords2_f_c,
-     vertex.color = wk_f_c,
+     vertex.color = wk_f_c$membership,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
@@ -1725,9 +1716,8 @@ wk_f_c <- walktrap.community(graph = av_f_c,
 plot(wk_f_c,
      av_f_c,
      layout = layout.fruchterman.reingold(av_f_c, 
-                                          niter = 200, 
-                                          area = 2000*vcount(av_f_c)),
-     vertex.color = wk_f_c,
+                                          niter = 200),
+     vertex.color = wk_f_c$membership,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
@@ -1767,7 +1757,7 @@ koords2_f_c <- koords2[which(V(av)$name %in% V(av_f_c)$name),]
 plot(wk_f_c,
      av_f_c,
      layout = koords2_f_c,
-     vertex.color = wk_f_c,
+     vertex.color = wk_f_c$membership,
      vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "black",
@@ -1853,8 +1843,7 @@ V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
      layout = layout.fruchterman.reingold(agg, 
-                                        niter = 200,
-                                        area = 2000*vcount(agg)),
+                                        niter = 200),
      vertex.color = V(agg)$color,
      vertex.size = V(agg)$size,
      vertex.label = V(agg)$name, 
@@ -1874,8 +1863,7 @@ V(agg)$size <- sqrt(graph.strength(agg)-min(graph.strength(agg)))
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
      layout = layout.fruchterman.reingold(agg, 
-                                          niter = 200,
-                                          area = 2000*vcount(agg)),
+                                          niter = 200),
      vertex.color = V(agg)$color,
      vertex.size = V(agg)$size,
      vertex.label = V(agg)$name, 
@@ -1889,21 +1877,20 @@ plot(agg,
 (Node Weighted Degree = number of agencies with shared VDC aid targets, 
      weighted by the number of VDCs per agency)")
 
-# CHANGE THE NODE SIZE TO REFLECT NUBER OF SHARED VDCs USING LOG
+# CHANGE THE NODE SIZE TO REFLECT NUMBER OF SHARED VDCs USING LOG
 V(agg)$size <- log(graph.strength(agg))
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
      layout = layout.fruchterman.reingold(agg, 
-                                          niter = 200,
-                                          area = 2000*vcount(agg)),
+                                          niter = 200),
      vertex.color = V(agg)$color,
      vertex.size = V(agg)$size,
      vertex.label = V(agg)$name, 
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
      vertex.label.cex = 0.75, 
-     edge.width = 0.25*E(agg)$weight,
+     edge.width = 0.15*E(agg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Aid Agency Association Network (Node Size = Log(Weighted Degree)
@@ -1937,8 +1924,7 @@ agg_f<-filter(cutoff = cut75,
 
 plot(as.undirected(agg_f),
      layout = layout.fruchterman.reingold(agg_f,
-                                          niter = 200,
-                                          area = 2000*vcount(agg_f)),
+                                          niter = 200),
      vertex.color = V(agg_f)$color,
      vertex.size = V(agg_f)$size,
      vertex.label = V(agg_f)$name, 
@@ -1971,8 +1957,7 @@ agg_f <- filter(cutoff = cut85,
 
 plot(as.undirected(agg_f),
      layout = layout.fruchterman.reingold(agg_f,
-                                          niter = 200,
-                                          area = 2000*vcount(agg_f)),
+                                          niter = 200),
      vertex.color = V(agg_f)$color,
      vertex.size = V(agg_f)$size,
      vertex.label = V(agg_f)$name, 
@@ -2006,8 +1991,7 @@ agg_f <- filter(cutoff = cut90,
 
 plot(as.undirected(agg_f),
      layout = layout.fruchterman.reingold(agg_f,
-                                          niter = 200,
-                                          area = 2000*vcount(agg_f)),
+                                          niter = 200),
      vertex.color = V(agg_f)$color,
      vertex.size = V(agg_f)$size,
      vertex.label = V(agg_f)$name, 
@@ -2041,8 +2025,7 @@ agg_f <- filter(cutoff = cut95,
 
 plot(as.undirected(agg_f),
      layout = layout.fruchterman.reingold(agg_f,
-                                          niter = 200,
-                                          area = 2000*vcount(agg_f)),
+                                          niter = 200),
      vertex.color = V(agg_f)$color,
      vertex.size = V(agg_f)$size,
      vertex.label = V(agg_f)$name, 
@@ -2075,8 +2058,7 @@ agg_f <- filter(cutoff = cut97,
 
 plot(as.undirected(agg_f),
      layout = layout.fruchterman.reingold(agg_f,
-                                          niter = 200,
-                                          area = 2000*vcount(agg_f)),
+                                          niter = 200),
      vertex.color = V(agg_f)$color,
      vertex.size = V(agg_f)$size,
      vertex.label = V(agg_f)$name, 
@@ -2166,6 +2148,14 @@ hist(as.data.frame(table(unique_aid$impl_ag))[,2], breaks=100,
 
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
 
+
+agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+
+# SET THE GRAPH COLOR, LABELS, AND NODE SIZE
+V(agg)$color <- rep("green",length(ag))
+V(agg)$name <- ag
+V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
+
 # THIS IS THE NUMBER OF AGENCIES WITH COMMON VDC TARGETS AS A GIVEN AGENCY
 summary(degree(agg))
 
@@ -2222,7 +2212,8 @@ cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
 agg_f <- filter(cutoff = cut75,
                 edge_matrix = ag_m,
                 vertex_colors = V(agg)$color,
-                vertex_names = ag)
+                vertex_names = ag,
+                vertex_size = V(agg)$size)
 agg_f <- as.undirected(agg_f)
 transitivity(agg_f)
 
@@ -2238,39 +2229,41 @@ V(agg)$color <- rep("green", length(ag))
 agg <- giant_comp(graph = agg,
                   vertex_color = V(agg)$color,
                   vertex_names = ag)
-sh<-shortest.paths(agg)
-is.na(sh)<-sapply(sh,is.infinite)
+sh <- shortest.paths(agg)
+is.na(sh) <- sapply(sh,is.infinite)
 sh[1:5,1:5]
-paths<-na.omit(as.vector(sh))
+paths <- na.omit(as.vector(sh))
 length(paths)
 summary(paths)
 plot(sort(paths),
-     xlab="Path Index", 
-     ylab="Path Length", 
-     main="Paths (sorted by length)", 
-     pch=20,
-     col=adjustcolor(rgb(1,0,1/2,1)))
+     xlab = "Path Index", 
+     ylab = "Path Length", 
+     main = "Paths (sorted by length)", 
+     pch = 20,
+     col = adjustcolor(rgb(1,0,1/2,1)))
 hist(paths,
-     breaks=15,
-     col=adjustcolor(rgb(1,0,1/2,1)),
-     xlab="Path Length Values",
-     main="Path Length Distribution for g")
-
+     breaks = 15,
+     col = adjustcolor(rgb(1,0,1/2,1)),
+     xlab = "Path Length Values",
+     main = "Path Length Distribution for g")
 
 
 # BETWEENNESS CENTRALITY: THE NUMBER OF GEODESICS GOING THROUGH A NODE
-bc <- betweenness(agg,v=V(agg), directed=FALSE)
-plot(sort(bc, decreasing=TRUE),
-     col=adjustcolor(rgb(1/2,0,0,1/2)), 
-     xlab="Node Index", 
-     ylab="Betweenness Centrality", 
-     main="Sorted Relief Agency Betweenness Centrality Values", 
-     pch=19)
+bc <- betweenness(agg,
+                  v = V(agg),
+                  directed = FALSE)
+plot(sort(bc,
+          decreasing = TRUE),
+     col = adjustcolor(rgb(1/2,0,0,1/2)), 
+     xlab = "Node Index", 
+     ylab = "Betweenness Centrality", 
+     main = "Sorted Relief Agency Betweenness Centrality Values", 
+     pch = 19)
 histP2(bc,
-       breaks=100,
-       col=adjustcolor(rgb(1/2,0,0,1/2)),
-       xlab="Betweenness Centrality Values",
-       main="Relief Agency Betweenness Centrality Distribution")
+       breaks = 100,
+       col = adjustcolor(rgb(1/2,0,0,1/2)),
+       xlab = "Betweenness Centrality Values",
+       main = "Relief Agency Betweenness Centrality Distribution")
 
 # PLOT HEAT MAP ON VERTICES ACCORDING TO BETWEENNESS CENTRALITY
 bc_int <- as.integer(round(bc,0))
@@ -2280,7 +2273,8 @@ for (k in 1:length(bc_int)){
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(agg,
-     layout = layout.fruchterman.reingold(agg, niter=200, area=2000*vcount(agg)),
+     layout = layout.fruchterman.reingold(agg,
+                                          niter = 200),
      vertex.color = V(agg)$color,
      vertex.size = 7,
      vertex.label = V(agg)$name, 
@@ -2289,7 +2283,8 @@ plot(agg,
      vertex.label.cex = 1, 
      edge.width = 0.5*E(agg)$weight,
      edge.curved = TRUE,
-     edge.color = gray.colors(1))
+     edge.color = gray.colors(1),
+     main = "Betweenness Centrality for the Aid Agency Association Network")
 
 # FIND THE TOP 10% BETWEENNES NODES
 top_bc <- bc[which(bc > quantile(bc,0.9))]
@@ -2299,31 +2294,13 @@ top_bc
 top_bc <- bc[which(bc > quantile(bc,0.95))]
 top_bc
 
-# REMOVE ISOLATED
-agg <- drop_isolated(graph = agg,
-                     vertex_colors = V(agg)$color,
-                     vertex_names = V(agg)$name)
-
-# GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
-agg <- giant_comp(graph = agg,
-                  vertex_colors = V(agg)$color,
-                  vertex_names = V(agg)$name)
-
-
-
-
-
-
-
-
-
-
 
 # SET THE GRAPH COLOR ACCORDING TO BC
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 # SET THE GRAPH COLOR
 V(agg)$color <- rep("green",length(ag))
 V(agg)$name <- ag
+V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
 # REMOVE ISOLATED
 agg <- drop_isolated(graph = agg,
                      vertex_colors = V(agg)$color,
@@ -2332,9 +2309,8 @@ agg <- drop_isolated(graph = agg,
 # GET THE GIANT CONNECTED COMPONENT (TWO CLSUTERS ONLY)
 agg <- giant_comp(graph = agg,
                   vertex_colors = V(agg)$color,
-                  vertex_names = V(agg)$name)
-
-
+                  vertex_names = V(agg)$name,
+                  vertex_size = V(agg)$size)
 
 bc<-betweenness(agg,v=V(agg), directed=FALSE)
 bc_int <- as.integer(round(bc,0))
@@ -2342,7 +2318,8 @@ for (k in 1:length(bc_int)){
   V(agg)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
 plot(agg,
-     layout = layout.fruchterman.reingold(agg, niter=2000, area=20000*vcount(agg)),
+     layout = layout.fruchterman.reingold(agg, 
+                                          niter = 2000),
      vertex.color = V(agg)$color,
      vertex.size = 5,
      vertex.label = NA, 
@@ -2356,25 +2333,30 @@ plot(agg,
 
 
 # FILTER AND REPEAT:
-agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
+agg <- as.undirected(graph.adjacency(ag_m,
+                                     weighted = TRUE))
 V(agg)$color <- rep("green",length(ag))
 V(agg)$name <- ag
+V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
 cut75 <- quantile(as.vector(ag_m[ag_m>0]),0.75)
 agg_f <- filter(cutoff = cut75,
                 edge_matrix = ag_m,
                 vertex_colors = V(agg)$color,
-                vertex_names = V(agg)$name)
+                vertex_names = V(agg)$name,
+                vertex_size = V(agg)$size)
 agg_f <- as.undirected(agg_f)
 agg_f <- giant_comp(graph = agg_f,
                   vertex_color = V(agg_f)$color,
-                  vertex_names = V(agg_f)$name)
+                  vertex_names = V(agg_f)$name,
+                  vertex_size = V(agg_f)$size)
 bc<-betweenness(agg_f,v=V(agg_f), directed=FALSE)
 bc_int <- as.integer(round(bc,0))
 for (k in 1:length(bc_int)){
   V(agg_f)$color[k] <- rev(heat.colors(1+as.integer(max(bc_int))))[as.integer(bc_int[k])+1]
 }
 plot(agg_f,
-     layout = layout.fruchterman.reingold(agg_f, niter=200, area=2000*vcount(agg_f)),
+     layout = layout.fruchterman.reingold(agg_f,
+                                          niter = 200),
      vertex.color = V(agg_f)$color,
      vertex.size = 5,
      vertex.label = NA, 
@@ -2385,10 +2367,23 @@ plot(agg_f,
      edge.curved = TRUE,
      edge.color = gray.colors(1))
 
+
+
+
+
+
+
+
+
+
+
+
+
 # FILTER AND REPEAT:
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 V(agg)$color <- rep("green",length(ag))
 V(agg)$name <- ag
+V(agg)$size <- sqrt(degree(agg)-min(degree(agg)))
 cut90 <- quantile(as.vector(ag_m[ag_m>0]),0.90)
 agg_f <- filter(cutoff = cut90,
                 edge_matrix = ag_m,
@@ -3073,7 +3068,8 @@ V(vgg)$name <- u_vdc
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     layout = layout.fruchterman.reingold(vgg,
+                                          niter = 200),
      vertex.color = "SkyBlue2",
      vertex.size = 2,
      vertex.label = NA, 
@@ -3092,10 +3088,12 @@ vgg <- drop_isolated(graph = vgg,
 # GET THE GIANT CONENCTED COMPONENT (TWO CLSUTERS ONLY)
 vgg <- giant_comp(graph = vgg,
                   vertex_colors = V(vgg)$color,
-                  vertex_names = V(vgg)$name)
+                  vertex_names = V(vgg)$name,
+                  vertex_size = V(vgg)$size)
 
 plot(vgg,
-     layout = layout.fruchterman.reingold(vgg, niter=200, area=2000*vcount(vgg)),
+     layout = layout.fruchterman.reingold(vgg,
+                                          niter = 200),
      vertex.color = "SkyBlue2",
      vertex.size = 2,
      vertex.label = NA, 
@@ -3120,13 +3118,16 @@ cut85 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.85)
 vgg_f <- filter(cutoff = cut85,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
-                vertex_names = V(vgg)$name)
+                vertex_names = V(vgg)$name,
+                vertex_size = V(vgg)$size)
 vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_colors = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
+                    vertex_names = V(vgg_f)$name,
+                    vertex_size = V(vgg_f)$size)
 plot(as.undirected(vgg_f),
-     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     layout=layout.fruchterman.reingold(vgg_f,
+                                        niter = 200),
      vertex.color = V(vgg_f)$color,
      vertex.size=2,
      vertex.label=NA, 
@@ -3147,13 +3148,16 @@ cut95 <- quantile(as.vector(aid_vdc[aid_vdc>0]),0.95)
 vgg_f <- filter(cutoff = cut95,
                 edge_matrix = aid_vdc,
                 vertex_colors = V(vgg)$color,
-                vertex_names = V(vgg)$name)
+                vertex_names = V(vgg)$name,
+                vertex_size = V(vgg)$size)
 vgg_f <- as.undirected(vgg_f)
 vgg_f <- giant_comp(graph = vgg_f,
                     vertex_colors = V(vgg_f)$color,
-                    vertex_names = V(vgg_f)$name)
+                    vertex_names = V(vgg_f)$name,
+                    vertex_size = V(vgg_f)$size)
 plot(as.undirected(vgg_f),
-     layout=layout.fruchterman.reingold(vgg_f, niter=200, area=2000*vcount(vgg_f)),
+     layout=layout.fruchterman.reingold(vgg_f,
+                                        niter = 200),
      vertex.color = V(vgg_f)$color,
      vertex.size=2,
      vertex.label=NA, 

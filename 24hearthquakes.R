@@ -1,4 +1,6 @@
 library(devtools)
+library(httr)
+library(dplyr)
 devtools::install_github("hadley/purrr")
 library(purrr)
 
