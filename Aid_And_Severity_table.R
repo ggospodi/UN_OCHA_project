@@ -278,14 +278,27 @@ for (k in 1:dim(aid_data)[1]){
   aid_sev$severity[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$severity)
 }
 
-# EXPORT THE DATA
-write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
-
-# EXPORT JUST SEVERITY DATA ON THE AID RECEIVING VDCs
-sev_list <- c("hazard","exposure","housing","poverty","vulnerability","severity")
-sev_aid <- sev[sev$hlcit %in% unique(aid_data$hlcit),sev_list]
-
 # ADD HLCIT AND VDC DEGREE VARIABLE
 vdc_degree <- readObj(paste0(DIR,"vdc_degree.df"))
 hlcit_degree <- readObj(paste0(DIR,"hlcit_degree.df"))
+for (k in 1:dim(aid_sev)[1]){
+  if (aid_sev$hlcit[k] %in% hlcit_degree$hlcit){
+    aid_sev$degree[k] <- hlcit_degree[hlcit_degree$hlcit %in% aid_sev$hlcit[k],]$hlcit_degree
+  } else {
+    aid_sev$degree[k] <- NA
+  }
+}
+  
+# EXPORT THE DATA
+write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
+writeObj(aid_sev,file=paste0(DIR,"aid_and_severity.df"))
 
+
+# EXPORT JUST SEVERITY DATA ON THE AID RECEIVING VDCs
+aid_hlcit_list <- unique(aid_sev$hlcit)
+var_list <- c("hazard","exposure","housing","poverty","vulnerability","severity","degree")   
+aid_sev_modeling <- unique(aid_sev[aid_sev$hlcit %in% aid_hlcit_list,var_list])
+
+# SAVE MODELING TABLE
+write.csv(aid_sev_modeling,file=paste0(DIR,"aid_sev_modeling.csv"))
+writeObj(aid_sev_modeling,file=paste0(DIR,"aid_sev_modeling.df"))

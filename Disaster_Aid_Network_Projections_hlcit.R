@@ -903,7 +903,7 @@ V(vgg)$size <- log(exp(1)+degree(vgg)/max(degree(vgg)))
 
 
 # SAVE HLCIT DEGREE FOR MODELING PURPOSES
-hlcit_degree <- cbind.data.frame(u_hlcit,degree(vgg))
+hlcit_degree <- cbind.data.frame(u_hlcit,as.numeric(degree(vgg)))
 colnames(hlcit_degree) <- c("hlcit","hlcit_degree")
 write.csv(hlcit_degree,file = paste0(DIR,"hlcit_degree.csv"))
 writeObj(hlcit_degree,file = paste0(DIR,"hlcit_degree.df"))
