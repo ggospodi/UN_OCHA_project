@@ -285,6 +285,7 @@ write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
 sev_list <- c("hazard","exposure","housing","poverty","vulnerability","severity")
 sev_aid <- sev[sev$hlcit %in% unique(aid_data$hlcit),sev_list]
 
-# ADD VDC DEGREE VARIABLE
-vdc_degree <- read.csv(paste0(DIR,"vdc_degree.csv"))
+# ADD HLCIT AND VDC DEGREE VARIABLE
+vdc_degree <- readObj(paste0(DIR,"vdc_degree.df"))
+hlcit_degree <- readObj(paste0(DIR,"hlcit_degree.df"))
 
