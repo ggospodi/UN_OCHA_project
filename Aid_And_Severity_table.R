@@ -31,7 +31,18 @@ DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
 #
 #
 #
-# FUNCTION TO DISPLAY RELATIVE PERCENTAGES FOR HSITOGRAM COLUMNS
+# WRITE OBJECT FUNCTION
+writeObj <- function(obj, file_name) {
+  save(obj, file=file_name)
+  return(file_name)
+}
+
+# READ OBJECT FUNCTION
+readObj <- function(file_name) {
+  obj_name <- load(file_name)
+  obj <- get(obj_name)
+  return(obj)
+}
 
 
 # LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
@@ -273,3 +284,7 @@ write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
 # EXPORT JUST SEVERITY DATA ON THE AID RECEIVING VDCs
 sev_list <- c("hazard","exposure","housing","poverty","vulnerability","severity")
 sev_aid <- sev[sev$hlcit %in% unique(aid_data$hlcit),sev_list]
+
+# ADD VDC DEGREE VARIABLE
+vdc_degree <- read.csv(paste0(DIR,"vdc_degree.csv"))
+

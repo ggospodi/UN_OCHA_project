@@ -57,6 +57,19 @@ histP2 <- function(x,breaks, ...) {
   plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
 }
 
+# WRITE OBJECT FUNCTION
+writeObj <- function(obj, file_name) {
+  save(obj, file=file_name)
+  return(file_name)
+}
+
+# READ OBJECT FUNCTION
+readObj <- function(file_name) {
+  obj_name <- load(file_name)
+  obj <- get(obj_name)
+  return(obj)
+}
+
 
 # FUNCTION THAT TRIMS LEADING WHITESPACE
 trim.leading <- function (x)  sub("^\\s+", "", x)
@@ -3250,7 +3263,9 @@ V(vgg)$size <- log(exp(1)+degree(vgg)/max(degree(vgg)))
 
 # SAVE DEGREE FOR MODELING PURPOSES
 vdc_degree <- cbind.data.frame(u_vdc,degree(vgg))
+colnames(vdc_degree) <- c("vdc","vdc_deg")
 write.csv(vdc_degree,file = paste0(DIR,"vdc_degree.csv"))
+writeObj(vdc_degree,file = paste0(DIR,"vdc_degree.df"))
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(vgg,
