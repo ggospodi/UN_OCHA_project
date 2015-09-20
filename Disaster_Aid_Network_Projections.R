@@ -3192,6 +3192,13 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 #
 #
 #
+#
+#
+#
+#
+#
+#
+#
 # VDC AID TARGET NETWORK:
 #
 #
@@ -3199,11 +3206,20 @@ hist(hb,breaks=100,col=adjustcolor(rgb(0,0,1,1/2)),xlab="Hub Score Values",main=
 #
 #
 #
-# FIX FIX FIX FIX FIX PLOT LABELS!!!!!!!!!!!!!!
 #
 #
 #
 #
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
 
 # ANALYSIS OF THE VDC AID TARGET NETWORK
 u_vdc <- as.character(unique(aid_data$vdc))
@@ -3230,6 +3246,11 @@ vgg <- as.undirected(graph.adjacency(aid_vdc,
 V(vgg)$color <- rep("SkyBlue2",length(u_vdc))
 V(vgg)$name <- u_vdc
 V(vgg)$size <- log(exp(1)+degree(vgg)/max(degree(vgg)))
+
+
+# SAVE DEGREE FOR MODELING PURPOSES
+vdc_degree <- cbind.data.frame(u_vdc,degree(vgg))
+write.csv(vdc_degree,file = paste0(DIR,"vdc_degree.csv"))
 
 # PLOT AGENCY GRAPH AND FILTER
 plot(vgg,

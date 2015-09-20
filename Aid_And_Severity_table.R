@@ -257,7 +257,7 @@ for (k in 1: length(resolve_vdc)){
 
 # NOW WE MERGE WITH THE SEVERITY INDEX DATA
 # GET UNIQUE HLCIT FROM AID DATA
-aid_sev <-aid_data
+aid_sev <- aid_data
 for (k in 1:dim(aid_data)[1]){
   aid_sev$hazard[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$hazard)
   aid_sev$exposure[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$exposure)
@@ -270,4 +270,6 @@ for (k in 1:dim(aid_data)[1]){
 # EXPORT THE DATA
 write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
 
-
+# EXPORT JUST SEVERITY DATA ON THE AID RECEIVING VDCs
+sev_list <- c("hazard","exposure","housing","poverty","vulnerability","severity")
+sev_aid <- sev[sev$hlcit %in% unique(aid_data$hlcit),sev_list]
