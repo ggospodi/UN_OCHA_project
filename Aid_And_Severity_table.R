@@ -255,6 +255,11 @@ for (k in 1:dim(sev)[1]){
   }
 }
 
+# EXPORT TRANSFORMED SEVERITY TABLE
+write.csv(sev,file=paste0(DIR,"severity_mapvalues.csv"))
+writeObj(sev,file=paste0(DIR,"severity_mapvalues.df"))
+
+
 # RESOLVE REMAINING VDC NAMES AND HLCIT CODES
 resolve_vdc <- sev[is.na(sev$hlcit),]$vdc
 resolve_which <- which(is.na(sev$hlcit))
