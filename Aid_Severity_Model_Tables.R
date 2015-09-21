@@ -72,12 +72,58 @@ readObj <- function(file_name) {
 }
 
 
-# FUNCTION TO SET NAs TO MEAN
-nas_to_mean <- function(df){
-  for (i in 1:(dim(df)[2])){
-    df[is.na(df[,i]),i] <- mean(df[!is.na(df[,i]),i])
+# FUNCITON TO REMOVE ALL PUNCTUATION CHARACTERS FROM LEVEL NAMES OF VARIABLES
+rm_punct <- function(df){
+  for (i in 1:dim(df)[2]){
+    if (class(df[,i])=="factor" || class(df[,i])=="character" ){
+      level_names <- unique(levels(df[,i]))
+      df[,i] <- mapvalues(df[,i], from=level_names,to=gsub("[[:punct:]]","",level_names))
+    }
   }
   return(df)
+}
+
+
+
+# FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF VARIABLES
+rm_space <- function(df){
+  for (i in 1:dim(df)[2]){
+    if (class(df[,i])=="factor" || class(df[,i])=="character" ){
+      level_names <- unique(levels(df[,i]))
+      df[,i] <- mapvalues(df[,i], from=level_names,to=gsub("[[:space:]]","",level_names))
+    }
+  }
+  return(df)
+}
+
+
+# FUNCTION THAT TRIMS LEADING WHITESPACE
+trim.leading <- function (x)  sub("^\\s+", "", x)
+
+
+# FUNCTION THAT TRIMS TRAILING WHITESPACE
+trim.trailing <- function (x) sub("\\s+$", "", x)
+
+
+# FUNCTION THAT TRIMS LEADING OR TRAILING WHITESPACE
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+
+
+# FUNCITON TO REMOVE ALL SPACES FROM LEVEL NAMES OF A VARIABLE
+rm_space <- function(df,col_name){
+  level_names <- unique(levels(df[,which(names(df) %in% col_name)]))
+  df[,which(names(df) %in% col_name)] <- mapvalues(df[,which(names(df) %in% col_name)], 
+                                                   from = level_names,
+                                                   to = gsub("[[:space:]]","",level_names))
+  return(df)
+}
+
+
+# FUNCTION TO GET GEODESIC DISTANCE IN KM
+gcd.slc <- function(long1, lat1, long2, lat2) {
+  R <- 6371 # Earth mean radius [km]
+  d <- acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2) * cos(long2-long1)) * R
+  return(d) # Distance in km
 }
 
 
@@ -104,7 +150,30 @@ nas_to_mean <- function(df){
 #
 #
 
+
+# QUAKE STATS
+quake_stats <- read.csv(paste0(DIR,"quake_stats.csv"))
+
+# NEPAL AFFECTED POPULATIN (DISTRICT LEVEL)
+affected_pop <- read.csv(paste0(DIR,"affected_pop.csv"))
+
+# NEPAL HAZARD SCORE
+n_hazard <- read.csv(paste0(DIR,"hazard_score.csv"))
+
+# NEPAL HEALTH FACILITIES
+nepal_h <- read.csv(paste0(DIR,"nepal_health.csv"))
+
+# LOAD POPULATION CENSUS TABLE
+popt <- read.csv(paste0(DIR,"npl-popt.csv"))
+
+# READ IN PCODE TO HLCIT TABLE
+p_to_h <- read.csv(paste0(DIR,"p_codes_to_hlcit.csv"))
+
+# RAW SEVERITY DATA
+sev <- read.csv(paste0(DIR,"severity.csv"))
+
 # LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
+centroids <- read.csv(paste0(DIR,"centroids.csv"))
 hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
 colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
 hlcit$hlcit_code <- as.factor(hlcit$hlcit_code)
@@ -116,9 +185,8 @@ hlcit$hlcit_code <- as.numeric(levels(hlcit$hlcit_code))[hlcit$hlcit_code]
 # READ SEVERITY TABLE
 severity_data <- readObj(file_name = paste0(DIR,"severity_mapvalues.df"))
 
-# COLUMN NAMES FOR agency_relief.csv ARE:
+# READ DISASTER AID RELIEF
 aid_data <- read.csv(paste0(DIR,"agency_relief.csv"), sep=",")
-
 
 # READ IN AID AND SEVERITY COMPLETE DATA TABLE
 aid_sev <- readObj(file_name = paste0(DIR,"aid_and_severity.df"))
@@ -129,6 +197,280 @@ aid_sev_modeling <- readObj(file_name=paste0(DIR,"aid_sev_modeling.df"))
 
 # SET NAs TO MEAN
 aid_sev_modeling <- nas_to_mean(aid_sev_modeling)
+
+# CONVERT EGREES TO RADIANS
+deg2rad <- function(deg) return(deg*pi/180)
+
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# BUILD THE NEED ATTRIBUTE MODELING TABLE
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+
+# TRANSFORM HOSPITAL TYPE VARIABLE
+nepal_h$hf_type <- mapvalues(x = nepal_h$hf_type,
+                             from = c("Sub Center","DPHO","Sub Health Post","Health Post","Hospital","Supply Center","Primary Health Center",
+                                      "District Cold Room","Laxmipur","DIstrict Cold Room","Ayurvedic Aushadhalaya","DAHC","","Distict Cold Room",
+                                      "Zonal Hospital","Private Hospital","Health Care Center","Health Center","Refugee Camp","Primary Health Post",
+                                      "Central Hospital","District Center","D(P)HO","District Ayurvedic HC","RMS"),
+                             to = c("Four","Five","One","Two","Four","Two","Three","Two","Two","Two","Three","Four",NA,"Two","Five","Four","Three","Three","Two","Two","Five","Five","Five","Four","Four"))
+nepal_h$hf_type <- mapvalues(x = nepal_h$hf_type,
+                             from = c("One","Two","Three","Four","Five"),
+                             to = 1:5)
+nepal_h$hf_type <- as.numeric(levels(nepal_h$hf_type))[nepal_h$hf_type]
+nepal_h$hf_type[is.na(nepal_h$hf_type)] <- 2
+
+
+# TRANSFORM DISASTER AID DATA
+aid_data$vdc <- trim(as.character(aid_data$vdc))
+aid_data <- rm_space(aid_data,"vdc")
+aid_data$vdc <- substr(as.character(aid_data$vdc),1,12)
+aid_data$impl_ag <- trim(as.character(aid_data$impl_ag))
+aid_data <- rm_space(aid_data,"impl_ag")
+aid_data$impl_ag <- substr(as.character(aid_data$impl_ag),1,12)
+aid_data <- aid_data[nchar(aid_data$vdc)>0 & nchar(aid_data$impl_ag)>0,]
+aid_data <- rm_space(aid_data,"hlcit")
+aid_data$hlcit <- as.numeric(levels(aid_data$hlcit))[aid_data$hlcit]
+for (k in 1:dim(aid_data)[1]){
+  aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$hlcit[k])[1]]
+}
+aid_data <- aid_data[!is.na(aid_data$hlcit),]
+aid_data[is.na(aid_data$no_actions),]$no_actions <- mean(aid_data[!is.na(aid_data$no_actions),]$no_actions)
+aid_data[is.na(aid_data$no_hh),]$no_hh <- mean(aid_data[!is.na(aid_data$no_hh),]$no_hh)
+aid_data[is.na(aid_data$ave_cost),]$ave_cost <- mean(aid_data[!is.na(aid_data$ave_cost),]$ave_cost)
+aid_data$no_actions <- log(1+aid_data$no_actions)
+
+
+# TRANSFORM ALL HLCIT CODES
+p_to_h <- rm_space(p_to_h,"hlcit")
+p_to_h$hlcit <- as.numeric(levels(p_to_h$hlcit))[p_to_h$hlcit]
+
+
+# ADD HLCIT CODES TO SEVERITY TABLE
+sev_hlcit <- sev
+for (k in 1:dim(sev_hlcit)[1]){
+  if (sev_hlcit$p_code[k] %in% p_to_h$p_code){
+    sev_hlcit$hlcit[k] <- mean(p_to_h[p_to_h$p_code %in% sev_hlcit$p_code[k],]$hlcit)
+    }
+  }
+
+
+# ADD LAT AND LON OF CENTROIDS TO SEVERITY TABLE
+need_attribute_table <- sev_hlcit
+for (k in 1:dim(need_attribute_table)[1]){
+    if (need_attribute_table$hlcit[k] %in% hlcit$hlcit_code){
+      need_attribute_table$lon[k] <- mean(hlcit[hlcit$hlcit_code %in% need_attribute_table$hlcit[k],]$lon)
+      need_attribute_table$lat[k] <- mean(hlcit[hlcit$hlcit_code %in% need_attribute_table$hlcit[k],]$lat)
+    } else {
+      need_attribute_table$lon[k] <- NA
+      need_attribute_table$lat[k] <- NA
+    }
+  }
+
+
+# ADDING POPULATION DENSITY WITH NEED_ATTRIBUTE_TABLE
+popt1 <- popt[,c("P_CODE","Popden2011")]
+colnames(popt1) <- c("p_code","pop_density")
+for (k in 1:dim(need_attribute_table)[1]){
+  if (need_attribute_table$p_code[k] %in% popt1$p_code){
+    need_attribute_table$pop_density[k] <- mean(popt1[popt1$p_code %in% need_attribute_table$p_code[k],]$pop_density)
+  }
+}
+
+
+# DROP TWO DUPLICATING VDCs WITH DIFFERENT NAMES
+need_attribute_table <- need_attribute_table[-c(3931,3937),]
+
+
+# ADD HELATHCARE FACILITIES
+for (k in 1:dim(need_attribute_table)[1]){
+  if (need_attribute_table$p_code[k] %in% nepal_h$vdc_code1){
+    h_type <- nepal_h[nepal_h$vdc_code1 %in% need_attribute_table$p_code[k],]$hf_type
+    need_attribute_table$hc_cnt[k] <- length(h_type)
+    need_attribute_table$hc_wt_cnt[k] <- sum(h_type)
+    } else {
+      need_attribute_table$hc_cnt[k] <- NA
+      need_attribute_table$hc_wt_cnt[k] <- NA
+    }
+  }
+
+
+# ADD NEPAL HAZARD SCORE
+for (k in 1:dim(need_attribute_table)[1]){
+  if (need_attribute_table$p_code[k] %in% n_hazard$p_code){
+    need_attribute_table$hazard_score[k] <- mean(n_hazard[n_hazard$p_code %in% need_attribute_table$p_code[k],]$index_cnt_vdc)
+  }
+}
+
+# INSERT DISTANCE TO EPICENTER
+q_lat <- deg2rad(sum(quake_stats$lat * quake_stats$magn)/sum(quake_stats$magn))
+q_lon <- deg2rad(sum(quake_stats$lon * quake_stats$magn)/sum(quake_stats$magn))
+for (k in 1:dim(need_attribute_table)[1]){
+    need_attribute_table$dist_epicenter[k] <- gcd.slc(deg2rad(need_attribute_table$lon[k]),deg2rad(need_attribute_table$lat[k]),q_lon,q_lat)
+}
+
+# INTERMEDIATE SAVE
+write.csv(need_attribute_table,file=paste0(DIR,"need_attribute_table.csv"))
+writeObj(need_attribute_table,file=paste0(DIR,"need_attribute_table.df"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# BUILD THE AID ATTRIBUTE MODELING TABLE
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# MERGE WITH AGENCY-VDC AID TABLE
+for (k in 1:dim(sev)[1]){
+  if (sev$vdc[k] %in% hlcit$vname){
+    sev$hlcit[k] <- hlcit[which(hlcit$vname==sev$vdc[k])[1],]$hlcit
+  } else {
+    sev$hlcit[k] <- NA
+  }
+}
+
+# EXPORT TRANSFORMED SEVERITY TABLE
+write.csv(sev,file=paste0(DIR,"severity_mapvalues.csv"))
+writeObj(sev,file=paste0(DIR,"severity_mapvalues.df"))
+
+
+# RESOLVE REMAINING VDC NAMES AND HLCIT CODES
+resolve_vdc <- sev[is.na(sev$hlcit),]$vdc
+resolve_which <- which(is.na(sev$hlcit))
+for (k in 1: length(resolve_vdc)){
+  if (sev$vdc[resolve_which[k]] %in% hlcit$vdc_name){
+    sev$hlcit[resolve_which[k]] <- hlcit[which(hlcit$vdc_name==sev$vdc[resolve_which[k]])[1],]$hlcit
+  } else {
+    sev$hlcit[resolve_which[k]] <- NA
+  }
+}
+
+# NOW WE MERGE WITH THE SEVERITY INDEX DATA
+# GET UNIQUE HLCIT FROM AID DATA
+aid_sev <- aid_data
+for (k in 1:dim(aid_data)[1]){
+  aid_sev$hazard[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$hazard)
+  aid_sev$exposure[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$exposure)
+  aid_sev$housing[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$housing)
+  aid_sev$poverty[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$poverty)
+  aid_sev$vulnerability[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$vulnerability)
+  aid_sev$severity[k] <- mean(sev[sev$hlcit %in% aid_data$hlcit[k],]$severity)
+}
+
+# ADD HLCIT AND VDC DEGREE VARIABLE
+vdc_degree <- readObj(paste0(DIR,"vdc_degree.df"))
+hlcit_degree <- readObj(paste0(DIR,"hlcit_degree.df"))
+for (k in 1:dim(aid_sev)[1]){
+  if (aid_sev$hlcit[k] %in% hlcit_degree$hlcit){
+    aid_sev$degree[k] <- hlcit_degree[hlcit_degree$hlcit %in% aid_sev$hlcit[k],]$hlcit_degree
+  } else {
+    aid_sev$degree[k] <- NA
+  }
+}
+
+# EXPORT THE DATA
+write.csv(aid_sev,file=paste0(DIR,"aid_and_severity.csv"))
+writeObj(aid_sev,file=paste0(DIR,"aid_and_severity.df"))
+
+
+# EXPORT JUST SEVERITY DATA ON THE AID RECEIVING VDCs
+aid_hlcit_list <- unique(aid_sev$hlcit)
+var_list <- c("hazard","exposure","housing","poverty","vulnerability","severity","degree")   
+aid_sev_modeling <- unique(aid_sev[aid_sev$hlcit %in% aid_hlcit_list,var_list])
+
+# SAVE MODELING TABLE
+write.csv(aid_sev_modeling,file=paste0(DIR,"aid_sev_modeling.csv"))
+writeObj(aid_sev_modeling,file=paste0(DIR,"aid_sev_modeling.df"))
+
+
+
+
+
+
+
 
 
 #
