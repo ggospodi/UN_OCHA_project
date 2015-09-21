@@ -33,6 +33,11 @@ library(rpart)
 library(pROC)
 library(bootstrap)
 library(MASS)
+library(leaps)
+library(car)
+library(relaimpo)
+library(foreign)
+library(reshape2)
 #
 #
 #
@@ -200,7 +205,7 @@ aid_sev_modeling <- readObj(file_name=paste0(DIR,"aid_sev_modeling.df"))
 # SET NAs TO MEAN
 aid_sev_modeling <- nas_to_mean(aid_sev_modeling)
 
-
+aid <- scale(aid_sev_modeling)
 # CREATE INITIAL FEATURE RANKING
 feature_weights <- weightsRF(df = aid_sev_modeling,
                              target = target,
@@ -210,12 +215,38 @@ initial_features <- feature_weights$features
 
 # print(feature_weights)
 #        features importance
-# 1      severity  130.47852
-# 2 vulnerability   83.61868
-# 3        hazard   79.03830
-# 4       poverty   77.74036
-# 5       housing   63.98707
-# 6      exposure   10.19198
+# 1      severity 193.406731
+# 2        hazard 111.277955
+# 3       poverty  77.736398
+# 4 vulnerability  67.782081
+# 5       housing  45.624705
+# 6      exposure  -5.480277
+
+
+# CORRELATION ANALYSIS
+dat <- melt(round(cor(aid_sev_modeling),2))
+dat$Var1 <- factor(dat$Var1,levels=colnames(aid_sev_modeling))
+dat$Var2 <- factor(dat$Var2,levels=rev(colnames(aid_sev_modeling)))
+ggplot(data = dat,
+       aes(x = Var1, y = Var2)) + 
+  geom_tile(aes(fill = value),colour = "white") + 
+  geom_text(aes(label = sprintf("%1.2f",value)),vjust = 1) + 
+  scale_fill_gradient(low = "white",high = "darkorange") + 
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
+  ggtitle("Correaltion Analysis of Severity Variables") + 
+  theme(plot.title = element_text(face="bold"))
+
+# HERE ARE THE VALUES
+# round(cor(aid_sev_modeling),2)
+# hazard exposure housing poverty vulnerability severity degree
+# hazard          1.00     0.07    0.17   -0.24         -0.12     0.72  -0.06
+# exposure        0.07     1.00    0.12   -0.12         -0.04     0.52  -0.05
+# housing         0.17     0.12    1.00   -0.31          0.38     0.37  -0.05
+# poverty        -0.24    -0.12   -0.31    1.00          0.76    -0.23   0.09
+# vulnerability  -0.12    -0.04    0.38    0.76          1.00     0.03   0.06
+# severity        0.72     0.52    0.37   -0.23          0.03     1.00  -0.07
+# degree         -0.06    -0.05   -0.05    0.09          0.06    -0.07   1.00
+
 
 
 # FEATURES
@@ -235,6 +266,59 @@ fit <- lm(degree ~ ., data=train)
 layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
 plot(fit)
 
+# SUMMARY OF THE REGRESSION STATS
+print(summary(fit))
+
+# Call:
+#   lm(formula = degree ~ ., data = train)
+# 
+# Residuals:
+#   Min      1Q  Median      3Q     Max 
+# -154.61  -84.95  -21.24   75.12  299.13 
+# 
+# Coefficients: (1 not defined because of singularities)
+# Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)    139.432     32.243   4.324 1.82e-05 ***
+#   hazard          -9.503      7.142  -1.330    0.184    
+# exposure       -14.314     15.234  -0.940    0.348    
+# housing         -1.395      4.333  -0.322    0.748    
+# poverty          3.035      2.755   1.102    0.271    
+# vulnerability       NA         NA      NA       NA    
+# severity        11.409     24.678   0.462    0.644    
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 102.3 on 542 degrees of freedom
+# Multiple R-squared:  0.0134,	Adjusted R-squared:  0.004297 
+# F-statistic: 1.472 on 5 and 542 DF,  p-value: 0.1971
+
+# LOOK AT THE RESIDUALS, AUTOCORRELATION ANALYSIS
+acf(fit$residuals)
+
+# STANDARD RESIDUALS
+plot(rstandard(fit))
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+# FURTHER INVESTIGATIONS
+#
+#
+#
+#
+#
+#
+
+
 # Assessing R2 shrinkage using 10-Fold Cross-Validation 
 theta.fit <- function(x,degree){lsfit(x,degree)}
 theta.predict <- function(fit,x){cbind(1,x)%*%fit$coef} 
@@ -250,38 +334,50 @@ cor(y,results$cv.fit)**2 # cross-validated R2
 
 # STEPWISE REGRESSION
 # Stepwise Regression
-library(MASS)
 fit <- lm(degree~.,data=train)
 step <- stepAIC(fit, direction="both")
 step$anova # display results
 
 
 
+# ROBUST REGRESSION ANALYSIS
+summary(ols <- lm(degree ~ ., data = train))
+opar <- par(mfrow = c(2,2), oma = c(0, 0, 1.1, 0))
+plot(ols, las = 1)
+par(opar)
+d1 <- cooks.distance(ols)
+r <- stdres(ols)
+a <- cbind(train, d1, r)
+a[d1 > 4/dim(train)[1], ]
+rabs <- abs(r)
+a <- cbind(train, d1, r, rabs)
+asorted <- a[order(-rabs), ]
+summary(rr.hubber <- rlm(degree ~ hazard+exposure+housing+poverty+severity, data = train))
+hweights <- data.frame(severity = train$severity,degree = train$degree,resid = rr.huber$resid, weight = rr.huber$w)
+hweights2 <- hweights[order(rr.huber$w), ]
+hweights2[1:15, ]
+rr.bisquare <- rlm(degree ~ hazard+exposure+housing+poverty+severity, data=train, psi = psi.bisquare)
+summary(rr.bisquare)
 
-# All Subsets Regression
-library(leaps)
-attach(train)
-leaps<-regsubsets(degree~.,data=train,nbest=10)
-# view results 
-summary(leaps)
-# plot a table of models showing variables in each model.
-# models are ordered by the selection statistic.
-plot(leaps,scale="r2")
-# plot statistic by subset size 
-library(car)
-subsets(leaps, statistic="rsq")
+
+#       severity degree    resid    weight
+# 681  1.1760796    447 322.5770 0.4987031
+# 579  0.7316551    443 309.9230 0.5190625
+# 846  0.5702592    426 289.7085 0.5552798
+# 562  0.2008899    410 267.1058 0.6022627
+# 1830 1.1063028    366 240.2861 0.6694975
+# 823  1.1834204    360 236.1161 0.6813207
+# 2104 0.5773126    371 235.0135 0.6845122
+# 627  0.5353111    362 225.4604 0.7135142
+# 1815 0.8919543    352 223.0202 0.7213219
+# 1331 0.7076701    353 220.8907 0.7282704
+# 1744 0.7791218    351 218.9036 0.7348917
+# 1141 0.7853564    350 218.4414 0.7364438
+# 1410 0.7289234    338 205.0274 0.7846284
+# 729  1.0206061    332 204.5952 0.7862914
+# 1417 0.7365237    330 197.0624 0.8163440
 
 
-library(relaimpo)
-calc.relimp(fit,type=c("lmg","last","first","pratt"),
-            rela=TRUE)
-
-# Bootstrap Measures of Relative Importance (1000 samples) 
-boot <- boot.relimp(fit, b = 1000, type = c("lmg", 
-                                            "last", "first", "pratt"), rank = TRUE, 
-                    diff = TRUE, rela = TRUE)
-booteval.relimp(boot) # print result
-plot(booteval.relimp(boot,sort=TRUE)) # plot result
 
 
 

@@ -205,6 +205,29 @@ giant_comp <- function(graph, vertex_colors, vertex_names, vertex_size){
 }
 
 
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# LOAD DATA
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
 # LOAD LAT/LON COORDINATES (OF CENTROIDS) AND HLCIT CODES
 hlcit <- read.csv(paste0(DIR,"master_hlcit.csv"))
 colnames(hlcit) <- c("lon","lat","vdc_name","vname","hlcit_code")
@@ -272,7 +295,7 @@ all <- union(ag,hlc)
 hl <- vector()
 xc <- vector()
 yc <- vector()
-for (k in 1:length(vd)){
+for (k in 1:length(hlc)){
   hl[k] <- hlc[k]
   xc[k] <- hlcit$lat[which(hlcit$hlcit_code==hlc[k])[1]]
   yc[k] <- hlcit$lon[which(hlcit$hlcit_code==hlc[k])[1]]
@@ -347,7 +370,7 @@ for (k in 1:dim(aid_m)[1]){
 }
 
 plot(av,
-     layout = koords21,
+     layout = koords2,
      vertex.color = V(av)$color,
      vertex.size = V(av)$size,
      vertex.label = V(av)$name, 
@@ -607,12 +630,13 @@ plot(agg,
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
      vertex.label.cex = 0.75, 
-     edge.width = 0.25*E(agg)$weight,
+     edge.width = 0.05*E(agg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Aid Agency Association Network (Node Size = Sqrt(Weighted Degree)
 (Node Weighted Degree = number of agencies with shared VDC aid targets, 
      weighted by the number of VDCs per agency)")
+
 
 # CHANGE THE NODE SIZE TO REFLECT NUMBER OF SHARED VDCs USING LOG
 V(agg)$size <- log(graph.strength(agg))
@@ -627,7 +651,7 @@ plot(agg,
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
      vertex.label.cex = 0.75, 
-     edge.width = 0.15*E(agg)$weight,
+     edge.width = 0.05*E(agg)$weight,
      edge.curved = TRUE,
      edge.color = gray.colors(1),
      main = "Aid Agency Association Network (Node Size = Log(Weighted Degree)
@@ -664,9 +688,6 @@ plot(agg,
 
 
 
-
-
-
 #
 #
 #
@@ -683,6 +704,7 @@ plot(agg,
 #
 #
 #
+
 
 # RANGE OF NUMBER OF DISTINCT AID INSTANCES FOR EACH AGENCY
 summary(as.data.frame(table(aid_data$impl_ag))[,2])
@@ -711,12 +733,14 @@ par(new = T)
 lines(x = c(0,length(ag)),y = rep(mean(as.data.frame(table(aid_data$impl_ag))[,2]),2), col ="black", lwd=4)
 text(x = 25,y = 75,paste("MEAN =",mean(as.data.frame(table(aid_data$impl_ag))[,2])),col="black",cex=2.5)
 
+
 histP1(as.data.frame(table(aid_data$impl_ag))[,2],
        breaks=100,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab="Agency Network Aid Action Numbers", 
        main="Agency Network Number of Aid Actions Distribution
   (VDC Overlap Counts Dsitribution)")
+
 
 # PLOT RELIEF AGENCY DEGREE DISTRIBUTION (DISTINCT VDCs)
 plot(sort(as.data.frame(table(unique_aid$impl_ag))[,2]),
@@ -732,9 +756,9 @@ hist(as.data.frame(table(unique_aid$impl_ag))[,2], breaks=100,
        main="Agency Network Number of Targeted VDCs Distribution
   (VDC Overlap Counts Distribution)")
 
+
+
 # ANALYSIS OF THE AGENCY NETWORK ITSELF: OVERLAP OF AGENCY EFFORTS
-
-
 agg <- as.undirected(graph.adjacency(ag_m,weighted=TRUE))
 
 # SET THE GRAPH COLOR, LABELS, AND NODE SIZE
@@ -749,6 +773,7 @@ summary(degree(agg))
 # TARGETS IS ACCOUNTED FOR BETWEEN EACH PAIR OF AGENCIES
 summary(graph.strength(agg))
 
+
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
 plot(sort(degree(agg)),
      col = adjustcolor(rgb(1,0,1,1)),
@@ -757,12 +782,14 @@ plot(sort(degree(agg)),
      ylab = "Numer of Agencies",
      main = "Number of Agencies with Shared Target with an Agency (Sorted)")
 
+
 histP1(degree(agg),
        breaks = 50,
        col = "green",
        xlab = "Agency Network Degree Values", 
        main = "Agency Network Degree Distribution
   (Distribution of the Number of Agencies with Common Targets as a Given Agency)")
+
 
 # PLOT THE NUMBER OF DISTINCT AGENCIES THAT SHARE TARGETS WITH A GIVEN AGENCY
 # WEIGHTED BY THE NUMBER OF SHARED VDC DISTRICT BETWEEN EACH PAIR OF AGENCIES
@@ -773,6 +800,7 @@ plot(sort(graph.strength(agg)),
      ylab = "Numer of Agencies",
      main = "Number of Agencies with Shared Target with an Agency (Sorted)
      (Weighted By The Number of Shared VDCs)")
+
 
 histP1(graph.strength(agg), 
        breaks = 50,
@@ -826,10 +854,12 @@ plot(sort(paths),
      ylab = "Path Length", 
      main = "Paths (sorted by length)", 
      pch = 20,
-     col = adjustcolor(rgb(1,0,1/2,1)))
-hist(paths,
+     col = adjustcolor(rgb(1,0,1,1)))
+
+
+histP1(paths,
      breaks = 15,
-     col = adjustcolor(rgb(1,0,1/2,1)),
+     col = adjustcolor(rgb(1,0,1,1)),
      xlab = "Path Length Values",
      main = "Path Length Distribution for g")
 
@@ -908,6 +938,7 @@ colnames(hlcit_degree) <- c("hlcit","hlcit_degree")
 write.csv(hlcit_degree,file = paste0(DIR,"hlcit_degree.csv"))
 writeObj(hlcit_degree,file = paste0(DIR,"hlcit_degree.df"))
 
+
 # PLOT AGENCY GRAPH AND FILTER
 plot(vgg,
      layout = layout.fruchterman.reingold(vgg,
@@ -923,6 +954,7 @@ plot(vgg,
      edge.color = gray.colors(1),
      main = "VDC Aid Association Network
      (node degree = number of VDCs with same aid agency)")
+
 
 # REMOVE ISOLATED
 vgg <- drop_isolated(graph = vgg,
@@ -1066,7 +1098,7 @@ histP2(graph.strength(vgg),
 # TYPICALLY ON THE ORDER OF 1-10%
 100*graph.density(vgg)
 
-# CLUSTERS ARE CONNECTED COMPONENTS, WE HAVE 4 in the UNFILTERED AGENCY-VDC NETWORK 
+# CLUSTERS ARE CONNECTED COMPONENTS
 clusters(vgg)$no
 
 # SORTED CLUSTERS BY SIZE, NOTE THAT FILTRATIONS RESULT IN INCREASED NUMBER OF CLUSTERS AND A DROP IN CLUSTER SIZE
