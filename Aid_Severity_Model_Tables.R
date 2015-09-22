@@ -16,6 +16,10 @@
 # 
 #
 # LOAD PACKAGES
+library(mgcv)
+library(stats)
+library(cluster)
+library(fpc)
 library(plyr)
 library(dplyr)
 library(igraph)
@@ -316,6 +320,11 @@ for (k in 1:dim(need_attribute_table)[1]){
     }
   }
 
+# RESOLVE THE NAs
+need_attribute_table$hc_cnt[is.na(need_attribute_table$hc_cnt)] <- median(need_attribute_table$hc_cnt[!is.na(need_attribute_table$hc_cnt)])
+need_attribute_table$hc_wt_cnt[is.na(need_attribute_table$hc_wt_cnt)] <- median(need_attribute_table$hc_wt_cnt[!is.na(need_attribute_table$hc_wt_cnt)])
+
+
 
 # ADD NEPAL HAZARD SCORE
 for (k in 1:dim(need_attribute_table)[1]){
@@ -334,6 +343,169 @@ for (k in 1:dim(need_attribute_table)[1]){
 # INTERMEDIATE SAVE
 write.csv(need_attribute_table,file=paste0(DIR,"need_attribute_table.csv"))
 writeObj(need_attribute_table,file=paste0(DIR,"need_attribute_table.df"))
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+# K MEANS CLUSTERING
+#
+#
+#
+#
+#
+
+
+# K MEANS WITH ALL FEATURES
+vars_list <- c("hazard","exposure","housing","poverty","vulnerability","severity","lon","lat","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+modeling_table <- need_attribute_table[,vars_list]
+
+# K MEANS
+wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
+for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
+
+# PLOT CLUSTERS
+par(mfrow=c(3,3))
+plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
+for (k in 2:9){
+  kc <- kmeans(modeling_table,k)
+  plotcluster(modeling_table,
+              kc$cluster,
+              pch = 21,
+              main = paste("All Variables With", k, "Clusters:
+","Sizes",list(kc$size)))
+}
+
+
+
+# K MEANS WITH SELECTED FEATURES
+vars_list2 <- c("hazard","exposure","housing","poverty","severity","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+modeling_table <- need_attribute_table[,vars_list2]
+
+# K MEANS
+wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
+for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
+
+# PLOT CLUSTERS
+par(mfrow=c(3,3))
+plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
+for (k in 2:9){
+  kc <- kmeans(modeling_table,k)
+  plotcluster(modeling_table,
+              kc$cluster,
+              pch = 21,
+              main = paste("Selected Variables With", k, "Clusters:
+","Sizes",list(kc$size)))
+}
+
+
+
+# K MEANS WITH SELECTED FEATURES DROP OUTLIERS
+vars_list2 <- c("hazard","exposure","housing","poverty","severity","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+modeling_table <- need_attribute_table[,vars_list2]
+
+# DROP OUTLIERS
+modeling_table <- modeling_table[modeling_table$hazard < quantile(modeling_table$hazard,0.999),]
+modeling_table <- modeling_table[modeling_table$exposure < quantile(modeling_table$exposure,0.9999),]
+modeling_table <- modeling_table[modeling_table$severity < quantile(modeling_table$severity,0.9999),]
+modeling_table <- modeling_table[modeling_table$pop_density < quantile(modeling_table$pop_density,0.999),]
+modeling_table <- modeling_table[modeling_table$hc_wt_cnt < quantile(modeling_table$hc_wt_cnt,0.999),]
+
+
+# K MEANS
+wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
+for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
+
+# PLOT CLUSTERS
+par(mfrow=c(3,3))
+plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
+for (k in 2:9){
+  kc <- kmeans(modeling_table,k)
+  plotcluster(modeling_table,
+              kc$cluster,
+              pch = 21,
+              main = paste("Remove Outliers With", k, "Clusters:
+","Sizes",list(kc$size)))
+}
+
+
+
+# K MEANS WITH ALL FEATURES DROP OUTLIERS SCALE
+vars_list3 <- c("hlcit","hazard","exposure","housing","poverty","severity","lon","lat","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+modeling_table <- need_attribute_table[,vars_list3]
+
+# DROP OUTLIERS
+modeling_table <- modeling_table[modeling_table$hazard < quantile(modeling_table$hazard,0.999),]
+modeling_table <- modeling_table[modeling_table$exposure < quantile(modeling_table$exposure,0.9999),]
+modeling_table <- modeling_table[modeling_table$severity < quantile(modeling_table$severity,0.9999),]
+modeling_table <- modeling_table[modeling_table$pop_density < quantile(modeling_table$pop_density,0.999),]
+modeling_table <- modeling_table[modeling_table$hc_wt_cnt < quantile(modeling_table$hc_wt_cnt,0.999),]
+
+
+# ELIMINATE THE HLCIT CODES
+hlcit_bkp <- modeling_table$hlcit
+vars_list4 <- c("hazard","exposure","housing","poverty","severity","lon","lat","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+modeling_table <- modeling_table[,vars_list4]
+
+
+# SCALE TABLE
+modeling_table <- scale(modeling_table)
+
+# K MEANS
+wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
+for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
+
+# PLOT CLUSTERS
+par(mfrow=c(3,3))
+plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
+for (k in 2:9){
+  kc <- kmeans(modeling_table,k)
+  if (k==2){
+    kc2 <- as.data.frame(kc$cluster)
+  }
+  if (k==3){
+    kc3 <- as.data.frame(kc$cluster)
+  }
+  plotcluster(modeling_table,
+              kc$cluster,
+              pch = 21,
+              main = paste("Remove Outliers With", k, "Clusters:
+","Sizes",list(kc$size)))
+}
+
+# SAVE THE 2-CLUSTERS AND 3-CLUSTERS:
+clust_2 <- cbind.data.frame(hlcit_bkp,kc2)
+clust_3 <- cbind.data.frame(hlcit_bkp,kc3)
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# ANALYZE THE 2-CLUSTER and 3-CLUSTER CONFIGURATIONS:
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+
 
 
 
