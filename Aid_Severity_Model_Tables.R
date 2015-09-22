@@ -44,6 +44,8 @@ library(foreign)
 library(reshape2)
 library(igraph)
 library(RColorBrewer)
+library(ggplot2)
+library(plotrix)
 #
 #
 #
@@ -59,6 +61,29 @@ DIR <- "/Users/ggospodinov/Desktop/UN_OCHA_project/data/"
 #
 #
 #
+
+
+# DEFINE HISTOGRAM FORMATTING FUNCTIONS
+histP <- function(x,breaks, ...) {
+  H <- hist(x, plot = FALSE, breaks=breaks)
+  H$density <- with(H, 100 * density* diff(breaks)[1])
+  labs <- paste(round(H$density), "%", sep="")
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
+}
+
+histP1 <- function(x,breaks, ...) {
+  H <- hist(x, plot = FALSE, breaks=breaks)
+  H$density <- with(H, 100 * density* diff(breaks)[1])
+  labs <- ifelse(round(H$density)>0,paste(round(H$density), "%", sep=""),NA)
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
+}
+
+histP2 <- function(x,breaks, ...) {
+  H <- hist(x, plot = FALSE, breaks=breaks)
+  H$density <- with(H, 100 * density* diff(breaks)[1])
+  labs <- ifelse(round(H$density)>5,paste(round(H$density), "%", sep=""),NA)
+  plot(H, freq = FALSE, labels = labs, ylim=c(0, 1.08*max(H$density)),...)
+}
 
 
 # WRITE OBJECT FUNCTION
@@ -128,6 +153,77 @@ gcd.slc <- function(long1, lat1, long2, lat2) {
   R <- 6371 # Earth mean radius [km]
   d <- acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2) * cos(long2-long1)) * R
   return(d) # Distance in km
+}
+
+
+# BUILD HISTOGRAM PLOTS BY 2-CLUSTERS BY VARIABLE
+histogram2 <- function(df1,df2,var_name,breaks){
+  # extract data
+  data1 <- df1[[var_name]]
+  data2 <- df2[[var_name]]
+  data1 <- (data1-min(data1))/max(data1-min(data1))
+  data2 <- (data2-min(data2))/max(data2-min(data2))
+  cnt1 <- hist(data1, breaks = breaks, plot = FALSE)$counts
+  brk1 <- hist(data1, breaks = breaks, plot = FALSE)$breaks
+  cnt2 <- hist(data2, breaks = breaks, plot = FALSE)$counts
+  brk2 <- hist(data2, breaks = breaks, plot = FALSE)$breaks
+  pct1 <- 100*cnt1/sum(cnt1)
+  pct2 <- 100*cnt2/sum(cnt2)
+  bardata <- cbind(pct1,pct2)
+  barplot(t(bardata), 
+          beside = T,
+          xlab = paste("VDC Index For",var_name),
+          ylab = "Relative Percentages",
+          main = paste("Distribution Comparison For",var_name),
+          col = c("black","red"))
+  axis(1, 
+       at = 3*(1:length(brk1)-1)-1,
+       labels = NA,
+       cex.axis = 1,
+       las = 1)
+  legend("topright",
+         legend = c("Cluster 1","Cluster 2"),
+         fill = c("black","red"),
+         bty = "n",
+         cex = 1.2)
+}
+
+
+# BUILD HISTOGRAM PLOTS BY 3-CLUSTERS BY VARIABLE
+histogram3 <- function(df1,df2,df3,var_name,breaks){
+  # extract data
+  data1 <- df1[[var_name]]
+  data2 <- df2[[var_name]]
+  data3 <- df3[[var_name]]
+  data1 <- (data1-min(data1))/max(data1-min(data1))
+  data2 <- (data2-min(data2))/max(data2-min(data2))
+  data3 <- (data3-min(data3))/max(data3-min(data3))
+  cnt1 <- hist(data1, breaks = breaks, plot = FALSE)$counts
+  brk1 <- hist(data1, breaks = breaks, plot = FALSE)$breaks
+  cnt2 <- hist(data2, breaks = breaks, plot = FALSE)$counts
+  brk2 <- hist(data2, breaks = breaks, plot = FALSE)$breaks
+  cnt3 <- hist(data3, breaks = breaks, plot = FALSE)$counts
+  brk3 <- hist(data3, breaks = breaks, plot = FALSE)$breaks
+  pct1 <- 100*cnt1/sum(cnt1)
+  pct2 <- 100*cnt2/sum(cnt2)
+  pct3 <- 100*cnt3/sum(cnt3)
+  bardata <- cbind(pct1,pct2,pct3)
+  barplot(t(bardata), 
+          beside = T,
+          xlab = paste("VDC Index For",var_name),
+          ylab = "Relative Percentages",
+          main = paste("Distribution Comparison For",var_name),
+          col = c("black","red","green"))
+  axis(1, 
+       at = 4*(1:(length(brk1)-1))-2,
+       labels = NA,
+       cex.axis = 1,
+       las = 1)
+  legend("topright",
+         legend = c("VDC Cluster 1","VDC Cluster 2","VDC Cluster 3"),
+         fill = c("black","red","green"),
+         bty = "n",
+         cex = 1.5)
 }
 
 
@@ -483,7 +579,8 @@ for (k in 2:9){
 # SAVE THE 2-CLUSTERS AND 3-CLUSTERS:
 clust_2 <- cbind.data.frame(hlcit_bkp,kc2)
 clust_3 <- cbind.data.frame(hlcit_bkp,kc3)
-
+colnames(clust_2) <- c("hlcit","cluster")
+colnames(clust_3) <- c("hlcit","cluster")
 #
 #
 #
@@ -504,6 +601,40 @@ clust_3 <- cbind.data.frame(hlcit_bkp,kc3)
 #
 #
 #
+
+
+# SAVE CLUSTERS IN SEPARATE TABELS WITH ALL ORIGINAL VARIABLES
+clust_2a <- need_attribute_table[need_attribute_table$hlcit %in% clust_2[clust_2$cluster==1,]$hlcit,]
+clust_2b <- need_attribute_table[need_attribute_table$hlcit %in% clust_2[clust_2$cluster==2,]$hlcit,]
+clust_3a <- need_attribute_table[need_attribute_table$hlcit %in% clust_3[clust_3$cluster==1,]$hlcit,]
+clust_3b <- need_attribute_table[need_attribute_table$hlcit %in% clust_3[clust_3$cluster==2,]$hlcit,]
+clust_3c <- need_attribute_table[need_attribute_table$hlcit %in% clust_3[clust_3$cluster==3,]$hlcit,]
+
+# EDA COMPARISON OF SELECTED VARIABLES FOR EACH CLUSTER
+var_list5 <- c("hazard","exposure","housing","poverty","vulnerability","severity","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+clust_2ah <- clust_2a[,var_list5]
+clust_2bh <- clust_2b[,var_list5]
+clust_3ah <- clust_3a[,var_list5]
+clust_3bh <- clust_3b[,var_list5]
+clust_3ch <- clust_3c[,var_list5]
+
+
+# GENERATE THE 2-CLUSTER PLOTS
+par(mfrow=c(2,2))
+for (k in 1:dim(clust_2ah)[2]){
+  histogram2(clust_2ah,clust_2bh,colnames(clust_2ah)[k],breaks=20)
+}
+
+
+# GENERATE THE 3-CLUSTER PLOTS
+par(mfrow=c(2,2))
+for (k in 1:dim(clust_3ah)[2]){
+  histogram3(clust_3ah,clust_3bh,clust_3ch,colnames(clust_2ah)[k],breaks=10)
+}
+
+
+
+
 
 
 
