@@ -125,6 +125,13 @@ rm_space <- function(df){
   return(df)
 }
 
+# FUNCTION TO SET NAs TO MEAN
+nas_to_mean <- function(df){
+  for (i in 1:(dim(df)[2])){
+    df[is.na(df[,i]),i] <- mean(df[!is.na(df[,i]),i])
+  }
+  return(df)
+}
 
 # FUNCTION THAT TRIMS LEADING WHITESPACE
 trim.leading <- function (x)  sub("^\\s+", "", x)
@@ -328,7 +335,6 @@ deg2rad <- function(deg) return(deg*pi/180)
 #
 #
 
-
 # TRANSFORM HOSPITAL TYPE VARIABLE
 nepal_h$hf_type <- mapvalues(x = nepal_h$hf_type,
                              from = c("Sub Center","DPHO","Sub Health Post","Health Post","Hospital","Supply Center","Primary Health Center",
@@ -468,9 +474,9 @@ wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
 for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
 
 # PLOT CLUSTERS
-par(mfrow=c(3,3))
+par(mfrow=c(4,3))
 plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
-for (k in 2:9){
+for (k in 2:11){
   kc <- kmeans(modeling_table,k)
   plotcluster(modeling_table,
               kc$cluster,
@@ -490,9 +496,9 @@ wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
 for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
 
 # PLOT CLUSTERS
-par(mfrow=c(3,3))
+par(mfrow=c(4,3))
 plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
-for (k in 2:9){
+for (k in 2:12){
   kc <- kmeans(modeling_table,k)
   plotcluster(modeling_table,
               kc$cluster,
@@ -520,9 +526,9 @@ wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
 for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
 
 # PLOT CLUSTERS
-par(mfrow=c(3,3))
+par(mfrow=c(4,3))
 plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
-for (k in 2:9){
+for (k in 2:12){
   kc <- kmeans(modeling_table,k)
   plotcluster(modeling_table,
               kc$cluster,
@@ -548,7 +554,14 @@ modeling_table <- modeling_table[modeling_table$hc_wt_cnt < quantile(modeling_ta
 # ELIMINATE THE HLCIT CODES
 hlcit_bkp <- modeling_table$hlcit
 vars_list4 <- c("hazard","exposure","housing","poverty","severity","lon","lat","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
-modeling_table <- modeling_table[,vars_list4]
+modeling_table <- need_attribute_table[,vars_list4]
+
+# DROP OUTLIERS
+modeling_table <- modeling_table[modeling_table$hazard < quantile(modeling_table$hazard,0.999),]
+modeling_table <- modeling_table[modeling_table$exposure < quantile(modeling_table$exposure,0.9999),]
+modeling_table <- modeling_table[modeling_table$severity < quantile(modeling_table$severity,0.9999),]
+modeling_table <- modeling_table[modeling_table$pop_density < quantile(modeling_table$pop_density,0.999),]
+modeling_table <- modeling_table[modeling_table$hc_wt_cnt < quantile(modeling_table$hc_wt_cnt,0.999),]
 
 
 # SCALE TABLE
@@ -559,9 +572,9 @@ wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
 for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
 
 # PLOT CLUSTERS
-par(mfrow=c(3,3))
+par(mfrow=c(4,3))
 plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
-for (k in 2:9){
+for (k in 2:12){
   kc <- kmeans(modeling_table,k)
   if (k==2){
     kc2 <- as.data.frame(kc$cluster)
@@ -575,6 +588,64 @@ for (k in 2:9){
               main = paste("Remove Outliers With", k, "Clusters:
 ","Sizes",list(kc$size)))
 }
+
+
+
+
+
+
+
+# CREATE FINAL MODELING TABLE
+
+# ELIMINATE THE HLCIT CODES
+vars_list5 <- c("hlcit","hazard","exposure","housing","poverty","severity","lon","lat","vulnerability","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
+modeling_table <- need_attribute_table[,vars_list5]
+
+# DROP OUTLIERS
+modeling_table <- modeling_table[modeling_table$hazard < quantile(modeling_table$hazard,0.999),]
+modeling_table <- modeling_table[modeling_table$exposure < quantile(modeling_table$exposure,0.9999),]
+modeling_table <- modeling_table[modeling_table$severity < quantile(modeling_table$severity,0.9999),]
+modeling_table <- modeling_table[modeling_table$pop_density < quantile(modeling_table$pop_density,0.999),]
+modeling_table <- modeling_table[modeling_table$hc_wt_cnt < quantile(modeling_table$hc_wt_cnt,0.999),]
+
+
+
+# SAVE HLCIT
+hlcit_bkp <- modeling_table$hlcit
+
+
+# DROP HLCIT AND SCALE TABLE
+modeling_table <- modeling_table[,!(colnames(modeling_table) %in% "hlcit")]
+modeling_table <- scale(modeling_table)
+
+# K MEANS
+wss <- (nrow(modeling_table)-1)*sum(apply(modeling_table,2,var))
+for (i in 2:12) wss[i] <- sum(kmeans(modeling_table,centers=i)$withinss)
+
+# PLOT CLUSTERS
+par(mfrow=c(4,3))
+plot(1:12,wss, pch=19, main="Within Groups Sum of Squares")
+for (k in 2:12){
+  kc <- kmeans(modeling_table,k)
+  if (k==2){
+    kc2 <- as.data.frame(kc$cluster)
+  }
+  if (k==3){
+    kc3 <- as.data.frame(kc$cluster)
+  }
+  plotcluster(modeling_table,
+              kc$cluster,
+              pch = 21,
+              main = paste("Remove Outliers With", k, "Clusters:
+                           ","Sizes",list(kc$size)))
+}
+
+
+# SAVE FOR ANALYSIS
+write.csv(modeling_table,file=paste0(DIR,"modeling_table.csv"))
+writeObj(modeling_table,file=paste0(DIR,"modeling_table.df"))
+
+
 
 # SAVE THE 2-CLUSTERS AND 3-CLUSTERS:
 clust_2 <- cbind.data.frame(hlcit_bkp,kc2)
@@ -611,7 +682,6 @@ clust_3b <- need_attribute_table[need_attribute_table$hlcit %in% clust_3[clust_3
 clust_3c <- need_attribute_table[need_attribute_table$hlcit %in% clust_3[clust_3$cluster==3,]$hlcit,]
 
 # EDA COMPARISON OF SELECTED VARIABLES FOR EACH CLUSTER
-var_list5 <- c("hazard","exposure","housing","poverty","vulnerability","severity","pop_density","hc_wt_cnt","hazard_score","dist_epicenter")
 clust_2ah <- clust_2a[,var_list5]
 clust_2bh <- clust_2b[,var_list5]
 clust_3ah <- clust_3a[,var_list5]
@@ -634,9 +704,18 @@ for (k in 1:dim(clust_3ah)[2]){
 
 
 
-
-
-
+# IDENTIFY VDC FROM EACH CLUSTER THAT RECEIVED AID:
+aid_hlcit <- unique(aid_data$hlcit)
+aid_hlcit_2a <- aid_hlcit[aid_hlcit %in% unique(clust_2a$hlcit)]
+aid_hlcit_2b <- aid_hlcit[aid_hlcit %in% unique(clust_2b$hlcit)]
+length(aid_hlcit_2a)
+length(aid_hlcit_2b)
+aid_hlcit_3a <- aid_hlcit[aid_hlcit %in% unique(clust_3a$hlcit)]
+aid_hlcit_3b <- aid_hlcit[aid_hlcit %in% unique(clust_3b$hlcit)]
+aid_hlcit_3c <- aid_hlcit[aid_hlcit %in% unique(clust_3c$hlcit)]
+length(aid_hlcit_3a)
+length(aid_hlcit_3b)
+length(aid_hlcit_3c)
 
 
 

@@ -281,7 +281,7 @@ for (k in 1:dim(aid_data)[1]){
   aid_data$vdc[k] <- hlcit$vdc_name[which(hlcit$hlcit_code %in% aid_data$hlcit[k])[1]]
 }
 
-# SINCE aid_data$hlcit AND aid_data$vdc HAVE 239 ROWS OF SIMULTANEOUS NAs,
+# SINCE aid_data$hlcit AND aid_data$vdc HAVE 25 ROWS OF SIMULTANEOUS NAs,
 # WE DROP THESE ROWS
 aid_data <- aid_data[!is.na(aid_data$hlcit),]
 
