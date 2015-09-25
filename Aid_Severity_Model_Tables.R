@@ -1013,7 +1013,7 @@ for (k in 1:dim(need_attribute_table)[1]){
 q_lat <- 28.1473
 q_lon <- 84.7079
 for (k in 1:dim(need_attribute_table)[1]){
-  need_attribute_table$dist_epicenter[k] <- gcd.slc(deg2rad(need_attribute_table$lon[k]),deg2rad(need_attribute_table$lat[k]),q_lon,q_lat)
+  need_attribute_table$dist_epicenter[k] <- sqrt((need_attribute_table$lon[k]-q_lon)^2+(need_attribute_table$lat[k]-q_lat)^2)
 }
 
 # INTERMEDIATE SAVE
@@ -1034,10 +1034,7 @@ need_attribute_table <- readObj(file_name = paste0(DIR,"need_attribute_table.df"
 
 # DEFINE NEED
 
-need_attribute_table <- need_attribute_table[need_attribute_table$severity 
-                                             < quantile(need_attribute_table$severity,0.9999),]
-need_attribute_table <- need_attribute_table[need_attribute_table$hc_wt_cnt 
-                                             < quantile(need_attribute_table$hc_wt_cnt,0.999),]
+
 need_attribute_table$severity <- scale(need_attribute_table$severity)-
   min(scale(need_attribute_table$severity))
 need_attribute_table$hc_wt_cnt <- scale(need_attribute_table$hc_wt_cnt)-
@@ -1046,75 +1043,76 @@ need_attribute_table$dist_epicenter <- scale(need_attribute_table$dist_epicenter
   min(scale(need_attribute_table$dist_epicenter))
 
 
-need_attribute_table$need <- need_attribute_table$severity/
-                                   ((need_attribute_table$hc_wt_cnt/6+0.1)^(1/3)*
-                                      (need_attribute_table$dist_epicenter+0.1)^(1/3))
+need_attribute_table$need <- 3*(need_attribute_table$severity)/
+  (((need_attribute_table$hc_wt_cnt/6+0.1)^(1/3))*(need_attribute_table$dist_epicenter+0.1)^(1/3))
 
 summary(need_attribute_table$need)
 # OBSERVE THREE DIFFERENT GROUPS
-histP2(need_attribute_table$need, 
-       breaks = 50,
+hist(need_attribute_table$need[need_attribute_table$need<60], 
+       breaks = 100,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "VDC NEED FOR AID RANK",
        ylab = " FREQUENCY OF NEED RANK OCCURENCE",
        main = " DISTRIBUTION OF NEED FOR ALL VDCs")
 
+
+
 # BETTER VIEW
-hist(need_attribute_table$need[need_attribute_table$need<15], 
-       breaks = 50,
+hist(need_attribute_table$need[need_attribute_table$need<53], 
+       breaks = 100,
        col = adjustcolor(rgb(1,0,1,1)),
        xlab = "VDC NEED FOR AID RANK",
        ylab = " FREQUENCY OF NEED RANK OCCURENCE",
        main = " DISTRIBUTION OF NEED FOR ALL VDCs")
 rect(xleft = 0,
-     xright = 1.75,
+     xright = 5,
      ybottom = 0,
-     ytop = 1680,
+     ytop = 850,
      border = "darkblue",
      density = 7,
      col = "blue",
      lwd = 0.8)
-text(1.1,1200,
+text(2.55,600,
       "LOW
 NEED
-64.6%",
+64.9%",
       col = "darkblue",
       cex = 1.5,
      font = 2)
-rect(xleft = 1.75,
-     xright = 6.25,
-     ybottom = 0,
-     ytop = 400,
-     border = "darkblue",
-     density = 7,
-     col = "blue",
-     lwd = 0.8)
-text(4.15,250,
-     "MED
-NEED
-24.9%",
-     col = "darkblue",
-     cex = 1.5,
-     font = 2)
-rect(xleft = 6.25,
-     xright = 15,
+rect(xleft = 5,
+     xright = 17,
      ybottom = 0,
      ytop = 200,
      border = "darkblue",
      density = 7,
      col = "blue",
      lwd = 0.8)
-text(12,100,
-     "HIGH NEED 10.5%",
+text(12,130,
+     "MED
+NEED
+29.7%",
+     col = "darkblue",
+     cex = 1.5,
+     font = 2)
+rect(xleft = 17,
+     xright = 50,
+     ybottom = 0,
+     ytop = 100,
+     border = "darkblue",
+     density = 7,
+     col = "blue",
+     lwd = 0.8)
+text(35,50,
+     "HIGH NEED 5.4%",
      col = "darkblue",
      cex = 1.5,
      font = 2)
 
 
 # SEPARATE THE DIFFERNET CLUSTERS:
-low_need <- need_attribute_table[need_attribute_table$need <= 1.75,]
-med_need <- need_attribute_table[need_attribute_table$need > 1.75 & need_attribute_table$need <= 6.25,]
-high_need<- need_attribute_table[need_attribute_table$need > 6.25,]
+low_need <- need_attribute_table[need_attribute_table$need <= 5,]
+med_need <- need_attribute_table[need_attribute_table$need > 5 & need_attribute_table$need <= 20,]
+high_need<- need_attribute_table[need_attribute_table$need > 20,]
 
 # COMPUTE THE PERCENTAGES
 length(unique(low_need$hlcit))/length(unique(need_attribute_table$hlcit))
@@ -1197,19 +1195,25 @@ av <- graph.adjacency(aid_m,
 
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color <- rep("white",length(all)+length(u_hl)-length(hlc))
-for (k in 1:length(all)){
-  if(is.element(all[k],high_need$hlcit)){
+V(av)$color <- rep(NA,(length(ag)+1):unique(hlcit$hlcit_code)+length(ag))
+for (k in (length(ag)+1):unique(hlcit$hlcit_code)+length(ag)){
+  if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit) & 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- "red"
   }  
-  if(is.element(all[k],med_need$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],med_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- "orange"
   } 
-  if(is.element(all[k],low_need$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],low_need$hlcit) & 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit) &
+     (need_attribute_table$dist_epicenter[k] < quantile(need_attribute_table$dist_epicenter,0.85))){
     V(av)$color[k] <- "yellow"
   } 
+  if (need_attribute_table$lat[k]>q_lat+0.7*q_lat){
+    V(av)$color[k] <- NA
+  }
 }
-
 
 
 for (k in 1:dim(aid_m)[1]){
@@ -1221,32 +1225,13 @@ for (k in 1:dim(aid_m)[1]){
     V(av)$name[k] <- NA}
 }
 
-# PLOT THE AGENCY-VDC AID NETWORK
-plot(av,
-     layout = layout.fruchterman.reingold(av, 
-                                          niter = 200),
-     vertex.color = NA,
-     vertex.size = 2,
-     vertex.label = NA, 
-     vertex.label.color = "black", 
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.2, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.2,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Abstract Network (VDC Level)")
-legend("topleft",
-       c("Implementing Aid Agency","Aid Target VDC"),
-       fill = c("green","SkyBlue2"),
-       bty = "n")
-
 
 # PLOT THE AGENCY-VDC AID NETWORK
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
     V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
+    V(av)$color[k] <- "green"
   } else {
     V(av)$size[k] <- 1
     V(av)$name[k] <- NA}
@@ -1263,8 +1248,12 @@ plot(av,
      vertex.label = V(av)$name, 
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
-     vertex.label.cex = 0.75
-  )
+     vertex.label.cex = 0.75,
+     main = "Weighted Agency-VDC Aid Network (with Aid Heat Map)")
+legend("topright",
+       c("Implementing Aid Agency", "VDCs With Geo-Coordinates"),
+       fill = c("green","darkorange"),
+       bty = "n")
 
 
 
@@ -1310,24 +1299,31 @@ av <- graph.adjacency(aid_m)
 
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color <- rep("white",length(u_hl))
-for (k in 1:length(all)){
-  if(is.element(all[k],high_need$hlcit)){
+V(av)$color <- rep(NA,length(u_hl))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit) & 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- "red"
   }  
-  if(is.element(all[k],med_need$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],med_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- "orange"
   } 
-  if(is.element(all[k],low_need$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],low_need$hlcit) & 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit) &
+     (need_attribute_table$dist_epicenter[k] < quantile(need_attribute_table$dist_epicenter,0.85))){
     V(av)$color[k] <- "yellow"
   } 
+  if (need_attribute_table$lat[k]>q_lat+0.7*q_lat){
+    V(av)$color[k] <- NA
+  }
 }
 
 
 plot(av,
      layout = koords,
      vertex.color = V(av)$color,
-     vertex.size = 1,
+     vertex.size = 2,
      vertex.label = NA, 
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
@@ -1336,15 +1332,62 @@ plot(av,
 
 
 
+# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+V(av)$color <- rep(NA,length(u_hl))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit)){
+    V(av)$color[k] <- "red"
+  }  
+  if(is.element(unique(hlcit$hlcit_code)[k],med_need$hlcit)){
+    V(av)$color[k] <- "orange"
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],low_need$hlcit)){
+    V(av)$color[k] <- "yellow"
+  }
+  if (need_attribute_table[need_attribute_table$hlcit %in% hlcit$hlcit_code[k],]$dist_epicenter>
+      quantile(need_attribute_table$dist_epicenter,0.70)){
+    V(av)$color[k] <- "white"
+  }
+}
+
+
+plot(av,
+     layout = koords,
+     vertex.color = V(av)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75
+)
+
+
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# LAST ONE
+#
+#
+#
+#
+#
+#
+#
+#
+#
 
 
 
 
 
-
-
-
-# SELECT UNIQUE AGENCIES AND TARGET VDC
+# EXTRAPOLATE LHCIT NUMBERS FROM LAT AND LON FOR VDCS FROM HLCIT_MASTER
 ag <- unique(aid_data$impl_ag)
 hlc <- unique(aid_data$hlcit)
 all <- union(ag,hlc)
@@ -1358,12 +1401,13 @@ for (k in 1:length(hlc)){
   xc[k] <- hlcit$lon[which(hlcit$hlcit_code==hlc[k])[1]]
   yc[k] <- hlcit$lat[which(hlcit$hlcit_code==hlc[k])[1]]
 }
-koords<-cbind(xc,yc)
+koords3 <- cbind(xc,yc)
 
 xa <- 71+9*runif(length(ag))
 ya <- 25+8*runif(length(ag))
 koords1 <-cbind(xa,ya)
-koords2<- rbind(koords1,koords)
+koords2<- rbind(koords1,koords3)
+
 
 # DEFINE THE AGENCY-VDC AID NETWORK ADJACENCY MATRIX
 aid_m <- matrix(0,nrow=length(all),ncol=length(all))
@@ -1381,51 +1425,40 @@ av <- graph.adjacency(aid_m,
 
 # COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
 V(av)$color <- rep("green",length(all))
-for (k in 1:length(all)){
-  if(is.element(all[k],hlc)){
-    V(av)$color[k] <- "SkyBlue2"
-  }  
-}
+
 
 for (k in 1:dim(aid_m)[1]){
   if(k-1<length(ag)){
     V(av)$size[k] <- 3
     V(av)$name[k] <- ag[k]
   } else {
-    V(av)$size[k] <- 2
-    V(av)$name[k] <- NA}
-}
-
-# PLOT THE AGENCY-VDC AID NETWORK
-plot(av,
-     layout = layout.fruchterman.reingold(av, 
-                                          niter = 200),
-     vertex.color = V(av)$color,
-     vertex.size = V(av)$size,
-     vertex.label = NA, 
-     vertex.label.color = "black", 
-     vertex.label.font = 1, 
-     vertex.label.cex = 0.2, 
-     edge.width = 0.2*sqrt(E(av)$weight),
-     edge.arrow.size = 0.2,
-     edge.curved = TRUE,
-     edge.color = gray.colors(1),
-     main = "Weighted Agency-VDC Aid Abstract Network (VDC Level)")
-legend("topleft",
-       c("Implementing Aid Agency","Aid Target VDC"),
-       fill = c("green","SkyBlue2"),
-       bty = "n")
-
-
-# PLOT THE AGENCY-VDC AID NETWORK
-for (k in 1:dim(aid_m)[1]){
-  if(k-1 < length(ag)){
-    V(av)$size[k] <- 3
-    V(av)$name[k] <- ag[k]
-  } else {
     V(av)$size[k] <- 1
     V(av)$name[k] <- NA}
 }
+
+
+# PLOT THE AGENCY-VDC AID NETWORK
+V(av)$color <- rep("green",length(all))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit) & 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- "red"
+  }  
+  if(is.element(unique(hlcit$hlcit_code)[k],med_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- "orange"
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],low_need$hlcit) & 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit) &
+     (need_attribute_table$dist_epicenter[k] < quantile(need_attribute_table$dist_epicenter,0.85))){
+    V(av)$color[k] <- "yellow"
+  } 
+  if (need_attribute_table$lat[k]>q_lat+0.7*q_lat){
+    V(av)$color[k] <- NA
+  }
+}
+
+
 
 plot(av,
      layout = koords2,
@@ -1442,8 +1475,100 @@ plot(av,
      main = "Nepal Agency-VDC Aid Relief Geo-Network")
 legend("topleft",
        c("Implementing Aid Agency","VDC With Geo-Coordinates"),
-       fill = c("green","SkyBlue2"),
+       fill = c("green","darkorange"),
        bty = "n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+#
+# AID RECEIVED
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
+
+
+
+# IDENTIFY VDC FROM EACH CLUSTER THAT RECEIVED AID:
+aid_hlcit <- unique(aid_data$hlcit)
+aid_hlcit_2a <- aid_hlcit[aid_hlcit %in% unique(clust_2a$hlcit)]
+aid_hlcit_2b <- aid_hlcit[aid_hlcit %in% unique(clust_2b$hlcit)]
+length(aid_hlcit_2a)
+length(aid_hlcit_2b)
+aid_hlcit_3a <- aid_hlcit[aid_hlcit %in% unique(clust_3a$hlcit)]
+aid_hlcit_3b <- aid_hlcit[aid_hlcit %in% unique(clust_3b$hlcit)]
+aid_hlcit_3c <- aid_hlcit[aid_hlcit %in% unique(clust_3c$hlcit)]
+
+
+# CHECK RELATIVE SIZES
+length(aid_hlcit_3a)
+length(aid_hlcit_3b)
+length(aid_hlcit_3c)
+dim(clust_3a)[1]
+dim(clust_3b)[1]
+dim(clust_3c)[1]
+
+
+# CREATE THE THREE AID TABLES
+aid_data_3a <- aid_data[aid_data$hlcit %in% aid_hlcit_3a,]
+aid_data_3b <- aid_data[aid_data$hlcit %in% aid_hlcit_3b,]
+aid_data_3c <- aid_data[aid_data$hlcit %in% aid_hlcit_3c,]
+
+
+# COUNT WEIGHTED SUM OF INSTANCES OF AID
+length(aid_hlcit_3a)/dim(clust_3ah)[1]
+length(aid_hlcit_3b)/dim(clust_3bh)[1]
+length(aid_hlcit_3c)/dim(clust_3ch)[1]
+
+
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
 
 
 
