@@ -529,7 +529,7 @@ hist(need_attribute_table$need[need_attribute_table$need < 45],
 rect(xleft = 0,
      xright = 3.75,
      ybottom = 0,
-     ytop = 810,
+     ytop = 900,
      border = "blue",
      density = 7,
      col = "blue",
@@ -821,34 +821,33 @@ DENSITY OF HEALTH CENTERS, AND SEVERITY")
 
 
 
-# NEED BASED HEAT MAP, 8 GROUPS
-V(av)$color <- rep(NA,length(u_hl))
+# NO AID NEED BASED HEAT MAP, 8 GROUPS
+V(av)$color <- rep("white",length(u_hl))
 for (k in 1:length(unique(hlcit$hlcit_code))){
-  if(is.element(unique(hlcit$hlcit_code)[k],A1_need$hlcit)& 
-     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],A1_need$hlcit) & 
+     !is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- cl1[1]
   } 
-  if(is.element(unique(hlcit$hlcit_code)[k],B1_need$hlcit)& 
-     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],B1_need$hlcit) & 
+     !is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- cl1[2]
   }  
-  if(is.element(unique(hlcit$hlcit_code)[k],C1_need$hlcit)& 
-     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],C1_need$hlcit) & 
+     !is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- cl1[3]
   } 
-  if(is.element(unique(hlcit$hlcit_code)[k],D1_need$hlcit)& 
-     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],D1_need$hlcit) & 
+     !is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- cl1[4]
   } 
-  if(is.element(unique(hlcit$hlcit_code)[k],E1_need$hlcit)& 
-     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],E1_need$hlcit) & 
+     !is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- cl1[5]
   } 
-  if(is.element(unique(hlcit$hlcit_code)[k],F1_need$hlcit)& 
-     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+  if(is.element(unique(hlcit$hlcit_code)[k],F1_need$hlcit) & 
+     !is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
     V(av)$color[k] <- cl1[6]
   } 
-  
 }
 plot(av,
      layout = koords,
@@ -858,8 +857,8 @@ plot(av,
      vertex.label.color = "darkgreen", 
      vertex.label.font = 1, 
      vertex.label.cex = 0.75,
-     main = "NO AID VDC NEED HEAT MAP BASED ON DISTANCE TO EPICENTER,
-     DENSITY OF HEALTH CENTERS, AND SEVERITY")
+     main = "NO AID VDC NEED HEAT MAP BASED ON 
+DISTANCE TO EPICENTER,DENSITY OF HEALTH CENTERS, AND SEVERITY")
 
 
 
