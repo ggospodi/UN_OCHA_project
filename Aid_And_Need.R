@@ -416,11 +416,8 @@ for (k in 1:dim(sev_hlcit)[1]){
 need_attribute_table <- sev_hlcit
 for (k in 1:dim(need_attribute_table)[1]){
   if (need_attribute_table$hlcit[k] %in% hlcit$hlcit_code){
-    need_attribute_table$lon[k] <- mean(hlcit[hlcit$hlcit_code %in% need_attribute_table$hlcit[k],]$lon)
-    need_attribute_table$lat[k] <- mean(hlcit[hlcit$hlcit_code %in% need_attribute_table$hlcit[k],]$lat)
-  } else {
-    need_attribute_table$lon[k] <- NA
-    need_attribute_table$lat[k] <- NA
+    need_attribute_table$lon[k] <- hlcit[hlcit$hlcit_code %in% need_attribute_table$hlcit[k],]$lon
+    need_attribute_table$lat[k] <- hlcit[hlcit$hlcit_code %in% need_attribute_table$hlcit[k],]$lat
   }
 }
 
@@ -498,48 +495,53 @@ need_attribute_table$dist_epicenter <- scale(need_attribute_table$dist_epicenter
   min(scale(need_attribute_table$dist_epicenter))
 
 
-need_attribute_table$need <- 3*(need_attribute_table$severity)/
-  (((need_attribute_table$hc_wt_cnt/6+0.1)^(1/3))*(need_attribute_table$dist_epicenter+0.1)^(1/3))
+need_attribute_table$need <- 
+  5*(need_attribute_table$severity)/
+  (((need_attribute_table$hc_wt_cnt/6+1)^(1/3))*(need_attribute_table$dist_epicenter+0.1)^(1/3))
 
-
+need_attribute_table$need <- round(need_attribute_table$need,2)
 
 summary(need_attribute_table$need)
 # OBSERVE THREE DIFFERENT GROUPS
-hist(need_attribute_table$need[need_attribute_table$need < 67], 
+hist(need_attribute_table$need, 
        breaks = 100,
-       col = rev(heat.colors(1+1.5*max(as.integer(need_attribute_table$need[need_attribute_table$need < 60])))),
+       col = rev(heat.colors(max(as.integer(0.9*need_attribute_table$need)))),
        xlab = "VDC NEED FOR AID RANK",
        ylab = " FREQUENCY OF NEED RANK OCCURENCE",
        main = " DISTRIBUTION OF NEED FOR ALL VDCs")
 
-
-
+hist(need_attribute_table$need[need_attribute_table$need < 45], 
+     breaks = 100,
+     col = rev(heat.colors(max(as.integer(0.9*need_attribute_table$need)))),
+     xlab = "VDC NEED FOR AID RANK",
+     ylab = " FREQUENCY OF NEED RANK OCCURENCE",
+     main = " DISTRIBUTION OF NEED FOR ALL VDCs")
 
 
 
 # A VIEW OF THE DISTRIBUTION WITH THE GROUPING BY NEED
-hist(need_attribute_table$need[need_attribute_table$need < 43], 
+hist(need_attribute_table$need[need_attribute_table$need < 45], 
        breaks = 100,
-       col = rev(heat.colors(1+1.85*max(as.integer(need_attribute_table$need[need_attribute_table$need < 43])))),
+       col = rev(heat.colors(1+2*max(as.integer(need_attribute_table$need[need_attribute_table$need < 45])))),
        xlab = "VDC NEED FOR AID RANK",
        ylab = " FREQUENCY OF NEED RANK OCCURENCE",
        main = " DISTRIBUTION OF NEED FOR ALL VDCs")
 rect(xleft = 0,
-     xright = 4.75,
+     xright = 3.75,
      ybottom = 0,
      ytop = 810,
      border = "blue",
      density = 7,
      col = "blue",
      lwd = 0.8)
-text(3,600,
+text(2,600,
       "LOW
 NEED
-63.9%",
+64.1%",
       col = "blue",
       cex = 1.5,
      font = 2)
-rect(xleft = 4.75,
+rect(xleft = 3.75,
      xright = 20,
      ybottom = 0,
      ytop = 300,
@@ -550,7 +552,7 @@ rect(xleft = 4.75,
 text(12,200,
      "MED
 NEED
-30.7%",
+33.0%",
      col = "blue",
      cex = 1.5,
      font = 2)
@@ -563,7 +565,7 @@ rect(xleft = 20,
      col = "blue",
      lwd = 0.8)
 text(30,75,
-     "HIGH NEED 5.4%",
+     "HIGH NEED 2.9%",
      col = "blue",
      cex = 1.5,
      font = 2)
@@ -572,8 +574,8 @@ text(30,75,
 
 
 # SEPARATE THE DIFFERNET CLUSTERS:
-low_need <- need_attribute_table[need_attribute_table$need <= 4.75,]
-med_need <- need_attribute_table[need_attribute_table$need > 4.75 & need_attribute_table$need <= 20,]
+low_need <- need_attribute_table[need_attribute_table$need <= 3.75,]
+med_need <- need_attribute_table[need_attribute_table$need > 3.75 & need_attribute_table$need <= 20,]
 high_need<- need_attribute_table[need_attribute_table$need > 20,]
 
 # COMPUTE THE PERCENTAGES
@@ -583,8 +585,37 @@ length(unique(high_need$hlcit))/length(unique(need_attribute_table$hlcit))
 
 
 
+# SEPARATE THE DIFFERNET CLUSTERS INTO 14:
+A0_need <- need_attribute_table[need_attribute_table$need <= 1,]
+A_need <- need_attribute_table[need_attribute_table$need > 1 & need_attribute_table$need <= 3,]
+B_need <- need_attribute_table[need_attribute_table$need > 3 & need_attribute_table$need <= 6,]
+C_need <- need_attribute_table[need_attribute_table$need > 6 & need_attribute_table$need <= 9,]
+D_need <- need_attribute_table[need_attribute_table$need > 9 & need_attribute_table$need <= 12,]
+E_need <- need_attribute_table[need_attribute_table$need > 12 & need_attribute_table$need <= 15,]
+F_need <- need_attribute_table[need_attribute_table$need > 15 & need_attribute_table$need <= 18,]
+G_need <- need_attribute_table[need_attribute_table$need > 18 & need_attribute_table$need <= 21,]
+H_need <- need_attribute_table[need_attribute_table$need > 21 & need_attribute_table$need <= 24,]
+I_need <- need_attribute_table[need_attribute_table$need > 24 & need_attribute_table$need <= 27,]
+J_need <- need_attribute_table[need_attribute_table$need > 27 & need_attribute_table$need <= 30,]
+K_need <- need_attribute_table[need_attribute_table$need > 31 & need_attribute_table$need <= 34,]
+L_need <- need_attribute_table[need_attribute_table$need > 34 & need_attribute_table$need <= 37,]
+M_need<- need_attribute_table[need_attribute_table$need > 37,]
 
 
+cl <- rev(heat.colors(42))[3*(0:13)]
+
+
+
+# SEPARATE THE DIFFERNET CLUSTERS INTO 5:
+A1_need <- need_attribute_table[need_attribute_table$need <= 0.5,]
+B1_need <- need_attribute_table[need_attribute_table$need > 0.5 & need_attribute_table$need <= 1.5,]
+C1_need <- need_attribute_table[need_attribute_table$need > 1.5 & need_attribute_table$need <= 5,]
+D1_need <- need_attribute_table[need_attribute_table$need > 5 & need_attribute_table$need <= 11,]
+E1_need <- need_attribute_table[need_attribute_table$need > 11 & need_attribute_table$need <= 20,]
+F1_need <- need_attribute_table[need_attribute_table$need > 20,]
+
+
+cl1 <- rev(heat.colors(18)[3*(1:6)])
 
 
 
@@ -622,8 +653,8 @@ aid_m <- matrix(0,
 av <- graph.adjacency(aid_m)
 
 
-# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
-V(av)$color <- rep(NA,length(u_hl))
+# # NEED BASED HEAT MAP, 3 GROUPS WHERE AID WAS SENT
+V(av)$color <- rep("white",length(u_hl))
 for (k in 1:length(unique(hlcit$hlcit_code))){
   if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit) & 
      is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
@@ -639,7 +670,33 @@ for (k in 1:length(unique(hlcit$hlcit_code))){
     V(av)$color[k] <- "yellow"
   } 
   if (need_attribute_table$lat[k]>q_lat+0.7*q_lat){
-    V(av)$color[k] <- NA
+    V(av)$color[k] <- "white"
+  }
+}
+
+
+plot(av,
+     layout = koords,
+     vertex.color = V(av)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75
+)
+
+
+# NEED BASED HEAT MAP, 3 GROUPS
+V(av)$color <- rep(NA,length(u_hl))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit)){
+    V(av)$color[k] <- "red"
+  }  
+  if(is.element(unique(hlcit$hlcit_code)[k],med_need$hlcit)){
+    V(av)$color[k] <- "orange"
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],low_need$hlcit)){
+    V(av)$color[k] <- "yellow"
   }
 }
 
@@ -656,7 +713,167 @@ plot(av,
 
 
 
-# COLOR VERTICES REPRESENTING AGENCIES (GREEN) AND VDCs (BLUE) WHERE AID WAS SENT
+
+# NEED BASED HEAT MAP, 8 GROUPS
+V(av)$color <- rep(NA,length(u_hl))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],A0_need$hlcit)){
+    V(av)$color[k] <- cl[1]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],A_need$hlcit)){
+    V(av)$color[k] <- cl[2]
+  }  
+  if(is.element(unique(hlcit$hlcit_code)[k],B_need$hlcit)){
+    V(av)$color[k] <- cl[3]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],C_need$hlcit)){
+    V(av)$color[k] <- cl[4]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],D_need$hlcit)){
+    V(av)$color[k] <- cl[5]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],E_need$hlcit)){
+    V(av)$color[k] <- cl[6]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],F_need$hlcit)){
+    V(av)$color[k] <- cl[7]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],G_need$hlcit)){
+    V(av)$color[k] <- cl[8]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],H_need$hlcit)){
+    V(av)$color[k] <- cl[9]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],I_need$hlcit)){
+    V(av)$color[k] <- cl[10]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],J_need$hlcit)){
+    V(av)$color[k] <- cl[11]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],K_need$hlcit)){
+    V(av)$color[k] <- cl[12]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],L_need$hlcit)){
+    V(av)$color[k] <- cl[13]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],M_need$hlcit)){
+    V(av)$color[k] <- cl[14]
+  } 
+  
+}
+
+
+plot(av,
+     layout = koords,
+     vertex.color = V(av)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75
+)
+
+
+
+
+
+
+
+
+# NEED BASED HEAT MAP, 8 GROUPS
+V(av)$color <- rep(NA,length(u_hl))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],A1_need$hlcit)){
+    V(av)$color[k] <- cl1[1]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],B1_need$hlcit)){
+    V(av)$color[k] <- cl1[2]
+  }  
+  if(is.element(unique(hlcit$hlcit_code)[k],C1_need$hlcit)){
+    V(av)$color[k] <- cl1[3]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],D1_need$hlcit)){
+    V(av)$color[k] <- cl1[4]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],E1_need$hlcit)){
+    V(av)$color[k] <- cl1[5]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],F1_need$hlcit)){
+    V(av)$color[k] <- cl1[6]
+  } 
+}
+plot(av,
+     layout = koords,
+     vertex.color = V(av)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75,
+     main = "VDC NEED HEAT MAP BASED ON DISTANCE TO EPICENTER,
+DENSITY OF HEALTH CENTERS, AND SEVERITY")
+
+
+
+
+
+
+
+
+
+# NEED BASED HEAT MAP, 8 GROUPS
+V(av)$color <- rep(NA,length(u_hl))
+for (k in 1:length(unique(hlcit$hlcit_code))){
+  if(is.element(unique(hlcit$hlcit_code)[k],A1_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- cl1[1]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],B1_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- cl1[2]
+  }  
+  if(is.element(unique(hlcit$hlcit_code)[k],C1_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- cl1[3]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],D1_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- cl1[4]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],E1_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- cl1[5]
+  } 
+  if(is.element(unique(hlcit$hlcit_code)[k],F1_need$hlcit)& 
+     is.element(unique(hlcit$hlcit_code)[k],aid_data$hlcit)){
+    V(av)$color[k] <- cl1[6]
+  } 
+  
+}
+plot(av,
+     layout = koords,
+     vertex.color = V(av)$color,
+     vertex.size = 2,
+     vertex.label = NA, 
+     vertex.label.color = "darkgreen", 
+     vertex.label.font = 1, 
+     vertex.label.cex = 0.75,
+     main = "NO AID VDC NEED HEAT MAP BASED ON DISTANCE TO EPICENTER,
+     DENSITY OF HEALTH CENTERS, AND SEVERITY")
+
+
+
+
+
+
+
+
+
+
+
+
+
+# NEED BASED HEAT MAP, 3 GROUPS, WITH WHITE OUTSIDE OF 30% OF LOW NEED AREA
 V(av)$color <- rep(NA,length(u_hl))
 for (k in 1:length(unique(hlcit$hlcit_code))){
   if(is.element(unique(hlcit$hlcit_code)[k],high_need$hlcit)){
@@ -688,16 +905,9 @@ plot(av,
 
 
 # CONTINUOUS HEAT MAP
-
-
-
-
-
-
 V(av)$color <- rep(NA,length(u_hl))
-for (k in 1:length(unique(hlcit$hlcit_code))){
-  V(av)$color[k] <- rev(heat.colors(1+max(as.integer(1.2*need_attribute_table$need))))[as.integer(need_attribute_table$need)[k]+1]
-  
+for (k in 1:length(unique(u_hl))){
+  V(av)$color[k] <- rev(heat.colors(1+max(as.integer(need_attribute_table$need))))[as.integer(need_attribute_table$need)[k]+1]
 }
 
 
