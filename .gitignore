@@ -1,3 +1,15 @@
-.Rproj.user
+# R environment
 .Rhistory
+.Rapp.history
 .RData
+.Ruserdata
+.Rproj.user/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
